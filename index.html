@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="贪吃蛇游戏 - 经典游戏，现代体验">
+    <title>贪吃蛇</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- 动态背景 -->
+    <div class="bg-animation">
+        <div class="bg-orb bg-orb--cyan"></div>
+        <div class="bg-orb bg-orb--fuchsia"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar__user">
+            <span class="navbar__user-icon">👤</span>
+            <span class="navbar__user-name" id="userName">游客</span>
+            <span class="navbar__stats" id="userStats"></span>
+        </div>
+        <button class="btn btn--ghost" id="logoutBtn">退出</button>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="page-container" style="padding-top: 80px;">
+        <div class="content-wrapper" style="max-width: 500px;">
+            <div class="glass-card">
+                <!-- 标题 -->
+                <h1 class="title gradient-text" style="font-size: 2rem; margin-bottom: 0.5rem;">🐍 贪吃蛇</h1>
+
+                <!-- 游戏画布 -->
+                <div class="game-canvas-wrapper">
+                    <canvas id="gameCanvas" class="game-canvas" width="400" height="400"></canvas>
+                </div>
+
+                <!-- 游戏信息 -->
+                <div class="game-info">
+                    <div class="game-stat">
+                        <div class="game-stat__label">当前分数</div>
+                        <div class="game-stat__value" id="currentScore">0</div>
+                    </div>
+                    <div class="game-stat">
+                        <div class="game-stat__label">最高分</div>
+                        <div class="game-stat__value" id="highScore">0</div>
+                    </div>
+                </div>
+
+                <!-- 速度控制 -->
+                <div class="speed-control">
+                    <label class="speed-control__label">
+                        <span>🚀 速度</span>
+                        <span class="speed-control__value" id="speedValue">中等</span>
+                    </label>
+                    <input type="range" id="speedSlider" class="speed-slider" min="1" max="5" value="3">
+                    <div class="speed-control__labels">
+                        <span>慢</span>
+                        <span>快</span>
+                    </div>
+                </div>
+
+                <!-- 游戏控制 -->
+                <div class="game-controls">
+                    <p class="game-status" id="gameStatus">按下空格键或点击按钮开始</p>
+                    <button class="btn btn--primary btn--large" id="startBtn">🎮 开始游戏</button>
+                </div>
+
+                <!-- 排行榜 -->
+                <div class="leaderboard" id="leaderboard">
+                    <h3 class="leaderboard__title">🏆 排行榜</h3>
+                    <ul class="leaderboard__list" id="leaderboardList">
+                        <li class="leaderboard__item">
+                            <span class="leaderboard__rank">-</span>
+                            <span class="leaderboard__name">暂无记录</span>
+                            <span class="leaderboard__score">-</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/game.js"></script>
+    <script>
+        // 检查登录状态
+        const currentUser = Auth.getCurrentUser();
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+
+        // DOM 元素
+        const userNameEl = document.getElementById('userName');
+        const userStatsEl = document.getElementById('userStats');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const currentScoreEl = document.getElementById('currentScore');
+        const highScoreEl = document.getElementById('highScore');
+        const gameStatusEl = document.getElementById('gameStatus');
+        const startBtn = document.getElementById('startBtn');
+        const leaderboardListEl = document.getElementById('leaderboardList');
+        const canvas = document.getElementById('gameCanvas');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValueEl = document.getElementById('speedValue');
+
+        // 初始化用户信息
+        function initUserInfo() {
+            if (currentUser) {
+                userNameEl.textContent = currentUser.username;
+                highScoreEl.textContent = currentUser.highScore || 0;
+                if (currentUser.isGuest) {
+                    userStatsEl.textContent = '(游客模式)';
+                } else {
+                    userStatsEl.textContent = `| 游戏次数: ${currentUser.gamesPlayed || 0}`;
+                }
+            }
+        }
+
+        // 更新排行榜显示
+        function updateLeaderboard() {
+            const leaderboard = Storage.getLeaderboard();
+
+            if (leaderboard.length === 0) {
+                leaderboardListEl.innerHTML = `
+                    <li class="leaderboard__item">
+                        <span class="leaderboard__rank">-</span>
+                        <span class="leaderboard__name">暂无记录</span>
+                        <span class="leaderboard__score">-</span>
+                    </li>
+                `;
+                return;
+            }
+
+            leaderboardListEl.innerHTML = leaderboard.map((entry, index) => `
+                <li class="leaderboard__item">
+                    <span class="leaderboard__rank">#${index + 1}</span>
+                    <span class="leaderboard__name">${entry.username}</span>
+                    <span class="leaderboard__score">${entry.score}</span>
+                </li>
+            `).join('');
+        }
+
+        // 速度配置（值越小越快）
+        const speedLevels = {
+            1: { ms: 200, label: '很慢' },
+            2: { ms: 150, label: '慢' },
+            3: { ms: 100, label: '中等' },
+            4: { ms: 70, label: '快' },
+            5: { ms: 50, label: '很快' }
+        };
+
+        // 更新速度显示
+        function updateSpeedDisplay() {
+            const level = speedSlider.value;
+            speedValueEl.textContent = speedLevels[level].label;
+        }
+
+        // 速度滑块事件
+        speedSlider.addEventListener('input', () => {
+            updateSpeedDisplay();
+            const level = speedSlider.value;
+            game.setSpeed(speedLevels[level].ms);
+        });
+
+        // 初始化游戏
+        const game = new SnakeGame(canvas, {
+            onScoreChange: (score) => {
+                currentScoreEl.textContent = score;
+            },
+            onGameOver: (finalScore) => {
+                // 触发震动效果
+                const canvasWrapper = document.querySelector('.game-canvas-wrapper');
+                canvasWrapper.classList.add('shake');
+                setTimeout(() => canvasWrapper.classList.remove('shake'), 500);
+
+                gameStatusEl.textContent = `游戏结束！得分: ${finalScore}`;
+                startBtn.textContent = '🔄 重新开始';
+                startBtn.classList.remove('hidden');
+                speedSlider.disabled = false; // 游戏结束后启用速度滑块
+
+                // 更新分数
+                const isNewRecord = Auth.updateScore(finalScore);
+                if (isNewRecord) {
+                    gameStatusEl.textContent = `🎉 新纪录！得分: ${finalScore}`;
+                }
+
+                // 刷新用户信息和排行榜
+                const updatedUser = Auth.getCurrentUser();
+                if (updatedUser) {
+                    highScoreEl.textContent = updatedUser.highScore;
+                    if (!updatedUser.isGuest) {
+                        userStatsEl.textContent = `| 游戏次数: ${updatedUser.gamesPlayed || 0}`;
+                    }
+                }
+                updateLeaderboard();
+            },
+            onGameStart: () => {
+                gameStatusEl.textContent = '游戏中... 使用方向键或WASD控制';
+                startBtn.classList.add('hidden');
+                speedSlider.disabled = true; // 游戏中禁用速度滑块
+            }
+        });
+
+        // 开始游戏按钮
+        startBtn.addEventListener('click', () => {
+            // 应用当前速度设置
+            const level = speedSlider.value;
+            game.setSpeed(speedLevels[level].ms);
+            game.start();
+        });
+
+        // 空格键开始/重新开始
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !game.isRunning) {
+                e.preventDefault();
+                game.start();
+            }
+        });
+
+        // 退出登录
+        logoutBtn.addEventListener('click', () => {
+            Auth.logout();
+            window.location.href = 'login.html';
+        });
+
+        // 初始化
+        initUserInfo();
+        updateLeaderboard();
+    </script>
+</body>
+
+</html>

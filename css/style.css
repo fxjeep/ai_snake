@@ -1,0 +1,704 @@
+/* ========================================
+   贪吃蛇游戏 - 设计系统
+   ======================================== */
+
+/* Google Fonts - Outfit */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ========================================
+   CSS 变量 - 颜色系统
+   ======================================== */
+:root {
+    /* 背景色 */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+
+    /* 主色调 */
+    --color-cyan: #00d4ff;
+    --color-cyan-dark: #00a8cc;
+    --color-fuchsia: #d946ef;
+    --color-fuchsia-dark: #a855f7;
+
+    /* 文字色 */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.5);
+
+    /* 毛玻璃效果 */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-hover: rgba(255, 255, 255, 0.2);
+
+    /* 阴影与发光 */
+    --shadow-cyan: 0 0 20px rgba(0, 212, 255, 0.4);
+    --shadow-cyan-strong: 0 0 30px rgba(0, 212, 255, 0.6);
+    --shadow-fuchsia: 0 0 20px rgba(217, 70, 239, 0.4);
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    /* 渐变 */
+    --gradient-primary: linear-gradient(135deg, var(--color-cyan), var(--color-fuchsia));
+    --gradient-button: linear-gradient(135deg, var(--color-cyan), var(--color-cyan-dark));
+    --gradient-text: linear-gradient(to right, var(--color-cyan), var(--color-fuchsia));
+
+    /* 间距 */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+
+    /* 圆角 */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+
+    /* 过渡 */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* ========================================
+   基础重置
+   ======================================== */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* ========================================
+   动态背景 - 漂浮光球
+   ======================================== */
+.bg-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: float 20s ease-in-out infinite;
+}
+
+.bg-orb--cyan {
+    width: 500px;
+    height: 500px;
+    background: var(--color-cyan);
+    top: -150px;
+    left: -150px;
+    animation-delay: 0s;
+}
+
+.bg-orb--fuchsia {
+    width: 400px;
+    height: 400px;
+    background: var(--color-fuchsia);
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -10s;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+        transform: translate(50px, 30px) scale(1.05);
+    }
+
+    50% {
+        transform: translate(20px, 60px) scale(0.95);
+    }
+
+    75% {
+        transform: translate(-30px, 20px) scale(1.02);
+    }
+}
+
+/* ========================================
+   毛玻璃容器
+   ======================================== */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    padding: var(--spacing-lg);
+    transition: all var(--transition-normal);
+}
+
+.glass-card:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+}
+
+/* ========================================
+   渐变文字
+   ======================================== */
+.gradient-text {
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ========================================
+   按钮样式
+   ======================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: 0.75rem 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.btn--primary {
+    background: var(--gradient-button);
+    color: var(--bg-primary);
+    box-shadow: var(--shadow-cyan);
+}
+
+.btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-cyan-strong);
+    filter: brightness(1.1);
+}
+
+.btn--primary:active {
+    transform: translateY(0);
+}
+
+.btn--secondary {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+}
+
+.btn--secondary:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+}
+
+.btn--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+}
+
+.btn--ghost:hover {
+    color: var(--text-primary);
+    background: var(--glass-bg);
+}
+
+.btn--large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn--full {
+    width: 100%;
+}
+
+/* ========================================
+   表单元素
+   ======================================== */
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    color: var(--text-primary);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+.form-input:focus {
+    border-color: var(--color-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
+
+.form-input:hover {
+    border-color: var(--glass-border-hover);
+}
+
+/* ========================================
+   分割线
+   ======================================== */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-md) 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
+}
+
+/* ========================================
+   页面布局
+   ======================================== */
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+}
+
+.content-wrapper {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* ========================================
+   标题样式
+   ======================================== */
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.title-icon {
+    display: block;
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ========================================
+   消息提示
+   ======================================== */
+.message {
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.message--error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+.message--success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #86efac;
+}
+
+.message--hidden {
+    display: none;
+}
+
+/* ========================================
+   导航栏
+   ======================================== */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 100;
+}
+
+.navbar__user {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--text-secondary);
+}
+
+.navbar__user-icon {
+    font-size: 1.2rem;
+}
+
+.navbar__user-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.navbar__stats {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   游戏画布容器
+   ======================================== */
+.game-canvas-wrapper {
+    position: relative;
+    padding: 4px;
+    border-radius: var(--radius-lg);
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-cyan), var(--shadow-fuchsia);
+    margin: var(--spacing-md) 0;
+}
+
+.game-canvas {
+    display: block;
+    background: var(--bg-primary);
+    border-radius: calc(var(--radius-lg) - 4px);
+}
+
+/* 碰撞震动动画 */
+.game-canvas-wrapper.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-8px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(8px);
+    }
+}
+
+/* ========================================
+   游戏信息
+   ======================================== */
+.game-info {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+}
+
+.game-stat {
+    text-align: center;
+}
+
+.game-stat__label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.game-stat__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-cyan);
+}
+
+/* ========================================
+   游戏控制
+   ======================================== */
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.game-status {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* ========================================
+   速度控制滑块
+   ======================================== */
+.speed-control {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background: var(--glass-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+}
+
+.speed-control__label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.speed-control__value {
+    font-weight: 600;
+    color: var(--color-cyan);
+}
+
+.speed-control__labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* 自定义滑块样式 */
+.speed-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--gradient-button);
+    cursor: pointer;
+    box-shadow: var(--shadow-cyan);
+    transition: all var(--transition-fast);
+}
+
+.speed-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-cyan-strong);
+}
+
+.speed-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--gradient-button);
+    cursor: pointer;
+    border: none;
+    box-shadow: var(--shadow-cyan);
+    transition: all var(--transition-fast);
+}
+
+.speed-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-cyan-strong);
+}
+
+.speed-slider::-moz-range-track {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg-secondary);
+}
+
+/* 禁用状态 */
+.speed-slider:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.speed-slider:disabled::-webkit-slider-thumb {
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.speed-slider:disabled::-moz-range-thumb {
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* ========================================
+   排行榜
+   ======================================== */
+.leaderboard {
+    margin-top: var(--spacing-lg);
+}
+
+.leaderboard__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+}
+
+.leaderboard__list {
+    list-style: none;
+}
+
+.leaderboard__item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.leaderboard__item:last-child {
+    border-bottom: none;
+}
+
+.leaderboard__rank {
+    font-weight: 600;
+    min-width: 30px;
+    color: var(--color-cyan);
+}
+
+.leaderboard__name {
+    flex: 1;
+}
+
+.leaderboard__score {
+    font-weight: 600;
+    color: var(--color-fuchsia);
+}
+
+/* ========================================
+   工具类
+   ======================================== */
+.text-center {
+    text-align: center;
+}
+
+.mt-sm {
+    margin-top: var(--spacing-sm);
+}
+
+.mt-md {
+    margin-top: var(--spacing-md);
+}
+
+.mt-lg {
+    margin-top: var(--spacing-lg);
+}
+
+.mb-sm {
+    margin-bottom: var(--spacing-sm);
+}
+
+.mb-md {
+    margin-bottom: var(--spacing-md);
+}
+
+.mb-lg {
+    margin-bottom: var(--spacing-lg);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ========================================
+   响应式设计
+   ======================================== */
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+
+    .glass-card {
+        padding: var(--spacing-md);
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .navbar {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .bg-orb--cyan {
+        width: 300px;
+        height: 300px;
+    }
+
+    .bg-orb--fuchsia {
+        width: 250px;
+        height: 250px;
+    }
+}
