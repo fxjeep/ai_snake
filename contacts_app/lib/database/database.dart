@@ -16,7 +16,20 @@ class Contacts extends Table {
   TextColumn get profileImage => text().nullable()();
 }
 
-@DriftDatabase(tables: [Contacts])
+enum ContactType { Live, Dead, Ancestor, Property }
+
+class ContactDetails extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get contactId => integer().references(Contacts, #id)();
+  BoolColumn get isPrinted => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get lastPrint => dateTime().nullable()();
+  TextColumn get name1 => text()();
+  TextColumn get name2 => text()();
+  TextColumn get name3 => text()();
+  TextColumn get type => text().map(const EnumNameConverter<ContactType>(ContactType.values))();
+}
+
+@DriftDatabase(tables: [Contacts, ContactDetails])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -37,6 +50,15 @@ class AppDatabase extends _$AppDatabase {
   Future<int> addContact(ContactsCompanion entry) => into(contacts).insert(entry);
   Future<bool> updateContact(Contact entry) => update(contacts).replace(entry);
   Future<int> deleteContact(Contact entry) => delete(contacts).delete(entry);
+
+  // Detail operations
+  Stream<List<ContactDetail>> watchDetailsForContact(int contactId) {
+    return (select(contactDetails)..where((t) => t.contactId.equals(contactId))).watch();
+  }
+
+  Future<int> addDetail(ContactDetailsCompanion entry) => into(contactDetails).insert(entry);
+  Future<bool> updateDetail(ContactDetail entry) => update(contactDetails).replace(entry);
+  Future<int> deleteDetail(ContactDetail entry) => delete(contactDetails).delete(entry);
 }
 
 LazyDatabase _openConnection() {

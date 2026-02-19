@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' hide Column;
 import '../database/database.dart';
 import '../core/theme.dart';
 import 'contact_dialog.dart';
+import 'detail_editor.dart';
 
 class ContactListTile extends StatelessWidget {
   final Contact contact;
@@ -80,6 +81,13 @@ class ContactListTile extends StatelessWidget {
   void _handleAction(BuildContext context, AppDatabase db, String action) async {
     switch (action) {
       case 'detail':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailEditor(contact: contact),
+          ),
+        );
+        break;
       case 'create_list':
         // Placeholder for now
         break;
