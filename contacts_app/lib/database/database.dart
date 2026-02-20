@@ -34,7 +34,22 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (m) async {
+        await m.createAll();
+      },
+      onUpgrade: (m, from, to) async {
+        if (from < 2) {
+          // Add the contactDetails table
+          await m.createTable(contactDetails);
+        }
+      },
+    );
+  }
 
   // Watch all contacts, sorted by name
   Stream<List<Contact>> watchAllContacts() => select(contacts).watch();
@@ -54,6 +69,19 @@ class AppDatabase extends _$AppDatabase {
   // Detail operations
   Stream<List<ContactDetail>> watchDetailsForContact(int contactId) {
     return (select(contactDetails)..where((t) => t.contactId.equals(contactId))).watch();
+  }
+
+  Stream<List<ContactDetail>> watchDetailsByType(int contactId, ContactType type, {String? query}) {
+    return (select(contactDetails)
+          ..where((t) {
+            final matchesContactAndType = t.contactId.equals(contactId) & t.type.equalsValue(type);
+            if (query == null || query.isEmpty) {
+              return matchesContactAndType;
+            }
+            return matchesContactAndType &
+                (t.name1.like('%$query%') | t.name2.like('%$query%') | t.name3.like('%$query%'));
+          }))
+        .watch();
   }
 
   Future<int> addDetail(ContactDetailsCompanion entry) => into(contactDetails).insert(entry);

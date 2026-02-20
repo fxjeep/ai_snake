@@ -20,12 +20,16 @@ class _DetailEditorState extends State<DetailEditor> {
   final TextEditingController _name1Controller = TextEditingController();
   final TextEditingController _name2Controller = TextEditingController();
   final TextEditingController _name3Controller = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _name1FocusNode = FocusNode();
 
   @override
   void dispose() {
     _name1Controller.dispose();
     _name2Controller.dispose();
     _name3Controller.dispose();
+    _searchController.dispose();
+    _name1FocusNode.dispose();
     super.dispose();
   }
 
@@ -83,15 +87,19 @@ class _DetailEditorState extends State<DetailEditor> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.search, color: AppTheme.primaryColor),
-                          SizedBox(width: 8),
-                          const Text(
-                            'Search...',
-                            style: TextStyle(color: AppTheme.secondaryTextColor),
-                          ),
-                        ],
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          setState(() {}); // Trigger rebuild of StreamBuilder
+                        },
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          hintText: 'Search...',
+                          hintStyle: TextStyle(color: AppTheme.secondaryTextColor),
+                          prefixIcon: Icon(Icons.search, color: AppTheme.primaryColor),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        ),
                       ),
                     ),
                   ),
@@ -254,7 +262,11 @@ class _DetailEditorState extends State<DetailEditor> {
               // Table Rows
               Expanded(
                 child: StreamBuilder<List<ContactDetail>>(
-                  stream: db.watchDetailsForContact(widget.contact.id),
+                  stream: db.watchDetailsByType(
+                    widget.contact.id,
+                    _selectedType,
+                    query: _searchController.text.trim(),
+                  ),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Center(
@@ -297,11 +309,13 @@ class _DetailEditorState extends State<DetailEditor> {
     switch (_selectedType) {
       case ContactType.Live:
         return [
-          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), flex: 1),
+          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), 
+              focusNode: _name1FocusNode, flex: 1),
         ];
       case ContactType.Dead:
         return [
-          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), flex: 1),
+          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), 
+              focusNode: _name1FocusNode, flex: 1),
           const SizedBox(width: 8),
           _buildTextField(_name2Controller, 'Name 2', (val) => _addNewDetail(context, db), flex: 1),
           const SizedBox(width: 8),
@@ -309,18 +323,21 @@ class _DetailEditorState extends State<DetailEditor> {
         ];
       case ContactType.Ancestor:
         return [
-          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), flex: 1),
+          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), 
+              focusNode: _name1FocusNode, flex: 1),
           const SizedBox(width: 8),
           _buildTextField(_name2Controller, 'Name 2', (val) => _addNewDetail(context, db), flex: 1),
         ];
       case ContactType.Property:
         return [
-          _buildTextField(_name1Controller, 'Property Details', (val) => _addNewDetail(context, db), flex: 3),
+          _buildTextField(_name1Controller, 'Property Details', (val) => _addNewDetail(context, db), 
+              focusNode: _name1FocusNode, flex: 3),
         ];
     }
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, Function(String)? onSubmitted, {int flex = 1}) {
+  Widget _buildTextField(TextEditingController controller, String hint, Function(String)? onSubmitted,
+      {FocusNode? focusNode, int flex = 1}) {
     final bool isEmpty = controller.text.trim().isEmpty;
     final bool showError = _showValidationErrors && isEmpty;
 
@@ -328,6 +345,7 @@ class _DetailEditorState extends State<DetailEditor> {
       flex: flex,
       child: TextField(
         controller: controller,
+        focusNode: focusNode,
         style: const TextStyle(color: Colors.white),
         onSubmitted: onSubmitted,
         onChanged: (val) {
@@ -408,6 +426,8 @@ class _DetailEditorState extends State<DetailEditor> {
     setState(() {
       _showValidationErrors = false;
     });
+
+    _name1FocusNode.requestFocus();
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -549,8 +569,9 @@ class _DetailRow extends StatelessWidget {
             child: Text(
               name2,
               style: const TextStyle(
-                color: AppTheme.secondaryTextColor,
-                fontSize: 14,
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
