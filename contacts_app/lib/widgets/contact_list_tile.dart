@@ -14,64 +14,67 @@ class ContactListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final db = Provider.of<AppDatabase>(context, listen: false);
-    final isPrinted = contact.lastPrintDate != null;
+    final isPrinted = contact.isPrinted;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        children: [
-          if (isPrinted) ...[
-            const Icon(
-              Icons.print,
-              size: 16,
-              color: AppTheme.primaryColor,
-            ),
-            const SizedBox(width: 8),
-          ],
-          // Info
-          Expanded(
-            child: Row(
-              children: [
-                Text(
-                  contact.name,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1c2732),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    contact.code,
+    return InkWell(
+      onTap: () => _handleAction(context, db, 'detail'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+        child: Row(
+          children: [
+            if (isPrinted) ...[
+              const Icon(
+                Icons.print,
+                size: 16,
+                color: AppTheme.primaryColor,
+              ),
+              const SizedBox(width: 8),
+            ],
+            // Info
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    contact.name,
                     style: const TextStyle(
-                      color: AppTheme.primaryColor,
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1c2732),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      contact.code,
+                      style: const TextStyle(
+                        color: AppTheme.primaryColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          // Actions
-          PopupMenuButton<String>(
-            onSelected: (value) => _handleAction(context, db, value),
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'detail', child: Text('Detail')),
-              const PopupMenuItem(value: 'create_list', child: Text('Create List')),
-              const PopupMenuItem(value: 'edit', child: Text('Edit')),
-              PopupMenuItem(value: 'print', child: Text(isPrinted ? 'Unprint' : 'Print')),
-              const PopupMenuItem(value: 'delete', child: Text('Delete')),
-            ],
-            icon: const Icon(Icons.more_vert, color: AppTheme.secondaryTextColor),
-          ),
-        ],
+            // Actions
+            PopupMenuButton<String>(
+              onSelected: (value) => _handleAction(context, db, value),
+              itemBuilder: (context) => [
+                const PopupMenuItem(value: 'detail', child: Text('Detail')),
+                const PopupMenuItem(value: 'create_list', child: Text('Create List')),
+                const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                PopupMenuItem(value: 'print', child: Text(isPrinted ? 'Unprint' : 'Print')),
+                const PopupMenuItem(value: 'delete', child: Text('Delete')),
+              ],
+              icon: const Icon(Icons.more_vert, color: AppTheme.secondaryTextColor),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -98,15 +101,20 @@ class ContactListTile extends StatelessWidget {
         );
         break;
       case 'print':
-        if (contact.lastPrintDate == null) {
-          await db.updateContact(contact.copyWith(lastPrintDate: Value(DateTime.now())));
+        if (!contact.isPrinted) {
+          await db.updateContact(contact.copyWith(
+            isPrinted: true,
+          ));
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Marked as printed')),
             );
           }
         } else {
-          await db.updateContact(contact.copyWith(lastPrintDate: const Value(null)));
+          await db.updateContact(contact.copyWith(
+            isPrinted: false,
+            // We can keep lastPrintDate as the history of the last time it was printed
+          ));
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Marked as unprinted')),

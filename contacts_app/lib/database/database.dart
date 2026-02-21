@@ -14,6 +14,7 @@ class Contacts extends Table {
   DateTimeColumn get lastPrintDate => dateTime().nullable()();
   TextColumn get initials => text()();
   TextColumn get profileImage => text().nullable()();
+  BoolColumn get isPrinted => boolean().withDefault(const Constant(false))();
 }
 
 enum ContactType { Live, Dead, Ancestor, Property }
@@ -34,7 +35,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -44,8 +45,10 @@ class AppDatabase extends _$AppDatabase {
       },
       onUpgrade: (m, from, to) async {
         if (from < 2) {
-          // Add the contactDetails table
           await m.createTable(contactDetails);
+        }
+        if (from < 3) {
+          await m.addColumn(contacts, contacts.isPrinted);
         }
       },
     );
@@ -87,6 +90,63 @@ class AppDatabase extends _$AppDatabase {
   Future<int> addDetail(ContactDetailsCompanion entry) => into(contactDetails).insert(entry);
   Future<bool> updateDetail(ContactDetail entry) => update(contactDetails).replace(entry);
   Future<int> deleteDetail(ContactDetail entry) => delete(contactDetails).delete(entry);
+
+  Future<void> batchUpdatePrintStatus(Set<int> ids, bool isPrinted) async {
+    await (update(contactDetails)..where((t) => t.id.isIn(ids))).write(
+      ContactDetailsCompanion(
+        isPrinted: Value(isPrinted),
+        // Removed lastPrint update - only setting isPrinted
+      ),
+    );
+  }
+
+  Future<void> batchDeleteDetails(Set<int> ids) async {
+    await (delete(contactDetails)..where((t) => t.id.isIn(ids))).go();
+  }
+
+  // Aggregate query for PrintView
+  Stream<List<ContactPrintData>> watchContactsWithDetails() {
+    final query = select(contacts).join([
+      leftOuterJoin(
+        contactDetails,
+        contactDetails.contactId.equalsExp(contacts.id),
+      ),
+    ]);
+
+    return query.watch().map((rows) {
+      final groupedData = <int, ContactPrintData>{};
+
+      for (final row in rows) {
+        final contact = row.readTable(contacts);
+        final detail = row.readTableOrNull(contactDetails);
+
+        final data = groupedData.putIfAbsent(
+          contact.id,
+          () => ContactPrintData(contact: contact, details: []),
+        );
+
+        if (detail != null) {
+          data.details.add(detail);
+        }
+      }
+
+      return groupedData.values.where((data) {
+        final hasPrintedDetails = data.details.any((d) => d.isPrinted);
+        return data.contact.isPrinted || hasPrintedDetails;
+      }).toList();
+    });
+  }
+
+  Stream<Contact> watchContactById(int id) {
+    return (select(contacts)..where((t) => t.id.equals(id))).watchSingle();
+  }
+}
+
+class ContactPrintData {
+  final Contact contact;
+  final List<ContactDetail> details;
+
+  ContactPrintData({required this.contact, required this.details});
 }
 
 LazyDatabase _openConnection() {

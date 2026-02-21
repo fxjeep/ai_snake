@@ -22,6 +22,7 @@ class _DetailEditorState extends State<DetailEditor> {
   final TextEditingController _name3Controller = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _name1FocusNode = FocusNode();
+  final Set<int> _selectedIds = {};
 
   @override
   void dispose() {
@@ -57,70 +58,182 @@ class _DetailEditorState extends State<DetailEditor> {
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
+              StreamBuilder<Contact>(
+                stream: db.watchContactById(widget.contact.id),
+                initialData: widget.contact,
+                builder: (context, contactSnapshot) {
+                  final contact = contactSnapshot.data ?? widget.contact;
+                  final isCurrentlyPrinted = contact.isPrinted;
+                  
+                  return Row(
+                    children: [
+                      if (isCurrentlyPrinted) ...[
+                        const Icon(
+                          Icons.print,
+                          size: 24,
+                          color: AppTheme.primaryColor,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Text(
+                        contact.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        contact.code,
+                        style: const TextStyle(
+                          color: AppTheme.primaryColor,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceColor,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: TextField(
+                                  controller: _searchController,
+                                  onChanged: (value) {
+                                    setState(() {}); // Trigger rebuild of StreamBuilder for details
+                                  },
+                                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search...',
+                                    hintStyle: TextStyle(color: AppTheme.secondaryTextColor),
+                                    prefixIcon: Icon(Icons.search, color: AppTheme.primaryColor, size: 20),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(bottom: 11),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SizedBox(
+                              height: 40,
+                              child: _ActionButton(
+                                icon: isCurrentlyPrinted ? Icons.print_disabled : Icons.print,
+                                label: isCurrentlyPrinted ? 'Unprint All' : 'Print All',
+                                color: isCurrentlyPrinted ? AppTheme.secondaryTextColor : AppTheme.primaryColor,
+                                isSolid: !isCurrentlyPrinted,
+                                isEnabled: true,
+                                onPressed: () async {
+                                  await db.updateContact(contact.copyWith(
+                                    isPrinted: !isCurrentlyPrinted,
+                                  ));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
               const SizedBox(height: 16),
-              Text(
-                widget.contact.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                'ID: ${widget.contact.code}',
-                style: const TextStyle(
-                  color: AppTheme.primaryColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Search and Action Buttons
               Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceColor,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) {
-                          setState(() {}); // Trigger rebuild of StreamBuilder
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: 'Search...',
-                          hintStyle: TextStyle(color: AppTheme.secondaryTextColor),
-                          prefixIcon: Icon(Icons.search, color: AppTheme.primaryColor),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
+                    flex: 3,
+                    child: StreamBuilder<List<ContactDetail>>(
+                      stream: db.watchDetailsByType(widget.contact.id, _selectedType, query: _searchController.text.trim()),
+                      builder: (context, snapshot) {
+                        final details = snapshot.data ?? [];
+                        final visibleIds = details.map((d) => d.id).toSet();
+                        final selectedVisibleIds = _selectedIds.intersection(visibleIds);
+                        
+                        return Row(
+                          children: [
+                            _ActionButton(
+                              icon: Icons.print,
+                              label: 'Print',
+                              color: AppTheme.primaryColor,
+                              isSolid: true,
+                              isEnabled: selectedVisibleIds.isNotEmpty,
+                              onPressed: () async {
+                                await db.batchUpdatePrintStatus(selectedVisibleIds, true);
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Selected records marked as printed')),
+                                  );
+                                }
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            _ActionButton(
+                              icon: Icons.print_disabled,
+                              label: 'Unprint',
+                              color: AppTheme.secondaryTextColor,
+                              isSolid: false,
+                              isEnabled: selectedVisibleIds.isNotEmpty,
+                              onPressed: () async {
+                                await db.batchUpdatePrintStatus(selectedVisibleIds, false);
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Selected records marked as not printed')),
+                                  );
+                                }
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            _ActionButton(
+                              icon: Icons.delete,
+                              label: 'Delete',
+                              color: Colors.redAccent,
+                              isSolid: false,
+                              isEnabled: selectedVisibleIds.isNotEmpty,
+                              borderColor: Colors.redAccent.withOpacity(0.3),
+                              onPressed: () async {
+                                final confirmed = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: AppTheme.surfaceColor,
+                                    title: const Text('Confirm Delete', style: TextStyle(color: Colors.white)),
+                                    content: Text('Delete ${selectedVisibleIds.length} selected record(s)?', 
+                                        style: const TextStyle(color: AppTheme.secondaryTextColor)),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context, false),
+                                        child: const Text('Cancel', style: TextStyle(color: AppTheme.secondaryTextColor)),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context, true),
+                                        child: const Text('Confirm', style: TextStyle(color: Colors.redAccent)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (confirmed == true) {
+                                  await db.batchDeleteDetails(selectedVisibleIds);
+                                  setState(() {
+                                    _selectedIds.removeAll(selectedVisibleIds);
+                                  });
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Selected records deleted')),
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                          ],
+                        );
+                      }
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  _ActionButton(
-                    icon: Icons.print,
-                    label: 'Print',
-                    color: AppTheme.primaryColor,
-                    isSolid: true,
-                  ),
-                  const SizedBox(width: 12),
-                  _ActionButton(
-                    icon: Icons.delete,
-                    label: 'Delete',
-                    color: Colors.redAccent,
-                    isSolid: false,
-                    borderColor: Colors.redAccent.withOpacity(0.3),
                   ),
                   const SizedBox(width: 12),
                   // Type Dropdown
@@ -167,15 +280,6 @@ class _DetailEditorState extends State<DetailEditor> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  _ActionButton(
-                    icon: Icons.more_horiz,
-                    label: 'more',
-                    color: AppTheme.primaryColor,
-                    isSolid: false,
-                    backgroundColor: AppTheme.surfaceColor,
-                    onPressed: () => _addDummyDetail(context, db),
-                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -200,66 +304,7 @@ class _DetailEditorState extends State<DetailEditor> {
               ),
               const SizedBox(height: 24),
 
-              // Table Header
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: _CustomCheckbox(value: false),
-                    ),
-                    const SizedBox(width: 8),
-                    const SizedBox(width: 24), // Space for isPrint icon/checkbox
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        'NAME 1',
-                        style: TextStyle(
-                          color: AppTheme.primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'NAME 2',
-                        style: TextStyle(
-                          color: AppTheme.primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'NAME 3',
-                        style: TextStyle(
-                          color: AppTheme.primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'LAST PRINT',
-                        style: TextStyle(
-                          color: AppTheme.primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Divider(color: Colors.white10),
-
-              // Table Rows
+              // Table Header & Content
               Expanded(
                 child: StreamBuilder<List<ContactDetail>>(
                   stream: db.watchDetailsByType(
@@ -268,31 +313,115 @@ class _DetailEditorState extends State<DetailEditor> {
                     query: _searchController.text.trim(),
                   ),
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(
-                        child: Text(
-                          'No Record',
-                          style: TextStyle(color: AppTheme.secondaryTextColor),
-                        ),
-                      );
-                    }
-                    final details = snapshot.data!;
+                    final details = snapshot.data ?? [];
 
-                    return ListView.builder(
-                      itemCount: details.length,
-                      itemBuilder: (context, index) {
-                        final detail = details[index];
-                        return _DetailRow(
-                          isSelected: false, // For row selection
-                          isPrinted: detail.isPrinted,
-                          name1: detail.name1,
-                          name2: detail.name2,
-                          name3: detail.name3,
-                          lastPrint: detail.lastPrint != null
-                              ? DateFormat('MMM dd, yyyy').format(detail.lastPrint!)
-                              : '-',
-                        );
-                      },
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: _CustomCheckbox(
+                                  value: details.isNotEmpty && details.every((d) => _selectedIds.contains(d.id)),
+                                  onTap: () {
+                                    final allCurrentlySelected = details.every((d) => _selectedIds.contains(d.id));
+                                    final ids = details.map((d) => d.id).toSet();
+                                    setState(() {
+                                      if (allCurrentlySelected) {
+                                        _selectedIds.removeAll(ids);
+                                      } else {
+                                        _selectedIds.addAll(ids);
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const SizedBox(width: 24), // Space for isPrint icon
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  'NAME 1',
+                                  style: TextStyle(
+                                    color: AppTheme.primaryColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'NAME 2',
+                                  style: TextStyle(
+                                    color: AppTheme.primaryColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'NAME 3',
+                                  style: TextStyle(
+                                    color: AppTheme.primaryColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'LAST PRINT',
+                                  style: TextStyle(
+                                    color: AppTheme.primaryColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Divider(color: Colors.white10),
+                        Expanded(
+                          child: details.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    'No Record',
+                                    style: TextStyle(color: AppTheme.secondaryTextColor),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  itemCount: details.length,
+                                  itemBuilder: (context, index) {
+                                    final detail = details[index];
+                                    return _DetailRow(
+                                      isSelected: _selectedIds.contains(detail.id),
+                                      onSelect: () {
+                                        setState(() {
+                                          if (_selectedIds.contains(detail.id)) {
+                                            _selectedIds.remove(detail.id);
+                                          } else {
+                                            _selectedIds.add(detail.id);
+                                          }
+                                        });
+                                      },
+                                      isPrinted: detail.isPrinted,
+                                      name1: detail.name1,
+                                      name2: detail.name2,
+                                      name3: detail.name3,
+                                      lastPrint: detail.lastPrint != null
+                                          ? DateFormat('MMM dd, yyyy').format(detail.lastPrint!)
+                                          : '-',
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
                     );
                   },
                 ),
@@ -417,7 +546,6 @@ class _DetailEditorState extends State<DetailEditor> {
       name3: (_selectedType == ContactType.Dead) ? name3 : '',
       type: _selectedType,
       isPrinted: const Value(true),
-      lastPrint: const Value(null),
     ));
 
     _name1Controller.clear();
@@ -435,21 +563,6 @@ class _DetailEditorState extends State<DetailEditor> {
       );
     }
   }
-
-  void _addDummyDetail(BuildContext context, AppDatabase db) async {
-    await db.addDetail(ContactDetailsCompanion.insert(
-      contactId: widget.contact.id,
-      name1: 'New',
-      name2: 'Detail',
-      name3: 'Item',
-      type: _selectedType,
-    ));
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Added dummy ${_selectedType.name} detail')),
-      );
-    }
-  }
 }
 
 class _ActionButton extends StatelessWidget {
@@ -457,6 +570,7 @@ class _ActionButton extends StatelessWidget {
   final String label;
   final Color color;
   final bool isSolid;
+  final bool isEnabled;
   final Color? borderColor;
   final Color? backgroundColor;
   final VoidCallback? onPressed;
@@ -466,6 +580,7 @@ class _ActionButton extends StatelessWidget {
     required this.label,
     required this.color,
     required this.isSolid,
+    this.isEnabled = true,
     this.borderColor,
     this.backgroundColor,
     this.onPressed,
@@ -473,39 +588,47 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = isEnabled ? color : AppTheme.secondaryTextColor;
+    final effectiveBorderColor = isEnabled 
+        ? (borderColor ?? (isSolid ? Colors.transparent : color)) 
+        : AppTheme.secondaryTextColor.withOpacity(0.1);
+
     return Expanded(
       child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: isSolid ? color : (backgroundColor ?? Colors.transparent),
-            borderRadius: BorderRadius.circular(12),
-            border: borderColor != null ? Border.all(color: borderColor!, width: 2) : null,
-            boxShadow: isSolid
-                ? [
-                    BoxShadow(
-                      color: color.withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ]
-                : null,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: isSolid ? Colors.white : color, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSolid ? Colors.white : color,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        onTap: isEnabled ? onPressed : null,
+        child: Opacity(
+          opacity: isEnabled ? 1.0 : 0.4,
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: isSolid ? effectiveColor : (backgroundColor ?? Colors.transparent),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: effectiveBorderColor, width: 2),
+              boxShadow: isSolid && isEnabled
+                  ? [
+                      BoxShadow(
+                        color: effectiveColor.withOpacity(0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ]
+                  : null,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: isSolid ? Colors.white : effectiveColor, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSolid ? Colors.white : effectiveColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -515,6 +638,7 @@ class _ActionButton extends StatelessWidget {
 
 class _DetailRow extends StatelessWidget {
   final bool isSelected;
+  final VoidCallback onSelect;
   final bool isPrinted;
   final String name1;
   final String name2;
@@ -523,6 +647,7 @@ class _DetailRow extends StatelessWidget {
 
   const _DetailRow({
     required this.isSelected,
+    required this.onSelect,
     required this.isPrinted,
     required this.name1,
     required this.name2,
@@ -542,7 +667,10 @@ class _DetailRow extends StatelessWidget {
           SizedBox(
             width: 24,
             height: 24,
-            child: _CustomCheckbox(value: isSelected),
+            child: _CustomCheckbox(
+              value: isSelected,
+              onTap: onSelect,
+            ),
           ),
           const SizedBox(width: 8),
           SizedBox(
@@ -601,26 +729,30 @@ class _DetailRow extends StatelessWidget {
 
 class _CustomCheckbox extends StatelessWidget {
   final bool value;
-  const _CustomCheckbox({required this.value});
+  final VoidCallback? onTap;
+  const _CustomCheckbox({required this.value, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: value ? AppTheme.primaryColor : Colors.transparent,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: value ? AppTheme.primaryColor : Colors.white24,
-          width: 2,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: value ? AppTheme.primaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: value ? AppTheme.primaryColor : Colors.white24,
+            width: 2,
+          ),
         ),
+        child: value
+            ? const Icon(
+                Icons.check,
+                size: 16,
+                color: Colors.white,
+              )
+            : null,
       ),
-      child: value
-          ? const Icon(
-              Icons.check,
-              size: 16,
-              color: Colors.white,
-            )
-          : null,
     );
   }
 }

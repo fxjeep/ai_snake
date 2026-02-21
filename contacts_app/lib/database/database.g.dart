@@ -73,6 +73,21 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _isPrintedMeta = const VerificationMeta(
+    'isPrinted',
+  );
+  @override
+  late final GeneratedColumn<bool> isPrinted = GeneratedColumn<bool>(
+    'is_printed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_printed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -81,6 +96,7 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
     lastPrintDate,
     initials,
     profileImage,
+    isPrinted,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -139,6 +155,12 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
         ),
       );
     }
+    if (data.containsKey('is_printed')) {
+      context.handle(
+        _isPrintedMeta,
+        isPrinted.isAcceptableOrUnknown(data['is_printed']!, _isPrintedMeta),
+      );
+    }
     return context;
   }
 
@@ -172,6 +194,10 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
         DriftSqlType.string,
         data['${effectivePrefix}profile_image'],
       ),
+      isPrinted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_printed'],
+      )!,
     );
   }
 
@@ -188,6 +214,7 @@ class Contact extends DataClass implements Insertable<Contact> {
   final DateTime? lastPrintDate;
   final String initials;
   final String? profileImage;
+  final bool isPrinted;
   const Contact({
     required this.id,
     required this.name,
@@ -195,6 +222,7 @@ class Contact extends DataClass implements Insertable<Contact> {
     this.lastPrintDate,
     required this.initials,
     this.profileImage,
+    required this.isPrinted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -209,6 +237,7 @@ class Contact extends DataClass implements Insertable<Contact> {
     if (!nullToAbsent || profileImage != null) {
       map['profile_image'] = Variable<String>(profileImage);
     }
+    map['is_printed'] = Variable<bool>(isPrinted);
     return map;
   }
 
@@ -224,6 +253,7 @@ class Contact extends DataClass implements Insertable<Contact> {
       profileImage: profileImage == null && nullToAbsent
           ? const Value.absent()
           : Value(profileImage),
+      isPrinted: Value(isPrinted),
     );
   }
 
@@ -239,6 +269,7 @@ class Contact extends DataClass implements Insertable<Contact> {
       lastPrintDate: serializer.fromJson<DateTime?>(json['lastPrintDate']),
       initials: serializer.fromJson<String>(json['initials']),
       profileImage: serializer.fromJson<String?>(json['profileImage']),
+      isPrinted: serializer.fromJson<bool>(json['isPrinted']),
     );
   }
   @override
@@ -251,6 +282,7 @@ class Contact extends DataClass implements Insertable<Contact> {
       'lastPrintDate': serializer.toJson<DateTime?>(lastPrintDate),
       'initials': serializer.toJson<String>(initials),
       'profileImage': serializer.toJson<String?>(profileImage),
+      'isPrinted': serializer.toJson<bool>(isPrinted),
     };
   }
 
@@ -261,6 +293,7 @@ class Contact extends DataClass implements Insertable<Contact> {
     Value<DateTime?> lastPrintDate = const Value.absent(),
     String? initials,
     Value<String?> profileImage = const Value.absent(),
+    bool? isPrinted,
   }) => Contact(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -270,6 +303,7 @@ class Contact extends DataClass implements Insertable<Contact> {
         : this.lastPrintDate,
     initials: initials ?? this.initials,
     profileImage: profileImage.present ? profileImage.value : this.profileImage,
+    isPrinted: isPrinted ?? this.isPrinted,
   );
   Contact copyWithCompanion(ContactsCompanion data) {
     return Contact(
@@ -283,6 +317,7 @@ class Contact extends DataClass implements Insertable<Contact> {
       profileImage: data.profileImage.present
           ? data.profileImage.value
           : this.profileImage,
+      isPrinted: data.isPrinted.present ? data.isPrinted.value : this.isPrinted,
     );
   }
 
@@ -294,14 +329,22 @@ class Contact extends DataClass implements Insertable<Contact> {
           ..write('code: $code, ')
           ..write('lastPrintDate: $lastPrintDate, ')
           ..write('initials: $initials, ')
-          ..write('profileImage: $profileImage')
+          ..write('profileImage: $profileImage, ')
+          ..write('isPrinted: $isPrinted')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, code, lastPrintDate, initials, profileImage);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    code,
+    lastPrintDate,
+    initials,
+    profileImage,
+    isPrinted,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -311,7 +354,8 @@ class Contact extends DataClass implements Insertable<Contact> {
           other.code == this.code &&
           other.lastPrintDate == this.lastPrintDate &&
           other.initials == this.initials &&
-          other.profileImage == this.profileImage);
+          other.profileImage == this.profileImage &&
+          other.isPrinted == this.isPrinted);
 }
 
 class ContactsCompanion extends UpdateCompanion<Contact> {
@@ -321,6 +365,7 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
   final Value<DateTime?> lastPrintDate;
   final Value<String> initials;
   final Value<String?> profileImage;
+  final Value<bool> isPrinted;
   const ContactsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -328,6 +373,7 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     this.lastPrintDate = const Value.absent(),
     this.initials = const Value.absent(),
     this.profileImage = const Value.absent(),
+    this.isPrinted = const Value.absent(),
   });
   ContactsCompanion.insert({
     this.id = const Value.absent(),
@@ -336,6 +382,7 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     this.lastPrintDate = const Value.absent(),
     required String initials,
     this.profileImage = const Value.absent(),
+    this.isPrinted = const Value.absent(),
   }) : name = Value(name),
        code = Value(code),
        initials = Value(initials);
@@ -346,6 +393,7 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     Expression<DateTime>? lastPrintDate,
     Expression<String>? initials,
     Expression<String>? profileImage,
+    Expression<bool>? isPrinted,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -354,6 +402,7 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
       if (lastPrintDate != null) 'last_print_date': lastPrintDate,
       if (initials != null) 'initials': initials,
       if (profileImage != null) 'profile_image': profileImage,
+      if (isPrinted != null) 'is_printed': isPrinted,
     });
   }
 
@@ -364,6 +413,7 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     Value<DateTime?>? lastPrintDate,
     Value<String>? initials,
     Value<String?>? profileImage,
+    Value<bool>? isPrinted,
   }) {
     return ContactsCompanion(
       id: id ?? this.id,
@@ -372,6 +422,7 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
       lastPrintDate: lastPrintDate ?? this.lastPrintDate,
       initials: initials ?? this.initials,
       profileImage: profileImage ?? this.profileImage,
+      isPrinted: isPrinted ?? this.isPrinted,
     );
   }
 
@@ -396,6 +447,9 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     if (profileImage.present) {
       map['profile_image'] = Variable<String>(profileImage.value);
     }
+    if (isPrinted.present) {
+      map['is_printed'] = Variable<bool>(isPrinted.value);
+    }
     return map;
   }
 
@@ -407,7 +461,8 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
           ..write('code: $code, ')
           ..write('lastPrintDate: $lastPrintDate, ')
           ..write('initials: $initials, ')
-          ..write('profileImage: $profileImage')
+          ..write('profileImage: $profileImage, ')
+          ..write('isPrinted: $isPrinted')
           ..write(')'))
         .toString();
   }
@@ -942,6 +997,7 @@ typedef $$ContactsTableCreateCompanionBuilder =
       Value<DateTime?> lastPrintDate,
       required String initials,
       Value<String?> profileImage,
+      Value<bool> isPrinted,
     });
 typedef $$ContactsTableUpdateCompanionBuilder =
     ContactsCompanion Function({
@@ -951,6 +1007,7 @@ typedef $$ContactsTableUpdateCompanionBuilder =
       Value<DateTime?> lastPrintDate,
       Value<String> initials,
       Value<String?> profileImage,
+      Value<bool> isPrinted,
     });
 
 final class $$ContactsTableReferences
@@ -1018,6 +1075,11 @@ class $$ContactsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get isPrinted => $composableBuilder(
+    column: $table.isPrinted,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> contactDetailsRefs(
     Expression<bool> Function($$ContactDetailsTableFilterComposer f) f,
   ) {
@@ -1082,6 +1144,11 @@ class $$ContactsTableOrderingComposer
     column: $table.profileImage,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isPrinted => $composableBuilder(
+    column: $table.isPrinted,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ContactsTableAnnotationComposer
@@ -1114,6 +1181,9 @@ class $$ContactsTableAnnotationComposer
     column: $table.profileImage,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get isPrinted =>
+      $composableBuilder(column: $table.isPrinted, builder: (column) => column);
 
   Expression<T> contactDetailsRefs<T extends Object>(
     Expression<T> Function($$ContactDetailsTableAnnotationComposer a) f,
@@ -1175,6 +1245,7 @@ class $$ContactsTableTableManager
                 Value<DateTime?> lastPrintDate = const Value.absent(),
                 Value<String> initials = const Value.absent(),
                 Value<String?> profileImage = const Value.absent(),
+                Value<bool> isPrinted = const Value.absent(),
               }) => ContactsCompanion(
                 id: id,
                 name: name,
@@ -1182,6 +1253,7 @@ class $$ContactsTableTableManager
                 lastPrintDate: lastPrintDate,
                 initials: initials,
                 profileImage: profileImage,
+                isPrinted: isPrinted,
               ),
           createCompanionCallback:
               ({
@@ -1191,6 +1263,7 @@ class $$ContactsTableTableManager
                 Value<DateTime?> lastPrintDate = const Value.absent(),
                 required String initials,
                 Value<String?> profileImage = const Value.absent(),
+                Value<bool> isPrinted = const Value.absent(),
               }) => ContactsCompanion.insert(
                 id: id,
                 name: name,
@@ -1198,6 +1271,7 @@ class $$ContactsTableTableManager
                 lastPrintDate: lastPrintDate,
                 initials: initials,
                 profileImage: profileImage,
+                isPrinted: isPrinted,
               ),
           withReferenceMapper: (p0) => p0
               .map(
