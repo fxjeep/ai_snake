@@ -415,7 +415,7 @@ class _DetailEditorState extends State<DetailEditor> {
                                       name2: detail.name2,
                                       name3: detail.name3,
                                       lastPrint: detail.lastPrint != null
-                                          ? DateFormat('MMM dd, yyyy').format(detail.lastPrint!)
+                                          ? detail.lastPrint!.toIso8601String().substring(0, 10)
                                           : '-',
                                     );
                                   },

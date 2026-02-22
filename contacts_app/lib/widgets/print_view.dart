@@ -1,12 +1,144 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:drift/drift.dart' show Value;
 import '../database/database.dart';
 import '../core/theme.dart';
 import 'detail_editor.dart';
 
-class PrintView extends StatelessWidget {
+class PrintView extends StatefulWidget {
   const PrintView({super.key});
+
+  @override
+  State<PrintView> createState() => _PrintViewState();
+}
+
+class _PrintViewState extends State<PrintView> {
+  bool _isGenerating = false;
+
+  Future<void> _generatePrintFile(BuildContext context, AppDatabase db) async {
+    if (_isGenerating) return;
+    setState(() => _isGenerating = true);
+    try {
+      // 1. Get save location
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save Print File',
+        fileName: 'print_${DateFormat('yyyyMMdd').format(DateTime.now())}.txt',
+        type: FileType.custom,
+        allowedExtensions: ['txt'],
+      );
+
+      if (outputFile == null) return;
+
+      // 2. Fetch all data
+      final List<ContactPrintData> allData = await db.watchContactsWithDetails().first;
+      
+      final buffer = StringBuffer();
+
+      // 3. Format data
+      for (final data in allData) {
+        final contact = data.contact;
+        final details = data.details;
+
+        // Determination of which details to export
+        List<ContactDetail> detailsToExport;
+        if (contact.isPrinted) {
+          // Master is ON: export all details
+          detailsToExport = details;
+        } else {
+          // Master is OFF: export only details with isPrinted == true
+          detailsToExport = details.where((d) => d.isPrinted).toList();
+        }
+
+        for (final detail in detailsToExport) {
+          final fields = [
+            contact.code,
+            contact.name,
+            _getTypeFullText(detail.type),
+            detail.name1,
+            detail.name2 ?? '',
+            detail.name3 ?? '',
+          ];
+          
+          buffer.write(fields.join('\t'));
+          buffer.write('\r\n');
+        }
+      }
+
+      // 4. Save file
+      final file = File(outputFile);
+      await file.writeAsString(buffer.toString());
+
+      // 5. Update lastPrint timestamps
+      final now = DateTime.now();
+
+      // Collect detail IDs to update and track which contacts to update
+      final Set<int> detailIdsToUpdate = {};
+      final Set<int> contactIdsToUpdate = {};
+
+      for (final data in allData) {
+        final contact = data.contact;
+        final details = data.details;
+
+        List<ContactDetail> detailsToExport;
+        if (contact.isPrinted) {
+          detailsToExport = details;
+        } else {
+          detailsToExport = details.where((d) => d.isPrinted).toList();
+        }
+
+        if (detailsToExport.isNotEmpty) {
+          contactIdsToUpdate.add(contact.id);
+          for (final d in detailsToExport) {
+            if (d.isPrinted) detailIdsToUpdate.add(d.id);
+          }
+        }
+      }
+
+      // Batch update detail lastPrint
+      if (detailIdsToUpdate.isNotEmpty) {
+        await db.batchUpdateLastPrint(detailIdsToUpdate, now);
+      }
+
+      // Update master contact lastPrintDate
+      for (final data in allData) {
+        if (contactIdsToUpdate.contains(data.contact.id)) {
+          await db.updateContact(
+            data.contact.copyWith(lastPrintDate: Value(now)),
+          );
+        }
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('File saved to $outputFile')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error generating file: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
+    }
+  }
+
+  String _getTypeFullText(ContactType type) {
+    switch (type) {
+      case ContactType.Live:
+        return 'Live';
+      case ContactType.Dead:
+        return 'Dead';
+      case ContactType.Ancestor:
+        return 'Ancestor';
+      case ContactType.Property:
+        return 'Property';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +163,58 @@ class PrintView extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.refresh, color: AppTheme.primaryColor),
-                  onPressed: () {
-                    // Re-triggering build is enough for the date and StreamBuilder recreation
-                    (context as Element).markNeedsBuild();
-                  },
+                Row(
+                  children: [
+                    _HeaderButton(
+                      icon: Icons.auto_awesome,
+                      label: 'Generate',
+                      onPressed: _isGenerating ? null : () => _generatePrintFile(context, db),
+                    ),
+                    const SizedBox(width: 12),
+                    _HeaderButton(
+                      icon: Icons.clear_all,
+                      label: 'Clear',
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: const Color(0xFF1c2732),
+                            title: const Text(
+                              'Clear All Print Status',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            content: const Text(
+                              'This will reset the print status for all contacts and their records. This cannot be undone. Continue?',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Clear All', style: TextStyle(color: Colors.redAccent)),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true && context.mounted) {
+                          await db.clearAllPrintStatus();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('All print statuses cleared')),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.refresh, color: AppTheme.primaryColor),
+                      onPressed: () {
+                        (context as Element).markNeedsBuild();
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -235,6 +413,41 @@ class _PrintRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeaderButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onPressed;
+
+  const _HeaderButton({
+    required this.icon,
+    required this.label,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18, color: AppTheme.primaryColor),
+      label: Text(
+        label,
+        style: const TextStyle(
+          color: AppTheme.primaryColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      ),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }

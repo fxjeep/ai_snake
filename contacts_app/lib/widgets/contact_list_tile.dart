@@ -61,6 +61,20 @@ class ContactListTile extends StatelessWidget {
                 ],
               ),
             ),
+            // Last Print column
+            SizedBox(
+              width: 100,
+              child: Text(
+                contact.lastPrintDate != null
+                    ? contact.lastPrintDate!.toIso8601String().substring(0, 10)
+                    : '',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppTheme.secondaryTextColor,
+                  fontSize: 13,
+                ),
+              ),
+            ),
             // Actions
             PopupMenuButton<String>(
               onSelected: (value) => _handleAction(context, db, value),

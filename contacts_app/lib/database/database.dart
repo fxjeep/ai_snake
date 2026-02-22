@@ -104,6 +104,25 @@ class AppDatabase extends _$AppDatabase {
     await (delete(contactDetails)..where((t) => t.id.isIn(ids))).go();
   }
 
+  Future<void> batchUpdateLastPrint(Set<int> ids, DateTime lastPrint) async {
+    await (update(contactDetails)..where((t) => t.id.isIn(ids))).write(
+      ContactDetailsCompanion(
+        lastPrint: Value(lastPrint),
+      ),
+    );
+  }
+
+  Future<void> clearAllPrintStatus() async {
+    await transaction(() async {
+      await update(contacts).write(
+        const ContactsCompanion(isPrinted: Value(false)),
+      );
+      await update(contactDetails).write(
+        const ContactDetailsCompanion(isPrinted: Value(false)),
+      );
+    });
+  }
+
   // Aggregate query for PrintView
   Stream<List<ContactPrintData>> watchContactsWithDetails() {
     final query = select(contacts).join([
