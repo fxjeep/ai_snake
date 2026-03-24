@@ -12,8 +12,6 @@ class Contacts extends Table {
   TextColumn get name => text()();
   TextColumn get code => text()();
   DateTimeColumn get lastPrintDate => dateTime().nullable()();
-  TextColumn get initials => text()();
-  TextColumn get profileImage => text().nullable()();
   BoolColumn get isPrinted => boolean().withDefault(const Constant(false))();
 }
 
@@ -27,12 +25,15 @@ class ContactDetails extends Table {
   TextColumn get name1 => text()();
   TextColumn get name2 => text()();
   TextColumn get name3 => text()();
-  TextColumn get type => text().map(const EnumNameConverter<ContactType>(ContactType.values))();
+  TextColumn get type =>
+      text().map(const EnumNameConverter<ContactType>(ContactType.values))();
 }
 
 @DriftDatabase(tables: [Contacts, ContactDetails])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  final File dbFile;
+
+  AppDatabase(this.dbFile) : super(NativeDatabase.createInBackground(dbFile));
 
   @override
   int get schemaVersion => 3;
@@ -59,37 +60,56 @@ class AppDatabase extends _$AppDatabase {
 
   // Search contacts by name or code
   Stream<List<Contact>> searchContacts(String query) {
-    return (select(contacts)
-          ..where((t) => t.name.like('%$query%') | t.code.like('%$query%')))
-        .watch();
+    return (select(
+      contacts,
+    )..where((t) => t.name.like('%$query%') | t.code.like('%$query%'))).watch();
+  }
+
+  // Search contacts by name or code (Future for autocomplete)
+  Future<List<Contact>> searchContactsFuture(String query) {
+    return (select(
+      contacts,
+    )..where((t) => t.name.like('%$query%') | t.code.like('%$query%'))).get();
   }
 
   // CRUD operations
-  Future<int> addContact(ContactsCompanion entry) => into(contacts).insert(entry);
+  Future<int> addContact(ContactsCompanion entry) =>
+      into(contacts).insert(entry);
   Future<bool> updateContact(Contact entry) => update(contacts).replace(entry);
   Future<int> deleteContact(Contact entry) => delete(contacts).delete(entry);
 
   // Detail operations
   Stream<List<ContactDetail>> watchDetailsForContact(int contactId) {
-    return (select(contactDetails)..where((t) => t.contactId.equals(contactId))).watch();
+    return (select(
+      contactDetails,
+    )..where((t) => t.contactId.equals(contactId))).watch();
   }
 
-  Stream<List<ContactDetail>> watchDetailsByType(int contactId, ContactType type, {String? query}) {
-    return (select(contactDetails)
-          ..where((t) {
-            final matchesContactAndType = t.contactId.equals(contactId) & t.type.equalsValue(type);
-            if (query == null || query.isEmpty) {
-              return matchesContactAndType;
-            }
-            return matchesContactAndType &
-                (t.name1.like('%$query%') | t.name2.like('%$query%') | t.name3.like('%$query%'));
-          }))
+  Stream<List<ContactDetail>> watchDetailsByType(
+    int contactId,
+    ContactType type, {
+    String? query,
+  }) {
+    return (select(contactDetails)..where((t) {
+          final matchesContactAndType =
+              t.contactId.equals(contactId) & t.type.equalsValue(type);
+          if (query == null || query.isEmpty) {
+            return matchesContactAndType;
+          }
+          return matchesContactAndType &
+              (t.name1.like('%$query%') |
+                  t.name2.like('%$query%') |
+                  t.name3.like('%$query%'));
+        }))
         .watch();
   }
 
-  Future<int> addDetail(ContactDetailsCompanion entry) => into(contactDetails).insert(entry);
-  Future<bool> updateDetail(ContactDetail entry) => update(contactDetails).replace(entry);
-  Future<int> deleteDetail(ContactDetail entry) => delete(contactDetails).delete(entry);
+  Future<int> addDetail(ContactDetailsCompanion entry) =>
+      into(contactDetails).insert(entry);
+  Future<bool> updateDetail(ContactDetail entry) =>
+      update(contactDetails).replace(entry);
+  Future<int> deleteDetail(ContactDetail entry) =>
+      delete(contactDetails).delete(entry);
 
   Future<void> batchUpdatePrintStatus(Set<int> ids, bool isPrinted) async {
     await (update(contactDetails)..where((t) => t.id.isIn(ids))).write(
@@ -106,20 +126,18 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> batchUpdateLastPrint(Set<int> ids, DateTime lastPrint) async {
     await (update(contactDetails)..where((t) => t.id.isIn(ids))).write(
-      ContactDetailsCompanion(
-        lastPrint: Value(lastPrint),
-      ),
+      ContactDetailsCompanion(lastPrint: Value(lastPrint)),
     );
   }
 
   Future<void> clearAllPrintStatus() async {
     await transaction(() async {
-      await update(contacts).write(
-        const ContactsCompanion(isPrinted: Value(false)),
-      );
-      await update(contactDetails).write(
-        const ContactDetailsCompanion(isPrinted: Value(false)),
-      );
+      await update(
+        contacts,
+      ).write(const ContactsCompanion(isPrinted: Value(false)));
+      await update(
+        contactDetails,
+      ).write(const ContactDetailsCompanion(isPrinted: Value(false)));
     });
   }
 
@@ -156,9 +174,125 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
+  Future<void> mergeContacts(int sourceId, int targetId) async {
+    await transaction(() async {
+      // 1. Move all details from source to target
+      await (update(contactDetails)..where((t) => t.contactId.equals(sourceId)))
+          .write(ContactDetailsCompanion(contactId: Value(targetId)));
+
+      // 2. Delete the source contact
+      await (delete(contacts)..where((t) => t.id.equals(sourceId))).go();
+    });
+  }
+
+  Future<void> importRecords(List<ImportRecord> rows) async {
+    await transaction(() async {
+      for (final row in rows) {
+        // 1. Find or create contact
+        var contact =
+            await (select(contacts)
+                  ..where(
+                    (t) =>
+                        t.name.equals(row.contactName) &
+                        t.code.equals(row.contactCode),
+                  )
+                  ..limit(1))
+                .getSingleOrNull();
+
+        int contactId;
+        if (contact == null) {
+          contactId = await into(contacts).insert(
+            ContactsCompanion.insert(
+              name: row.contactName,
+              code: row.contactCode,
+              lastPrintDate: Value(row.contactLastPrintDate),
+              isPrinted: const Value(false),
+            ),
+          );
+        } else {
+          contactId = contact.id;
+        }
+
+        // 2. Map type string to enum
+        ContactType type;
+        switch (row.typeStr.toLowerCase()) {
+          case 'dead':
+            type = ContactType.Dead;
+            break;
+          case 'ancestor':
+            type = ContactType.Ancestor;
+            break;
+          case 'property':
+            type = ContactType.Property;
+            break;
+          case 'live':
+          default:
+            type = ContactType.Live;
+            break;
+        }
+
+        // 3. Insert detail record
+        await into(contactDetails).insert(
+          ContactDetailsCompanion.insert(
+            contactId: contactId,
+            name1: row.name1,
+            name2: row.name2,
+            name3: row.name3,
+            type: type,
+            lastPrint: Value(row.detailLastPrintDate),
+            isPrinted: const Value(false),
+          ),
+        );
+      }
+    });
+  }
+
+  Future<List<Contact>> getContactsByPrintDateAfter(DateTime date) async {
+    return await (select(contacts)
+          ..where((t) => t.lastPrintDate.isBiggerThanValue(date))
+          ..orderBy([(t) => OrderingTerm(expression: t.name)]))
+        .get();
+  }
+
+  Future<Contact?> findContact(String query) async {
+    return await (select(contacts)
+          ..where((t) => t.name.equals(query) | t.code.equals(query))
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  Future<Contact?> findContactByNameAndCode(String name, String code) async {
+    return await (select(contacts)
+          ..where((t) => t.name.equals(name) & t.code.equals(code))
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
   Stream<Contact> watchContactById(int id) {
     return (select(contacts)..where((t) => t.id.equals(id))).watchSingle();
   }
+}
+
+class ImportRecord {
+  final String contactName;
+  final String contactCode;
+  final DateTime? contactLastPrintDate;
+  final String typeStr;
+  final String name1;
+  final String name2;
+  final String name3;
+  final DateTime? detailLastPrintDate;
+
+  ImportRecord({
+    required this.contactName,
+    required this.contactCode,
+    this.contactLastPrintDate,
+    required this.typeStr,
+    required this.name1,
+    required this.name2,
+    required this.name3,
+    this.detailLastPrintDate,
+  });
 }
 
 class ContactPrintData {
@@ -166,12 +300,4 @@ class ContactPrintData {
   final List<ContactDetail> details;
 
   ContactPrintData({required this.contact, required this.details});
-}
-
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    return NativeDatabase.createInBackground(file);
-  });
 }

@@ -2,13 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme.dart';
 import 'database/database.dart';
+import 'database/database_provider.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final dbProvider = DatabaseProvider();
+  await dbProvider.initialize();
+
   runApp(
-    Provider<AppDatabase>(
-      create: (context) => AppDatabase(),
-      dispose: (context, db) => db.close(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: dbProvider),
+        ProxyProvider<DatabaseProvider, AppDatabase>(
+          update: (context, dbProv, previous) => dbProv.database,
+          dispose: (context, db) => db.close(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );

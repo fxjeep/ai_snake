@@ -83,6 +83,7 @@ class ContactListTile extends StatelessWidget {
                 const PopupMenuItem(value: 'create_list', child: Text('Create List')),
                 const PopupMenuItem(value: 'edit', child: Text('Edit')),
                 PopupMenuItem(value: 'print', child: Text(isPrinted ? 'Unprint' : 'Print')),
+                const PopupMenuItem(value: 'merge_into', child: Text('Merge into')),
                 const PopupMenuItem(value: 'delete', child: Text('Delete')),
               ],
               icon: const Icon(Icons.more_vert, color: AppTheme.secondaryTextColor),
@@ -136,6 +137,9 @@ class ContactListTile extends StatelessWidget {
           }
         }
         break;
+      case 'merge_into':
+        _showMergeDialog(context, db);
+        break;
       case 'delete':
         final confirm = await showDialog<bool>(
           context: context,
@@ -169,5 +173,156 @@ class ContactListTile extends StatelessWidget {
         }
         break;
     }
+  }
+
+  void _showMergeDialog(BuildContext context, AppDatabase db) {
+    Contact? selectedTarget;
+    final TextEditingController textController = TextEditingController();
+    final FocusNode focusNode = FocusNode();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceColor,
+        title: Text('Merge ${contact.name} / ${contact.code} into:'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RawAutocomplete<Contact>(
+              textEditingController: textController,
+              focusNode: focusNode,
+              displayStringForOption: (Contact option) => '${option.name} (${option.code})',
+              optionsBuilder: (TextEditingValue textEditingValue) async {
+                if (textEditingValue.text.isEmpty) {
+                  return const Iterable<Contact>.empty();
+                }
+                final results = await db.searchContactsFuture(textEditingValue.text);
+                // Exclude current contact from options
+                return results.where((c) => c.id != contact.id);
+              },
+              onSelected: (Contact selection) {
+                selectedTarget = selection;
+              },
+              fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  autofocus: true,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: 'Search target contact (name or code)',
+                    hintStyle: TextStyle(color: AppTheme.secondaryTextColor),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryColor)),
+                  ),
+                  onSubmitted: (value) {
+                    onFieldSubmitted();
+                  },
+                );
+              },
+              optionsViewBuilder: (context, onSelected, options) {
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 4.0,
+                    color: const Color(0xFF1c2732),
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: 280, // Approximate width for the dialog content
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: options.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final Contact option = options.elementAt(index);
+                          return InkWell(
+                            onTap: () => onSelected(option),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    option.name,
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    option.code,
+                                    style: const TextStyle(color: AppTheme.primaryColor, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.secondaryTextColor)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final query = textController.text.trim();
+              if (query.isEmpty) return;
+
+              // If they selected via autocomplete, we have selectedTarget.
+              // If they just typed a name/code exactly, we should try to find it.
+              Contact? target = selectedTarget;
+              if (target == null) {
+                target = await db.findContact(query);
+              }
+
+              if (target == null) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Target contact not found. Please select from dropdown.')),
+                  );
+                }
+                return;
+              }
+
+              if (target.id == contact.id) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Cannot merge a contact into itself')),
+                  );
+                }
+                return;
+              }
+
+              await db.mergeContacts(contact.id, target.id);
+              if (context.mounted) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: AppTheme.surfaceColor,
+                    title: const Text('Merge completed', style: TextStyle(color: Colors.white)),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close completion dialog
+                          Navigator.pop(context); // Close merge dialog
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+            child: const Text('Merge'),
+          ),
+        ],
+      ),
+    );
   }
 }

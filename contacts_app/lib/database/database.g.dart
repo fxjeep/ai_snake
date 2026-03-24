@@ -51,28 +51,6 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
         type: DriftSqlType.dateTime,
         requiredDuringInsert: false,
       );
-  static const VerificationMeta _initialsMeta = const VerificationMeta(
-    'initials',
-  );
-  @override
-  late final GeneratedColumn<String> initials = GeneratedColumn<String>(
-    'initials',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _profileImageMeta = const VerificationMeta(
-    'profileImage',
-  );
-  @override
-  late final GeneratedColumn<String> profileImage = GeneratedColumn<String>(
-    'profile_image',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
   static const VerificationMeta _isPrintedMeta = const VerificationMeta(
     'isPrinted',
   );
@@ -94,8 +72,6 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
     name,
     code,
     lastPrintDate,
-    initials,
-    profileImage,
     isPrinted,
   ];
   @override
@@ -138,23 +114,6 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
         ),
       );
     }
-    if (data.containsKey('initials')) {
-      context.handle(
-        _initialsMeta,
-        initials.isAcceptableOrUnknown(data['initials']!, _initialsMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_initialsMeta);
-    }
-    if (data.containsKey('profile_image')) {
-      context.handle(
-        _profileImageMeta,
-        profileImage.isAcceptableOrUnknown(
-          data['profile_image']!,
-          _profileImageMeta,
-        ),
-      );
-    }
     if (data.containsKey('is_printed')) {
       context.handle(
         _isPrintedMeta,
@@ -186,14 +145,6 @@ class $ContactsTable extends Contacts with TableInfo<$ContactsTable, Contact> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_print_date'],
       ),
-      initials: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}initials'],
-      )!,
-      profileImage: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}profile_image'],
-      ),
       isPrinted: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_printed'],
@@ -212,16 +163,12 @@ class Contact extends DataClass implements Insertable<Contact> {
   final String name;
   final String code;
   final DateTime? lastPrintDate;
-  final String initials;
-  final String? profileImage;
   final bool isPrinted;
   const Contact({
     required this.id,
     required this.name,
     required this.code,
     this.lastPrintDate,
-    required this.initials,
-    this.profileImage,
     required this.isPrinted,
   });
   @override
@@ -232,10 +179,6 @@ class Contact extends DataClass implements Insertable<Contact> {
     map['code'] = Variable<String>(code);
     if (!nullToAbsent || lastPrintDate != null) {
       map['last_print_date'] = Variable<DateTime>(lastPrintDate);
-    }
-    map['initials'] = Variable<String>(initials);
-    if (!nullToAbsent || profileImage != null) {
-      map['profile_image'] = Variable<String>(profileImage);
     }
     map['is_printed'] = Variable<bool>(isPrinted);
     return map;
@@ -249,10 +192,6 @@ class Contact extends DataClass implements Insertable<Contact> {
       lastPrintDate: lastPrintDate == null && nullToAbsent
           ? const Value.absent()
           : Value(lastPrintDate),
-      initials: Value(initials),
-      profileImage: profileImage == null && nullToAbsent
-          ? const Value.absent()
-          : Value(profileImage),
       isPrinted: Value(isPrinted),
     );
   }
@@ -267,8 +206,6 @@ class Contact extends DataClass implements Insertable<Contact> {
       name: serializer.fromJson<String>(json['name']),
       code: serializer.fromJson<String>(json['code']),
       lastPrintDate: serializer.fromJson<DateTime?>(json['lastPrintDate']),
-      initials: serializer.fromJson<String>(json['initials']),
-      profileImage: serializer.fromJson<String?>(json['profileImage']),
       isPrinted: serializer.fromJson<bool>(json['isPrinted']),
     );
   }
@@ -280,8 +217,6 @@ class Contact extends DataClass implements Insertable<Contact> {
       'name': serializer.toJson<String>(name),
       'code': serializer.toJson<String>(code),
       'lastPrintDate': serializer.toJson<DateTime?>(lastPrintDate),
-      'initials': serializer.toJson<String>(initials),
-      'profileImage': serializer.toJson<String?>(profileImage),
       'isPrinted': serializer.toJson<bool>(isPrinted),
     };
   }
@@ -291,8 +226,6 @@ class Contact extends DataClass implements Insertable<Contact> {
     String? name,
     String? code,
     Value<DateTime?> lastPrintDate = const Value.absent(),
-    String? initials,
-    Value<String?> profileImage = const Value.absent(),
     bool? isPrinted,
   }) => Contact(
     id: id ?? this.id,
@@ -301,8 +234,6 @@ class Contact extends DataClass implements Insertable<Contact> {
     lastPrintDate: lastPrintDate.present
         ? lastPrintDate.value
         : this.lastPrintDate,
-    initials: initials ?? this.initials,
-    profileImage: profileImage.present ? profileImage.value : this.profileImage,
     isPrinted: isPrinted ?? this.isPrinted,
   );
   Contact copyWithCompanion(ContactsCompanion data) {
@@ -313,10 +244,6 @@ class Contact extends DataClass implements Insertable<Contact> {
       lastPrintDate: data.lastPrintDate.present
           ? data.lastPrintDate.value
           : this.lastPrintDate,
-      initials: data.initials.present ? data.initials.value : this.initials,
-      profileImage: data.profileImage.present
-          ? data.profileImage.value
-          : this.profileImage,
       isPrinted: data.isPrinted.present ? data.isPrinted.value : this.isPrinted,
     );
   }
@@ -328,23 +255,13 @@ class Contact extends DataClass implements Insertable<Contact> {
           ..write('name: $name, ')
           ..write('code: $code, ')
           ..write('lastPrintDate: $lastPrintDate, ')
-          ..write('initials: $initials, ')
-          ..write('profileImage: $profileImage, ')
           ..write('isPrinted: $isPrinted')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    name,
-    code,
-    lastPrintDate,
-    initials,
-    profileImage,
-    isPrinted,
-  );
+  int get hashCode => Object.hash(id, name, code, lastPrintDate, isPrinted);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -353,8 +270,6 @@ class Contact extends DataClass implements Insertable<Contact> {
           other.name == this.name &&
           other.code == this.code &&
           other.lastPrintDate == this.lastPrintDate &&
-          other.initials == this.initials &&
-          other.profileImage == this.profileImage &&
           other.isPrinted == this.isPrinted);
 }
 
@@ -363,16 +278,12 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
   final Value<String> name;
   final Value<String> code;
   final Value<DateTime?> lastPrintDate;
-  final Value<String> initials;
-  final Value<String?> profileImage;
   final Value<bool> isPrinted;
   const ContactsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.code = const Value.absent(),
     this.lastPrintDate = const Value.absent(),
-    this.initials = const Value.absent(),
-    this.profileImage = const Value.absent(),
     this.isPrinted = const Value.absent(),
   });
   ContactsCompanion.insert({
@@ -380,19 +291,14 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     required String name,
     required String code,
     this.lastPrintDate = const Value.absent(),
-    required String initials,
-    this.profileImage = const Value.absent(),
     this.isPrinted = const Value.absent(),
   }) : name = Value(name),
-       code = Value(code),
-       initials = Value(initials);
+       code = Value(code);
   static Insertable<Contact> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? code,
     Expression<DateTime>? lastPrintDate,
-    Expression<String>? initials,
-    Expression<String>? profileImage,
     Expression<bool>? isPrinted,
   }) {
     return RawValuesInsertable({
@@ -400,8 +306,6 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
       if (name != null) 'name': name,
       if (code != null) 'code': code,
       if (lastPrintDate != null) 'last_print_date': lastPrintDate,
-      if (initials != null) 'initials': initials,
-      if (profileImage != null) 'profile_image': profileImage,
       if (isPrinted != null) 'is_printed': isPrinted,
     });
   }
@@ -411,8 +315,6 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     Value<String>? name,
     Value<String>? code,
     Value<DateTime?>? lastPrintDate,
-    Value<String>? initials,
-    Value<String?>? profileImage,
     Value<bool>? isPrinted,
   }) {
     return ContactsCompanion(
@@ -420,8 +322,6 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
       name: name ?? this.name,
       code: code ?? this.code,
       lastPrintDate: lastPrintDate ?? this.lastPrintDate,
-      initials: initials ?? this.initials,
-      profileImage: profileImage ?? this.profileImage,
       isPrinted: isPrinted ?? this.isPrinted,
     );
   }
@@ -441,12 +341,6 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
     if (lastPrintDate.present) {
       map['last_print_date'] = Variable<DateTime>(lastPrintDate.value);
     }
-    if (initials.present) {
-      map['initials'] = Variable<String>(initials.value);
-    }
-    if (profileImage.present) {
-      map['profile_image'] = Variable<String>(profileImage.value);
-    }
     if (isPrinted.present) {
       map['is_printed'] = Variable<bool>(isPrinted.value);
     }
@@ -460,8 +354,6 @@ class ContactsCompanion extends UpdateCompanion<Contact> {
           ..write('name: $name, ')
           ..write('code: $code, ')
           ..write('lastPrintDate: $lastPrintDate, ')
-          ..write('initials: $initials, ')
-          ..write('profileImage: $profileImage, ')
           ..write('isPrinted: $isPrinted')
           ..write(')'))
         .toString();
@@ -995,8 +887,6 @@ typedef $$ContactsTableCreateCompanionBuilder =
       required String name,
       required String code,
       Value<DateTime?> lastPrintDate,
-      required String initials,
-      Value<String?> profileImage,
       Value<bool> isPrinted,
     });
 typedef $$ContactsTableUpdateCompanionBuilder =
@@ -1005,8 +895,6 @@ typedef $$ContactsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String> code,
       Value<DateTime?> lastPrintDate,
-      Value<String> initials,
-      Value<String?> profileImage,
       Value<bool> isPrinted,
     });
 
@@ -1062,16 +950,6 @@ class $$ContactsTableFilterComposer
 
   ColumnFilters<DateTime> get lastPrintDate => $composableBuilder(
     column: $table.lastPrintDate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get initials => $composableBuilder(
-    column: $table.initials,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get profileImage => $composableBuilder(
-    column: $table.profileImage,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1135,16 +1013,6 @@ class $$ContactsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get initials => $composableBuilder(
-    column: $table.initials,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get profileImage => $composableBuilder(
-    column: $table.profileImage,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<bool> get isPrinted => $composableBuilder(
     column: $table.isPrinted,
     builder: (column) => ColumnOrderings(column),
@@ -1171,14 +1039,6 @@ class $$ContactsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get lastPrintDate => $composableBuilder(
     column: $table.lastPrintDate,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get initials =>
-      $composableBuilder(column: $table.initials, builder: (column) => column);
-
-  GeneratedColumn<String> get profileImage => $composableBuilder(
-    column: $table.profileImage,
     builder: (column) => column,
   );
 
@@ -1243,16 +1103,12 @@ class $$ContactsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> code = const Value.absent(),
                 Value<DateTime?> lastPrintDate = const Value.absent(),
-                Value<String> initials = const Value.absent(),
-                Value<String?> profileImage = const Value.absent(),
                 Value<bool> isPrinted = const Value.absent(),
               }) => ContactsCompanion(
                 id: id,
                 name: name,
                 code: code,
                 lastPrintDate: lastPrintDate,
-                initials: initials,
-                profileImage: profileImage,
                 isPrinted: isPrinted,
               ),
           createCompanionCallback:
@@ -1261,16 +1117,12 @@ class $$ContactsTableTableManager
                 required String name,
                 required String code,
                 Value<DateTime?> lastPrintDate = const Value.absent(),
-                required String initials,
-                Value<String?> profileImage = const Value.absent(),
                 Value<bool> isPrinted = const Value.absent(),
               }) => ContactsCompanion.insert(
                 id: id,
                 name: name,
                 code: code,
                 lastPrintDate: lastPrintDate,
-                initials: initials,
-                profileImage: profileImage,
                 isPrinted: isPrinted,
               ),
           withReferenceMapper: (p0) => p0

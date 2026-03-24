@@ -5,6 +5,8 @@ import '../core/theme.dart';
 import '../widgets/contact_list_tile.dart';
 import '../widgets/contact_dialog.dart';
 import '../widgets/print_view.dart';
+import '../widgets/data_view.dart';
+import '../widgets/settings_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,8 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _buildContactsTab(db),
           const PrintView(),
-          const Center(child: Text('Report View', style: TextStyle(color: Colors.white))),
-          const Center(child: Text('Settings View', style: TextStyle(color: Colors.white))),
+          const DataView(),
+          const SettingsView(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -44,10 +46,16 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.contacts), label: 'Contacts'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.contacts),
+            label: 'Contacts',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.print), label: 'Print'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Report'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(icon: Icon(Icons.table_chart), label: 'Data'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
     );
@@ -107,7 +115,9 @@ class _HomeScreenState extends State<HomeScreen> {
             // Contacts List
             Expanded(
               child: StreamBuilder<List<Contact>>(
-                stream: _searchQuery.isEmpty ? db.watchAllContacts() : db.searchContacts(_searchQuery),
+                stream: _searchQuery.isEmpty
+                    ? db.watchAllContacts()
+                    : db.searchContacts(_searchQuery),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -123,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   }
 
-                  final sortedContacts = List<Contact>.from(contacts)..sort((a, b) => a.name.compareTo(b.name));
+                  final sortedContacts = List<Contact>.from(contacts)
+                    ..sort((a, b) => a.name.compareTo(b.name));
 
                   return ListView.builder(
                     itemCount: sortedContacts.length,
@@ -154,9 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showAddDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const ContactDialog(),
-    );
+    showDialog(context: context, builder: (context) => const ContactDialog());
   }
 }

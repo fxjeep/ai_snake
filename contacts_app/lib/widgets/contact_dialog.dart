@@ -79,18 +79,15 @@ class _ContactDialogState extends State<ContactDialog> {
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                final initials = _getInitials(_nameController.text);
                 if (isEditing) {
                   await db.updateContact(widget.contact!.copyWith(
                     name: _nameController.text,
                     code: _codeController.text,
-                    initials: initials,
                   ));
                 } else {
                   await db.addContact(ContactsCompanion.insert(
                     name: _nameController.text,
                     code: _codeController.text,
-                    initials: initials,
                   ));
                 }
                 if (mounted) Navigator.pop(context);
@@ -103,12 +100,4 @@ class _ContactDialogState extends State<ContactDialog> {
     );
   }
 
-  String _getInitials(String name) {
-    if (name.isEmpty) return '';
-    final parts = name.split(' ');
-    if (parts.length > 1) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return parts[0][0].toUpperCase();
-  }
 }

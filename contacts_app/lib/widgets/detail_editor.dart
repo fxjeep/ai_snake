@@ -64,7 +64,7 @@ class _DetailEditorState extends State<DetailEditor> {
                 builder: (context, contactSnapshot) {
                   final contact = contactSnapshot.data ?? widget.contact;
                   final isCurrentlyPrinted = contact.isPrinted;
-                  
+
                   return Row(
                     children: [
                       if (isCurrentlyPrinted) ...[
@@ -103,17 +103,30 @@ class _DetailEditorState extends State<DetailEditor> {
                                   color: AppTheme.surfaceColor,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                                 child: TextField(
                                   controller: _searchController,
                                   onChanged: (value) {
-                                    setState(() {}); // Trigger rebuild of StreamBuilder for details
+                                    setState(
+                                      () {},
+                                    ); // Trigger rebuild of StreamBuilder for details
                                   },
-                                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
                                   decoration: const InputDecoration(
                                     hintText: 'Search...',
-                                    hintStyle: TextStyle(color: AppTheme.secondaryTextColor),
-                                    prefixIcon: Icon(Icons.search, color: AppTheme.primaryColor, size: 20),
+                                    hintStyle: TextStyle(
+                                      color: AppTheme.secondaryTextColor,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                      color: AppTheme.primaryColor,
+                                      size: 20,
+                                    ),
                                     border: InputBorder.none,
                                     contentPadding: EdgeInsets.only(bottom: 11),
                                   ),
@@ -124,15 +137,23 @@ class _DetailEditorState extends State<DetailEditor> {
                             SizedBox(
                               height: 40,
                               child: _ActionButton(
-                                icon: isCurrentlyPrinted ? Icons.print_disabled : Icons.print,
-                                label: isCurrentlyPrinted ? 'Unprint All' : 'Print All',
-                                color: isCurrentlyPrinted ? AppTheme.secondaryTextColor : AppTheme.primaryColor,
+                                icon: isCurrentlyPrinted
+                                    ? Icons.print_disabled
+                                    : Icons.print,
+                                label: isCurrentlyPrinted
+                                    ? 'Unprint All'
+                                    : 'Print All',
+                                color: isCurrentlyPrinted
+                                    ? AppTheme.secondaryTextColor
+                                    : AppTheme.primaryColor,
                                 isSolid: !isCurrentlyPrinted,
                                 isEnabled: true,
                                 onPressed: () async {
-                                  await db.updateContact(contact.copyWith(
-                                    isPrinted: !isCurrentlyPrinted,
-                                  ));
+                                  await db.updateContact(
+                                    contact.copyWith(
+                                      isPrinted: !isCurrentlyPrinted,
+                                    ),
+                                  );
                                 },
                               ),
                             ),
@@ -149,90 +170,146 @@ class _DetailEditorState extends State<DetailEditor> {
                   Expanded(
                     flex: 3,
                     child: StreamBuilder<List<ContactDetail>>(
-                      stream: db.watchDetailsByType(widget.contact.id, _selectedType, query: _searchController.text.trim()),
+                      stream: db.watchDetailsByType(
+                        widget.contact.id,
+                        _selectedType,
+                        query: _searchController.text.trim(),
+                      ),
                       builder: (context, snapshot) {
                         final details = snapshot.data ?? [];
                         final visibleIds = details.map((d) => d.id).toSet();
-                        final selectedVisibleIds = _selectedIds.intersection(visibleIds);
-                        
+                        final selectedVisibleIds = _selectedIds.intersection(
+                          visibleIds,
+                        );
+
                         return Row(
                           children: [
-                            _ActionButton(
-                              icon: Icons.print,
-                              label: 'Print',
-                              color: AppTheme.primaryColor,
-                              isSolid: true,
-                              isEnabled: selectedVisibleIds.isNotEmpty,
-                              onPressed: () async {
-                                await db.batchUpdatePrintStatus(selectedVisibleIds, true);
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Selected records marked as printed')),
+                            Expanded(
+                              child: _ActionButton(
+                                icon: Icons.print,
+                                label: 'Print',
+                                color: AppTheme.primaryColor,
+                                isSolid: true,
+                                isEnabled: selectedVisibleIds.isNotEmpty,
+                                onPressed: () async {
+                                  await db.batchUpdatePrintStatus(
+                                    selectedVisibleIds,
+                                    true,
                                   );
-                                }
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _ActionButton(
-                              icon: Icons.print_disabled,
-                              label: 'Unprint',
-                              color: AppTheme.secondaryTextColor,
-                              isSolid: false,
-                              isEnabled: selectedVisibleIds.isNotEmpty,
-                              onPressed: () async {
-                                await db.batchUpdatePrintStatus(selectedVisibleIds, false);
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Selected records marked as not printed')),
-                                  );
-                                }
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            _ActionButton(
-                              icon: Icons.delete,
-                              label: 'Delete',
-                              color: Colors.redAccent,
-                              isSolid: false,
-                              isEnabled: selectedVisibleIds.isNotEmpty,
-                              borderColor: Colors.redAccent.withOpacity(0.3),
-                              onPressed: () async {
-                                final confirmed = await showDialog<bool>(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    backgroundColor: AppTheme.surfaceColor,
-                                    title: const Text('Confirm Delete', style: TextStyle(color: Colors.white)),
-                                    content: Text('Delete ${selectedVisibleIds.length} selected record(s)?', 
-                                        style: const TextStyle(color: AppTheme.secondaryTextColor)),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context, false),
-                                        child: const Text('Cancel', style: TextStyle(color: AppTheme.secondaryTextColor)),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context, true),
-                                        child: const Text('Confirm', style: TextStyle(color: Colors.redAccent)),
-                                      ),
-                                    ],
-                                  ),
-                                );
-
-                                if (confirmed == true) {
-                                  await db.batchDeleteDetails(selectedVisibleIds);
-                                  setState(() {
-                                    _selectedIds.removeAll(selectedVisibleIds);
-                                  });
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Selected records deleted')),
+                                      const SnackBar(
+                                        content: Text(
+                                          'Selected records marked as printed',
+                                        ),
+                                      ),
                                     );
                                   }
-                                }
-                              },
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _ActionButton(
+                                icon: Icons.print_disabled,
+                                label: 'Unprint',
+                                color: AppTheme.secondaryTextColor,
+                                isSolid: false,
+                                isEnabled: selectedVisibleIds.isNotEmpty,
+                                onPressed: () async {
+                                  await db.batchUpdatePrintStatus(
+                                    selectedVisibleIds,
+                                    false,
+                                  );
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Selected records marked as not printed',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _ActionButton(
+                                icon: Icons.delete,
+                                label: 'Delete',
+                                color: Colors.redAccent,
+                                isSolid: false,
+                                isEnabled: selectedVisibleIds.isNotEmpty,
+                                borderColor: Colors.redAccent.withOpacity(0.3),
+                                onPressed: () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      backgroundColor: AppTheme.surfaceColor,
+                                      title: const Text(
+                                        'Confirm Delete',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      content: Text(
+                                        'Delete ${selectedVisibleIds.length} selected record(s)?',
+                                        style: const TextStyle(
+                                          color: AppTheme.secondaryTextColor,
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              color:
+                                                  AppTheme.secondaryTextColor,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                          child: const Text(
+                                            'Confirm',
+                                            style: TextStyle(
+                                              color: Colors.redAccent,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                  if (confirmed == true) {
+                                    await db.batchDeleteDetails(
+                                      selectedVisibleIds,
+                                    );
+                                    setState(() {
+                                      _selectedIds.removeAll(
+                                        selectedVisibleIds,
+                                      );
+                                    });
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Selected records deleted',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                              ),
                             ),
                           ],
                         );
-                      }
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -243,14 +320,19 @@ class _DetailEditorState extends State<DetailEditor> {
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceColor,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.primaryColor.withOpacity(0.3)),
+                        border: Border.all(
+                          color: AppTheme.primaryColor.withOpacity(0.3),
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<ContactType>(
                           value: _selectedType,
                           dropdownColor: AppTheme.surfaceColor,
-                          icon: const Icon(Icons.arrow_drop_down, color: AppTheme.primaryColor),
+                          icon: const Icon(
+                            Icons.arrow_drop_down,
+                            color: AppTheme.primaryColor,
+                          ),
                           isExpanded: true,
                           items: ContactType.values.map((ContactType type) {
                             return DropdownMenuItem<ContactType>(
@@ -325,10 +407,18 @@ class _DetailEditorState extends State<DetailEditor> {
                                 width: 24,
                                 height: 24,
                                 child: _CustomCheckbox(
-                                  value: details.isNotEmpty && details.every((d) => _selectedIds.contains(d.id)),
+                                  value:
+                                      details.isNotEmpty &&
+                                      details.every(
+                                        (d) => _selectedIds.contains(d.id),
+                                      ),
                                   onTap: () {
-                                    final allCurrentlySelected = details.every((d) => _selectedIds.contains(d.id));
-                                    final ids = details.map((d) => d.id).toSet();
+                                    final allCurrentlySelected = details.every(
+                                      (d) => _selectedIds.contains(d.id),
+                                    );
+                                    final ids = details
+                                        .map((d) => d.id)
+                                        .toSet();
                                     setState(() {
                                       if (allCurrentlySelected) {
                                         _selectedIds.removeAll(ids);
@@ -340,7 +430,9 @@ class _DetailEditorState extends State<DetailEditor> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const SizedBox(width: 24), // Space for isPrint icon
+                              const SizedBox(
+                                width: 24,
+                              ), // Space for isPrint icon
                               const SizedBox(width: 16),
                               Expanded(
                                 child: Text(
@@ -392,7 +484,9 @@ class _DetailEditorState extends State<DetailEditor> {
                               ? const Center(
                                   child: Text(
                                     'No Record',
-                                    style: TextStyle(color: AppTheme.secondaryTextColor),
+                                    style: TextStyle(
+                                      color: AppTheme.secondaryTextColor,
+                                    ),
                                   ),
                                 )
                               : ListView.builder(
@@ -400,10 +494,14 @@ class _DetailEditorState extends State<DetailEditor> {
                                   itemBuilder: (context, index) {
                                     final detail = details[index];
                                     return _DetailRow(
-                                      isSelected: _selectedIds.contains(detail.id),
+                                      isSelected: _selectedIds.contains(
+                                        detail.id,
+                                      ),
                                       onSelect: () {
                                         setState(() {
-                                          if (_selectedIds.contains(detail.id)) {
+                                          if (_selectedIds.contains(
+                                            detail.id,
+                                          )) {
                                             _selectedIds.remove(detail.id);
                                           } else {
                                             _selectedIds.add(detail.id);
@@ -415,7 +513,9 @@ class _DetailEditorState extends State<DetailEditor> {
                                       name2: detail.name2,
                                       name3: detail.name3,
                                       lastPrint: detail.lastPrint != null
-                                          ? detail.lastPrint!.toIso8601String().substring(0, 10)
+                                          ? detail.lastPrint!
+                                                .toIso8601String()
+                                                .substring(0, 10)
                                           : '-',
                                     );
                                   },
@@ -438,35 +538,75 @@ class _DetailEditorState extends State<DetailEditor> {
     switch (_selectedType) {
       case ContactType.Live:
         return [
-          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), 
-              focusNode: _name1FocusNode, flex: 1),
+          _buildTextField(
+            _name1Controller,
+            'Name 1',
+            (val) => _addNewDetail(context, db),
+            focusNode: _name1FocusNode,
+            flex: 1,
+          ),
         ];
       case ContactType.Dead:
         return [
-          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), 
-              focusNode: _name1FocusNode, flex: 1),
+          _buildTextField(
+            _name1Controller,
+            'Name 1',
+            (val) => _addNewDetail(context, db),
+            focusNode: _name1FocusNode,
+            flex: 1,
+          ),
           const SizedBox(width: 8),
-          _buildTextField(_name2Controller, 'Name 2', (val) => _addNewDetail(context, db), flex: 1),
+          _buildTextField(
+            _name2Controller,
+            'Name 2',
+            (val) => _addNewDetail(context, db),
+            flex: 1,
+          ),
           const SizedBox(width: 8),
-          _buildTextField(_name3Controller, 'Name 3', (val) => _addNewDetail(context, db), flex: 1),
+          _buildTextField(
+            _name3Controller,
+            'Name 3',
+            (val) => _addNewDetail(context, db),
+            flex: 1,
+          ),
         ];
       case ContactType.Ancestor:
         return [
-          _buildTextField(_name1Controller, 'Name 1', (val) => _addNewDetail(context, db), 
-              focusNode: _name1FocusNode, flex: 1),
+          _buildTextField(
+            _name1Controller,
+            'Name 1',
+            (val) => _addNewDetail(context, db),
+            focusNode: _name1FocusNode,
+            flex: 1,
+          ),
           const SizedBox(width: 8),
-          _buildTextField(_name2Controller, 'Name 2', (val) => _addNewDetail(context, db), flex: 1),
+          _buildTextField(
+            _name2Controller,
+            'Name 2',
+            (val) => _addNewDetail(context, db),
+            flex: 1,
+          ),
         ];
       case ContactType.Property:
         return [
-          _buildTextField(_name1Controller, 'Property Details', (val) => _addNewDetail(context, db), 
-              focusNode: _name1FocusNode, flex: 3),
+          _buildTextField(
+            _name1Controller,
+            'Property Details',
+            (val) => _addNewDetail(context, db),
+            focusNode: _name1FocusNode,
+            flex: 3,
+          ),
         ];
     }
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, Function(String)? onSubmitted,
-      {FocusNode? focusNode, int flex = 1}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    Function(String)? onSubmitted, {
+    FocusNode? focusNode,
+    int flex = 1,
+  }) {
     final bool isEmpty = controller.text.trim().isEmpty;
     final bool showError = _showValidationErrors && isEmpty;
 
@@ -486,20 +626,27 @@ class _DetailEditorState extends State<DetailEditor> {
           hintText: hint,
           hintStyle: const TextStyle(color: AppTheme.secondaryTextColor),
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: 16,
+          ),
           filled: true,
           fillColor: AppTheme.surfaceColor,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: showError ? Colors.redAccent : AppTheme.primaryColor.withOpacity(0.3),
+              color: showError
+                  ? Colors.redAccent
+                  : AppTheme.primaryColor.withOpacity(0.3),
               width: showError ? 2.0 : 1.0,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: showError ? Colors.redAccent : AppTheme.primaryColor.withOpacity(0.1),
+              color: showError
+                  ? Colors.redAccent
+                  : AppTheme.primaryColor.withOpacity(0.1),
               width: showError ? 2.0 : 1.0,
             ),
           ),
@@ -517,10 +664,10 @@ class _DetailEditorState extends State<DetailEditor> {
 
   void _addNewDetail(BuildContext context, AppDatabase db) async {
     bool hasEmptyVisibleFields = false;
-    
+
     // Check visible fields based on selected type
     if (_name1Controller.text.trim().isEmpty) hasEmptyVisibleFields = true;
-    
+
     if (_selectedType == ContactType.Dead) {
       if (_name2Controller.text.trim().isEmpty) hasEmptyVisibleFields = true;
       if (_name3Controller.text.trim().isEmpty) hasEmptyVisibleFields = true;
@@ -539,14 +686,20 @@ class _DetailEditorState extends State<DetailEditor> {
     final name2 = _name2Controller.text.trim();
     final name3 = _name3Controller.text.trim();
 
-    await db.addDetail(ContactDetailsCompanion.insert(
-      contactId: widget.contact.id,
-      name1: name1,
-      name2: (_selectedType == ContactType.Dead || _selectedType == ContactType.Ancestor) ? name2 : '',
-      name3: (_selectedType == ContactType.Dead) ? name3 : '',
-      type: _selectedType,
-      isPrinted: const Value(true),
-    ));
+    await db.addDetail(
+      ContactDetailsCompanion.insert(
+        contactId: widget.contact.id,
+        name1: name1,
+        name2:
+            (_selectedType == ContactType.Dead ||
+                _selectedType == ContactType.Ancestor)
+            ? name2
+            : '',
+        name3: (_selectedType == ContactType.Dead) ? name3 : '',
+        type: _selectedType,
+        isPrinted: const Value(true),
+      ),
+    );
 
     _name1Controller.clear();
     _name2Controller.clear();
@@ -589,46 +742,55 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveColor = isEnabled ? color : AppTheme.secondaryTextColor;
-    final effectiveBorderColor = isEnabled 
-        ? (borderColor ?? (isSolid ? Colors.transparent : color)) 
+    final effectiveBorderColor = isEnabled
+        ? (borderColor ?? (isSolid ? Colors.transparent : color))
         : AppTheme.secondaryTextColor.withOpacity(0.1);
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: isEnabled ? onPressed : null,
-        child: Opacity(
-          opacity: isEnabled ? 1.0 : 0.4,
-          child: Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: isSolid ? effectiveColor : (backgroundColor ?? Colors.transparent),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: effectiveBorderColor, width: 2),
-              boxShadow: isSolid && isEnabled
-                  ? [
-                      BoxShadow(
-                        color: effectiveColor.withOpacity(0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ]
-                  : null,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: isSolid ? Colors.white : effectiveColor, size: 24),
-                const SizedBox(width: 8),
-                Text(
+    return GestureDetector(
+      onTap: isEnabled ? onPressed : null,
+      child: Opacity(
+        opacity: isEnabled ? 1.0 : 0.4,
+        child: Container(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: isSolid
+                ? effectiveColor
+                : (backgroundColor ?? Colors.transparent),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: effectiveBorderColor, width: 2),
+            boxShadow: isSolid && isEnabled
+                ? [
+                    BoxShadow(
+                      color: effectiveColor.withOpacity(0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isSolid ? Colors.white : effectiveColor,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
                   label,
                   style: TextStyle(
                     color: isSolid ? Colors.white : effectiveColor,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -667,10 +829,7 @@ class _DetailRow extends StatelessWidget {
           SizedBox(
             width: 24,
             height: 24,
-            child: _CustomCheckbox(
-              value: isSelected,
-              onTap: onSelect,
-            ),
+            child: _CustomCheckbox(value: isSelected, onTap: onSelect),
           ),
           const SizedBox(width: 8),
           SizedBox(
@@ -679,7 +838,9 @@ class _DetailRow extends StatelessWidget {
             child: Icon(
               isPrinted ? Icons.print : Icons.print_disabled,
               size: 16,
-              color: isPrinted ? AppTheme.primaryColor : AppTheme.secondaryTextColor,
+              color: isPrinted
+                  ? AppTheme.primaryColor
+                  : AppTheme.secondaryTextColor,
             ),
           ),
           const SizedBox(width: 16),
@@ -706,10 +867,7 @@ class _DetailRow extends StatelessWidget {
           Expanded(
             child: Text(
               name3,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           Expanded(
@@ -746,11 +904,7 @@ class _CustomCheckbox extends StatelessWidget {
           ),
         ),
         child: value
-            ? const Icon(
-                Icons.check,
-                size: 16,
-                color: Colors.white,
-              )
+            ? const Icon(Icons.check, size: 16, color: Colors.white)
             : null,
       ),
     );
