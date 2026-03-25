@@ -7,12 +7,19 @@ namespace QuickNote;
 
 public partial class Form1 : Form
 {
-    private NotifyIcon trayIcon;
-    private TabControl tabControl;
-    private TabPage addTabPage;
-    private System.Windows.Forms.Timer autoSaveTimer;
-    private TextBox editTabBox;
-    private TabPage currentlyEditingTab;
+    private NotifyIcon trayIcon = null!;
+    private ToolStrip toolStrip = null!;
+    private TabControl tabControl = null!;
+    private FlowLayoutPanel? tabHeaderPanel;
+    private TabPage? addTabPage;
+    private System.Windows.Forms.Timer? autoSaveTimer;
+    private TextBox? editTabBox;
+    private TabPage? currentlyEditingTab;
+
+    private ToolStripLabel searchLabel = null!;
+    private ToolStripTextBox searchTextBox = null!;
+    private ToolStripButton searchNextButton = null!;
+    private string lastSearchText = "";
 
     public Form1()
     {
@@ -40,9 +47,11 @@ public partial class Form1 : Form
     private void InitializeUI()
     {
         // Setup Global Toolbar
-        var toolStrip = new ToolStrip();
+        toolStrip = new ToolStrip();
+        toolStrip.Dock = DockStyle.Top;
         toolStrip.GripStyle = ToolStripGripStyle.Hidden;
         toolStrip.Padding = new Padding(5);
+        toolStrip.BackColor = Color.FromArgb(250, 250, 250);
 
         // Styling Buttons
         var btnBold = new ToolStripButton("B");
@@ -98,26 +107,132 @@ public partial class Form1 : Form
         
         toolStrip.Items.Add(btnExit);
 
+        // Search Controls
+        toolStrip.Items.Add(new ToolStripSeparator { Name = "searchSep", Visible = false });
+        
+        searchLabel = new ToolStripLabel("Find:");
+        searchLabel.Visible = false;
+        
+        searchTextBox = new ToolStripTextBox();
+        searchTextBox.Visible = false;
+        searchTextBox.Width = 150;
+        searchTextBox.TextChanged += (s, e) => PerformSearch(false);
+        searchTextBox.KeyDown += (s, e) => {
+            if (e.KeyCode == Keys.Enter) {
+                e.Handled = true;
+                PerformSearch(true);
+            }
+        };
+
+        searchNextButton = new ToolStripButton(">");
+        searchNextButton.Visible = false;
+        searchNextButton.ToolTipText = "Find Next (Enter)";
+        searchNextButton.Click += (s, e) => PerformSearch(true);
+
+        toolStrip.Items.Add(searchLabel);
+        toolStrip.Items.Add(searchTextBox);
+        toolStrip.Items.Add(searchNextButton);
+
+        // Setup TabHeaderPanel
+        tabHeaderPanel = new FlowLayoutPanel();
+        tabHeaderPanel.Dock = DockStyle.Top;
+        tabHeaderPanel.Height = 40;
+        tabHeaderPanel.BackColor = Color.FromArgb(240, 240, 240);
+        tabHeaderPanel.FlowDirection = FlowDirection.LeftToRight;
+        tabHeaderPanel.WrapContents = true;
+        tabHeaderPanel.AutoScroll = false;
+        tabHeaderPanel.Padding = new Padding(5, 5, 5, 5);
+        tabHeaderPanel.Visible = true;
+        
+        this.Resize += (s, e) => UpdateHeaderHeight();
+
         // Setup TabControl
         tabControl = new TabControl();
         tabControl.Dock = DockStyle.Fill;
-        tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
-        tabControl.Padding = new Point(16, 6); 
+        tabControl.Appearance = TabAppearance.Buttons;
+        tabControl.ItemSize = new Size(0, 1);
+        tabControl.SizeMode = TabSizeMode.Fixed;
         tabControl.Font = new Font("Segoe UI", 12, FontStyle.Regular);
         
-        tabControl.DrawItem += TabControl_DrawItem;
-        tabControl.MouseDown += TabControl_MouseDown;
-        tabControl.Selecting += TabControl_Selecting;
-        tabControl.DoubleClick += TabControl_DoubleClick;
+        tabControl.SelectedIndexChanged += (s, e) => RefreshTabHeaders();
         
-        // Setup the '+' tab
+        // Setup the '+' tab (still needed for logic, though hidden)
         addTabPage = new TabPage("+");
         tabControl.TabPages.Add(addTabPage);
         
-        // Add controls to form
-        this.Controls.Add(toolStrip);
+        // Add controls to form - Order matters for docking!
+        // To have toolstrip at top, then tabheader, then tabcontrol fill:
         this.Controls.Add(tabControl);
-        tabControl.BringToFront();
+        this.Controls.Add(tabHeaderPanel);
+        this.Controls.Add(toolStrip);
+        
+        // Ensure the docked controls are in the right z-order
+        toolStrip.BringToFront();
+        tabHeaderPanel.BringToFront();
+
+        this.KeyPreview = true;
+        this.KeyDown += Form1_KeyDown;
+    }
+
+    private void Form1_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.F3)
+        {
+            e.Handled = true;
+            ToggleSearchUI();
+        }
+    }
+
+    private void ToggleSearchUI()
+    {
+        bool isVisible = !searchTextBox.Visible;
+        searchLabel.Visible = isVisible;
+        searchTextBox.Visible = isVisible;
+        searchNextButton.Visible = isVisible;
+        
+        if (toolStrip.Items["searchSep"] is ToolStripSeparator sep)
+            sep.Visible = isVisible;
+
+        if (isVisible)
+        {
+            searchTextBox.Focus();
+            if (!string.IsNullOrEmpty(searchTextBox.Text))
+                PerformSearch(false);
+        }
+    }
+
+    private void PerformSearch(bool next)
+    {
+        if (tabControl.SelectedTab == null || tabControl.SelectedTab == addTabPage) return;
+        var rtb = GetRichTextBox(tabControl.SelectedTab);
+        if (rtb == null) return;
+
+        string searchText = searchTextBox.Text;
+        if (string.IsNullOrEmpty(searchText)) return;
+
+        int start = 0;
+        if (next && searchText == lastSearchText)
+        {
+            start = rtb.SelectionStart + rtb.SelectionLength;
+        }
+
+        int index = rtb.Find(searchText, start, RichTextBoxFinds.None);
+        if (index == -1 && start > 0)
+        {
+            // Wrap around
+            index = rtb.Find(searchText, 0, RichTextBoxFinds.None);
+        }
+
+        if (index != -1)
+        {
+            rtb.Select(index, searchText.Length);
+            rtb.ScrollToCaret();
+            
+            if (next) rtb.Focus();
+            else searchTextBox.Focus();
+        }
+
+        lastSearchText = searchText;
     }
 
     private Image GenerateExitIcon()
@@ -213,79 +328,113 @@ public partial class Form1 : Form
         tabPage.Controls.Add(rtb);
     }
 
-    // Drawing methods
-    private void TabControl_DrawItem(object? sender, DrawItemEventArgs e)
+    // Drawing methods (OBSOLETE - replaced by custom headers)
+    private void UpdateHeaderHeight()
     {
-        if (sender is not TabControl tabCtrl) return;
-        if (e.Index < 0 || e.Index >= tabCtrl.TabPages.Count) return;
-        
-        var tabPage = tabCtrl.TabPages[e.Index];
-        var tabRect = tabCtrl.GetTabRect(e.Index);
-        
-        bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
-        Brush bgBrush = isSelected ? SystemBrushes.ControlLightLight : SystemBrushes.Control;
-        e.Graphics.FillRectangle(bgBrush, tabRect);
-        
-        if (isSelected)
-        {
-            e.Graphics.DrawLine(SystemPens.ControlDark, tabRect.Left, tabRect.Top, tabRect.Right, tabRect.Top);
-            e.Graphics.DrawLine(SystemPens.ControlDark, tabRect.Left, tabRect.Top, tabRect.Left, tabRect.Bottom);
-            e.Graphics.DrawLine(SystemPens.ControlDark, tabRect.Right - 1, tabRect.Top, tabRect.Right - 1, tabRect.Bottom);
-        }
-
-        var textBrush = new SolidBrush(Color.Black);
-        
-        if (tabPage == addTabPage)
-        {
-            var stringFormat = new StringFormat
-            {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
-            };
-            e.Graphics.DrawString(tabPage.Text, new Font(tabCtrl.Font.FontFamily, tabCtrl.Font.Size + 2, FontStyle.Bold), textBrush, tabRect, stringFormat);
-        }
-        else
-        {
-            var format = new StringFormat
-            {
-                Alignment = StringAlignment.Near,
-                LineAlignment = StringAlignment.Center
-            };
-            var textRect = new Rectangle(tabRect.Left + 5, tabRect.Top, tabRect.Width - 25, tabRect.Height);
-            e.Graphics.DrawString(tabPage.Text, tabCtrl.Font, textBrush, textRect, format);
-            
-            var closeFont = new Font("Arial", 9, FontStyle.Bold);
-            var closeRect = GetCloseButtonRect(e.Index);
-            
-            var xFormat = new StringFormat
-            {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
-            };
-            e.Graphics.DrawString("x", closeFont, Brushes.Gray, closeRect, xFormat);
-        }
-    }
-    
-    private Rectangle GetCloseButtonRect(int tabIndex)
-    {
-        var tabRect = tabControl.GetTabRect(tabIndex);
-        return new Rectangle(tabRect.Right - 18, tabRect.Top + (tabRect.Height - 14) / 2, 14, 14);
+        if (tabHeaderPanel == null) return;
+        int preferredHeight = tabHeaderPanel.GetPreferredSize(new Size(tabHeaderPanel.Width, 0)).Height;
+        tabHeaderPanel.Height = Math.Max(40, preferredHeight);
     }
 
-    private void TabControl_MouseDown(object? sender, MouseEventArgs e)
+    private void RefreshTabHeaders()
     {
-        for (int i = 0; i < tabControl.TabPages.Count; i++)
+        if (tabHeaderPanel == null) return;
+        tabHeaderPanel.SuspendLayout();
+        tabHeaderPanel.Controls.Clear();
+
+        foreach (TabPage page in tabControl.TabPages)
         {
-            var tabPage = tabControl.TabPages[i];
-            if (tabPage == addTabPage) continue;
-            
-            var closeRect = GetCloseButtonRect(i);
-            if (closeRect.Contains(e.Location))
-            {
-                CloseCurrentTab(tabPage);
-                return;
+            if (page == addTabPage) continue;
+            var tabBtn = CreateTabButton(page);
+            tabBtn.Visible = true;
+            tabHeaderPanel.Controls.Add(tabBtn);
+        }
+
+        // The "+" button to add new tabs
+        var btnAdd = new Panel();
+        btnAdd.Size = new Size(30,30);
+        btnAdd.Margin = new Padding(5, 5, 5, 5);
+        btnAdd.Cursor = Cursors.Hand;
+        btnAdd.BackColor = Color.Transparent;
+        btnAdd.Paint += (s, e) => {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using var pen = new Pen(Color.FromArgb(100, 100, 100), 2);
+            e.Graphics.DrawLine(pen, 15, 8, 15, 22);
+            e.Graphics.DrawLine(pen, 8, 15, 22, 15);
+        };
+        btnAdd.Click += (s, e) => AddNewTab();
+        btnAdd.MouseEnter += (s, e) => btnAdd.BackColor = Color.FromArgb(220, 220, 220);
+        btnAdd.MouseLeave += (s, e) => btnAdd.BackColor = Color.Transparent;
+
+        btnAdd.Visible = true;
+        tabHeaderPanel.Controls.Add(btnAdd);
+        
+        tabHeaderPanel.ResumeLayout();
+        UpdateHeaderHeight();
+    }
+
+    private Control CreateTabButton(TabPage page)
+    {
+        bool isSelected = tabControl.SelectedTab == page;
+        
+        var panel = new Panel();
+        panel.Margin = new Padding(2, 2, 2, 2);
+        panel.Cursor = Cursors.Hand;
+        
+        using (var g = panel.CreateGraphics())
+        {
+            var textSize = g.MeasureString(page.Text, tabControl.Font);
+            panel.Width = (int)textSize.Width + 45; 
+            panel.Height = Math.Max(35, (int)textSize.Height + 10);
+        }
+
+        panel.BackColor = isSelected ? Color.White : Color.Transparent;
+        
+        // Bottom border for selected tab
+        panel.Paint += (s, e) => {
+            if (isSelected) {
+                using var p = new Pen(Color.FromArgb(0, 120, 215), 3);
+                e.Graphics.DrawLine(p, 0, panel.Height - 1, panel.Width, panel.Height - 1);
             }
-        }
+        };
+
+        var lbl = new Label();
+        lbl.Text = page.Text;
+        lbl.AutoSize = false;
+        lbl.Dock = DockStyle.Fill;
+        lbl.TextAlign = ContentAlignment.MiddleLeft;
+        lbl.Padding = new Padding(10, 0, 0, 0);
+        lbl.Font = new Font(tabControl.Font, isSelected ? FontStyle.Bold : FontStyle.Regular);
+        lbl.ForeColor = isSelected ? Color.Black : Color.FromArgb(80, 80, 80);
+        
+        lbl.Click += (s, e) => tabControl.SelectedTab = page;
+        lbl.DoubleClick += (s, e) => {
+            var rect = panel.Bounds;
+            StartEditingTab(page, rect);
+        };
+
+        var btnClose = new Label();
+        btnClose.Text = "×";
+        btnClose.AutoSize = false;
+        btnClose.Width = 25;
+        btnClose.Dock = DockStyle.Right;
+        btnClose.TextAlign = ContentAlignment.MiddleCenter;
+        btnClose.Font = new Font("Arial", 11, FontStyle.Bold);
+        btnClose.ForeColor = Color.FromArgb(150, 150, 150);
+        btnClose.Cursor = Cursors.Hand;
+        
+        btnClose.MouseEnter += (s, e) => btnClose.ForeColor = Color.IndianRed;
+        btnClose.MouseLeave += (s, e) => btnClose.ForeColor = Color.FromArgb(150, 150, 150);
+        btnClose.Click += (s, e) => CloseCurrentTab(page);
+
+        panel.Controls.Add(lbl);
+        panel.Controls.Add(btnClose);
+
+        // Hover effects
+        lbl.MouseEnter += (s, e) => { if (!isSelected) panel.BackColor = Color.FromArgb(225, 225, 225); };
+        lbl.MouseLeave += (s, e) => { if (!isSelected) panel.BackColor = Color.Transparent; };
+
+        return panel;
     }
 
     private void TabControl_Selecting(object? sender, TabControlCancelEventArgs e)
@@ -293,23 +442,7 @@ public partial class Form1 : Form
         if (e.TabPage == addTabPage)
         {
             e.Cancel = true; 
-            this.BeginInvoke(new Action(() => AddNewTab()));
-        }
-    }
-
-    private void TabControl_DoubleClick(object? sender, EventArgs e)
-    {
-        var cursor = tabControl.PointToClient(Cursor.Position);
-        for (int i = 0; i < tabControl.TabPages.Count; i++)
-        {
-            if (tabControl.TabPages[i] == addTabPage) continue;
-            
-            var rect = tabControl.GetTabRect(i);
-            if (rect.Contains(cursor))
-            {
-                StartEditingTab(tabControl.TabPages[i], rect);
-                break;
-            }
+            AddNewTab();
         }
     }
 
@@ -327,7 +460,10 @@ public partial class Form1 : Form
         currentlyEditingTab = tab;
         editTabBox.Text = tab.Text;
         
-        editTabBox.Bounds = new Rectangle(tabControl.Left + rect.X + 2, tabControl.Top + rect.Y + 2, rect.Width - 25, rect.Height - 4);
+        int x = tabHeaderPanel != null ? tabHeaderPanel.Left : tabControl.Left;
+        int y = tabHeaderPanel != null ? tabHeaderPanel.Top : tabControl.Top;
+        
+        editTabBox.Bounds = new Rectangle(x + rect.X + 2, y + rect.Y + 2, rect.Width - 25, rect.Height - 4);
         editTabBox.Visible = true;
         editTabBox.BringToFront();
         editTabBox.Focus();
@@ -370,7 +506,8 @@ public partial class Form1 : Form
                 {
                     try
                     {
-                        string directory = Path.GetDirectoryName(oldFilePath);
+                        string? directory = Path.GetDirectoryName(oldFilePath);
+                        if (directory == null) return;
                         string isoTime = DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss");
                         string safeNewText = string.Join("_", newText.Split(Path.GetInvalidFileNameChars()));
                         string newFileName = $"{safeNewText}_{isoTime}.rtf";
@@ -389,7 +526,7 @@ public partial class Form1 : Form
             editTabBox.Visible = false;
         }
         currentlyEditingTab = null;
-        tabControl.Invalidate();
+        RefreshTabHeaders();
     }
 
     private void InitializeTrayIcon()
@@ -432,6 +569,7 @@ public partial class Form1 : Form
             
             AddNewTabExisting(file, tabHeader);
         }
+        RefreshTabHeaders();
     }
 
     private void AddNewTabExisting(string filePath, string tabHeader)
@@ -445,6 +583,7 @@ public partial class Form1 : Form
         CreateTabEditor(tabPage, filePath);
 
         tabControl.TabPages.Insert(insertIndex, tabPage);
+        RefreshTabHeaders();
 
         if (tabControl.TabPages.Count == 2) 
         {
@@ -481,17 +620,18 @@ public partial class Form1 : Form
         CreateTabEditor(tabPage, filePath);
         
         tabControl.TabPages.Insert(insertIndex, tabPage);
+        RefreshTabHeaders();
         tabControl.SelectedTab = tabPage;
     }
 
     private void ScheduleSave(RichTextBox rtb)
     {
         rtb.Modified = true;
-        autoSaveTimer.Stop();
-        autoSaveTimer.Start();
+        autoSaveTimer?.Stop();
+        autoSaveTimer?.Start();
     }
 
-    private RichTextBox GetRichTextBox(TabPage page)
+    private RichTextBox? GetRichTextBox(TabPage? page)
     {
         if (page == null) return null;
         foreach (Control c in page.Controls)
@@ -503,7 +643,7 @@ public partial class Form1 : Form
 
     private void AutoSaveTimer_Tick(object? sender, EventArgs e)
     {
-        autoSaveTimer.Stop();
+        autoSaveTimer?.Stop();
         foreach (TabPage page in tabControl.TabPages)
         {
             if (page == addTabPage || page.Tag is not string filePath) continue;
@@ -527,6 +667,7 @@ public partial class Form1 : Form
         }
         
         tabControl.TabPages.Remove(tab);
+        RefreshTabHeaders();
         tab.Dispose();
     }
 
