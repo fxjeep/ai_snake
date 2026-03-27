@@ -37,11 +37,13 @@ public partial class MainWindow : Window
 
             if (selectedType == "长生")
             {
-                LivePrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true, PrintRedStampCheckBox.IsChecked == true, PrintConfigure.ChangeShengConfig);
+                LivePrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true,
+                                PrintRedStampCheckBox.IsChecked == true, PrintConfigure.ChangeShengConfig, PrintConfigure.Main);
             }
-            else if (selectedType == "消灾")
+            else if (selectedType == "冤亲")
             {
-                LivePrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true, PrintRedStampCheckBox.IsChecked == true, PrintConfigure.YuanQinConfig);
+                LivePrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true,
+                            PrintRedStampCheckBox.IsChecked == true, PrintConfigure.YuanQinConfig, PrintConfigure.SideYuanQin);
             }
             else if (selectedType == "往生")
             {

@@ -14,8 +14,9 @@
         </side>
     </item>
     <item>
-        <main><line>先母朱金英</line></main>
+        <main><line>先妣朱金英</line></main>
         <side>
+            <line>　</line>
             <line>女兒　黃桂香</line>
         </side>
     </item>
@@ -29,21 +30,24 @@
     </item>
     <item>
         <main>
-            <line>先母楊金梅</line>
+            <line>先妣楊金梅</line>
         </main>
         <side>
+        <line>　</line>
             <line>女兒　廖衢英</line>
         </side>
     </item>
     <item>
         <main><line>十方龍天護法</line></main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
     <item>
         <main><line>十方無祀孤魂</line></main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -53,6 +57,7 @@
             <line>生堂上眾等神靈</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -62,6 +67,7 @@
             <line>一切婴靈</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -71,6 +77,7 @@
             <line>一切眾生</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -80,6 +87,7 @@
             <line>軍民同胞</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -89,6 +97,7 @@
             <line>切蜎飛蠕動眾生</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -98,6 +107,7 @@
             <line>城隍土地尊神</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -107,6 +117,7 @@
             <line>苦難眾生</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -116,6 +127,7 @@
             <line>眾弟子歷代祖先</line>
         </main>
         <side>
+        <line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -124,7 +136,7 @@
             <line>一心信佛向善</line>
             <line>求生淨土眾生</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -133,7 +145,7 @@
             <line>全世界各國元首</line>
             <line>之累劫冤親債主</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -142,7 +154,7 @@
             <line>全世界居民</line>
             <line>萬姓祖先</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -151,7 +163,7 @@
             <line>娑婆世界所有</line>
             <line>细菌病菌病毒</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -160,7 +172,7 @@
             <line>全球所有製造淫亂</line>
             <line>污穢之一切眾生</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -169,7 +181,7 @@
             <line>世界各地區過現</line>
             <line>未一切罹難眾生</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -178,7 +190,7 @@
             <line>澳洲全國各地區</line>
             <line>遭屠殺之原住民</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -187,7 +199,7 @@
             <line>世界各地因疫</line>
             <line>情罹難的眾生</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -196,7 +208,7 @@
             <line>新型冠状</line>
             <line>细菌菩薩</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -206,7 +218,7 @@
             <line>一切戰場上死亡</line>
             <line>軍民暨鬼畜眾靈</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -216,7 +228,7 @@
             <line>山神沙神水神</line>
             <line>土地神等眾神靈</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -226,7 +238,7 @@
             <line>樹神花神草神</line>
             <line>水神河神等眾神</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -236,7 +248,7 @@
             <line>雷思维爾街82號</line>
             <line>地基主</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -246,7 +258,7 @@
             <line>雷思维爾街84號</line>
             <line>地基主</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -256,7 +268,7 @@
             <line>雷思维爾街94號</line>
             <line>地基主</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -267,7 +279,7 @@
             <line>82號84號94號</line>
             <line>被殺被害之一切眾生</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -277,7 +289,7 @@
             <line>雷思维爾街班克</line>
             <line>斯坦小學地基主</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -288,23 +300,23 @@
             <line>蓮位之亡靈及地基主</line>
             <line>累劫冤親債主等衆</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會牌位組人員等</line>
         </side>
     </item>
     <item>
         <main>
-            <line>先考鄭母陳太夫人<s>諱</s>玉带</line>
+            <line>先妣鄭母陳太夫人<s>諱</s>玉带</line>
         </main>
-        <side>
-            <line>兒子　鄭德旺</line>
+        <side><line>　</line>
+            <line>兒子　鄭得旺</line>
         </side>
     </item>
     <item>
         <main>
             <line>先會長賴格蘭姆先生</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>雪梨淨宗學會等四衆弟子</line>
         </side>
     </item>
@@ -313,17 +325,17 @@
             <line>住在羅柏安身上及</line>
             <line>身旁修行的眾神靈</line>
         </main>
-        <side>
+        <side><line>　</line>
             <line>佛弟子　羅柏安</line>
         </side>
     </item>
     <item>
         <main>
-            <line>引起左麵部痤攣抽</line>
+            <line>引起左麵部痙攣抽</line>
             <line>搐的一切有緣衆生</line>
         </main>
-        <side>
-            <line>佛弟子　鄭德旺</line>
+        <side><line>　</line>
+            <line>佛弟子　鄭得旺</line>
         </side>
     </item>
 </list>

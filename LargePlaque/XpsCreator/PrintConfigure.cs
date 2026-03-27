@@ -45,20 +45,22 @@ public class PrintConfigure
     public static FontSize Main { get; } = new FontSize { Large = 47, Medium = 37, Small = 30, LargeLines = 7, MediumLines = 10 };
     public static FontSize Side { get; } = new FontSize { Large = 25, Medium = 25, Small = 20, LargeLines = 5, MediumLines = 9 };
 
+    public static FontSize SideYuanQin { get; } = new FontSize { Large = 33, Medium = 28, Small = 25, LargeLines = 5, MediumLines = 8 };
+
     public static MainBoxConfigure ChangeShengConfig { get; } = new MainBoxConfigure
     {
         TextPrintBox = new TextPrintBoxConfigure
         {
             Left = 11.6 * cmToPx,
-            Top = 15.5 * cmToPx,
+            Top = 16 * cmToPx,
             Width = 6.5 * cmToPx,
             Height = 10.5 * cmToPx,
             ColumnAlign = EnumColumnAlign.Center
         },
         StampPosition = new StampPositionConfig
         {
-            Left = 11.5 * cmToPx,
-            Top = 1.0 * cmToPx,
+            Left = 11.8 * cmToPx,
+            Top = 2.0 * cmToPx,
             Size = 6.0 * cmToPx
         }
     };
@@ -67,11 +69,12 @@ public class PrintConfigure
     {
         TextPrintBox = new TextPrintBoxConfigure
         {
-            Left = 5.6 * cmToPx,
-            Top = 20.1 * cmToPx,
-            Width = 4.7 * cmToPx,
-            Height = 10.5 * cmToPx,
-            ColumnAlign = EnumColumnAlign.Right
+            Left = 8.1 * cmToPx,
+            Top = 21 * cmToPx,
+            Width = 2.2 * cmToPx,
+            Height = 10 * cmToPx,
+            ColumnAlign = EnumColumnAlign.Right,
+            ColumnGap = 5
         },
         StampPosition = new StampPositionConfig
         {
@@ -93,8 +96,8 @@ public class PrintConfigure
         },
         StampPosition = new StampPositionConfig
         {
-            Left = 11.5 * cmToPx,
-            Top = 1.0 * cmToPx,
+            Left = 12 * cmToPx,
+            Top = 2.5 * cmToPx,
             Size = 6.0 * cmToPx
         }
     };

@@ -10,7 +10,7 @@
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
             <ComboBox x:Name="TypeComboBox" Width="150" Height="40" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,20,0" SelectedIndex="0">
                 <ComboBoxItem Content="长生"/>
-                <ComboBoxItem Content="消灾"/>
+                <ComboBoxItem Content="冤亲"/>
                 <ComboBoxItem Content="往生"/>
                 <ComboBoxItem Content="祖先"/>
             </ComboBox>
