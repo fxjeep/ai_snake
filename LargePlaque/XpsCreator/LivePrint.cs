@@ -10,7 +10,7 @@ namespace XpsCreator;
 
 public static class LivePrint
 {
-    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, MainBoxConfigure config, FontSize fontSizeConfig)
+    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, MainBoxConfigure config, FontSize fontSizeConfig)
     {
         try
         {
@@ -46,7 +46,7 @@ public static class LivePrint
                         fixedPage.Height = a3Height;
                         var canvas = new Canvas();
 
-                        PrintTextBox.Print(canvas, linesList.ToArray(), printBorder, printStamp, config.TextPrintBox, config.StampPosition,
+                        PrintTextBox.Print(canvas, linesList.ToArray(), printBorder, printStamp, printNames, config.TextPrintBox, config.StampPosition,
                                             fontSizeConfig);
 
                         fixedPage.Children.Add(canvas);

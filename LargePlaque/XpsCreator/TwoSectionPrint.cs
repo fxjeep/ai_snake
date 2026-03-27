@@ -11,7 +11,7 @@ namespace XpsCreator;
 
 public static class TwoSectionPrint
 {
-    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, MainBoxConfigure config, TextPrintBoxConfigure sideConfig)
+    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, MainBoxConfigure config, TextPrintBoxConfigure sideConfig)
     {
         try
         {
@@ -42,22 +42,16 @@ public static class TwoSectionPrint
                     var mainElement = item.Element("main");
                     if (mainElement != null)
                     {
-                        var mainLines = GetLinesFromElement(mainElement);
-                        if (mainLines.Any())
-                        {
-                            PrintTextBox.Print(canvas, mainLines.ToArray(), printBorder, printStamp, config.TextPrintBox, config.StampPosition, PrintConfigure.Main);
-                        }
+                        var mainLines = printNames ? GetLinesFromElement(mainElement) : new System.Collections.Generic.List<string>();
+                        PrintTextBox.Print(canvas, mainLines.ToArray(), printBorder, printStamp, printNames, config.TextPrintBox, config.StampPosition, PrintConfigure.Main);
                     }
 
                     // 2. Draw Side Section
                     var sideElement = item.Element("side");
                     if (sideElement != null)
                     {
-                        var sideLines = GetLinesFromElement(sideElement);
-                        if (sideLines.Any())
-                        {
-                            PrintTextBox.Print(canvas, sideLines.ToArray(), printBorder, false, sideConfig, null, PrintConfigure.Side);
-                        }
+                        var sideLines = printNames ? GetLinesFromElement(sideElement) : new System.Collections.Generic.List<string>();
+                        PrintTextBox.Print(canvas, sideLines.ToArray(), printBorder, false, printNames, sideConfig, null, PrintConfigure.Side);
                     }
 
                     fixedPage.Children.Add(canvas);

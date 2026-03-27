@@ -47,18 +47,8 @@ public static class PrintTextBox
         return segments;
     }
 
-    public static void Print(Canvas canvas, string[] lines, bool printBorder, bool printStamp, TextPrintBoxConfigure textConfig, StampPositionConfig? stampConfig, FontSize fontSizeConfig)
+    public static void Print(Canvas canvas, string[] lines, bool printBorder, bool printStamp, bool printNames, TextPrintBoxConfigure textConfig, StampPositionConfig? stampConfig, FontSize fontSizeConfig)
     {
-        if (lines == null || lines.Length == 0) return;
-
-        var lineSegments = lines.Select(l => ParseSegments(l)).ToList();
-
-        int maxUnits = lineSegments.Max(ls => ls.Sum(s => CountLogicalLines(s.Text)));
-        double fontSize;
-        if (maxUnits <= fontSizeConfig.LargeLines) fontSize = fontSizeConfig.Large;
-        else if (maxUnits < fontSizeConfig.MediumLines) fontSize = fontSizeConfig.Medium;
-        else fontSize = fontSizeConfig.Small;
-
         if (printBorder)
         {
             DrawBorder(canvas, textConfig);
@@ -69,6 +59,15 @@ public static class PrintTextBox
             DrawStamp(canvas, stampConfig);
         }
 
+        if (lines == null || lines.Length == 0 || !printNames) return;
+
+        var lineSegments = lines.Select(l => ParseSegments(l)).ToList();
+
+        int maxUnits = lineSegments.Max(ls => ls.Sum(s => CountLogicalLines(s.Text)));
+        double fontSize;
+        if (maxUnits <= fontSizeConfig.LargeLines) fontSize = fontSizeConfig.Large;
+        else if (maxUnits < fontSizeConfig.MediumLines) fontSize = fontSizeConfig.Medium;
+        else fontSize = fontSizeConfig.Small;
         // Process all lines as individual columns
         DrawColumns(canvas, lineSegments, fontSize, textConfig);
     }

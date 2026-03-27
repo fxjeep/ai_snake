@@ -35,23 +35,25 @@ public partial class MainWindow : Window
                 selectedType = cbi.Content.ToString() ?? "";
             }
 
+            bool printBorder = PrintBorderCheckBox.IsChecked == true;
+            bool printStamp = PrintRedStampCheckBox.IsChecked == true;
+            bool printNames = PrintNamesCheckBox.IsChecked == true;
+
             if (selectedType == "长生")
             {
-                LivePrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true,
-                                PrintRedStampCheckBox.IsChecked == true, PrintConfigure.ChangeShengConfig, PrintConfigure.Main);
+                LivePrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, PrintConfigure.ChangeShengConfig, PrintConfigure.Main);
             }
             else if (selectedType == "冤亲")
             {
-                LivePrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true,
-                            PrintRedStampCheckBox.IsChecked == true, PrintConfigure.YuanQinConfig, PrintConfigure.SideYuanQin);
+                LivePrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, PrintConfigure.YuanQinConfig, PrintConfigure.SideYuanQin);
             }
             else if (selectedType == "往生")
             {
-                TwoSectionPrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true, PrintRedStampCheckBox.IsChecked == true, PrintConfigure.WangShengMain, PrintConfigure.WangShengSide);
+                TwoSectionPrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, PrintConfigure.WangShengMain, PrintConfigure.WangShengSide);
             }
             else if (selectedType == "祖先")
             {
-                TwoSectionPrint.GenerateXps(openFileDialog.FileName, PrintBorderCheckBox.IsChecked == true, PrintRedStampCheckBox.IsChecked == true, PrintConfigure.ZhuXianMain, PrintConfigure.ZhuXianSide);
+                TwoSectionPrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, PrintConfigure.ZhuXianMain, PrintConfigure.ZhuXianSide);
             }
             else
             {

@@ -78,8 +78,8 @@ public class PrintConfigure
         },
         StampPosition = new StampPositionConfig
         {
-            Left = 11.5 * cmToPx,
-            Top = 1.0 * cmToPx,
+            Left = 12 * cmToPx,
+            Top = 1.5 * cmToPx,
             Size = 6.0 * cmToPx
         }
     };

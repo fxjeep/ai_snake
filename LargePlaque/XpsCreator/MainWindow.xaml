@@ -16,6 +16,7 @@
             </ComboBox>
             <CheckBox x:Name="PrintBorderCheckBox" Content="Print border" Margin="0,0,20,10" VerticalAlignment="Center" FontSize="16"/>
             <CheckBox x:Name="PrintRedStampCheckBox" Content="Print Red Stamp" Margin="0,0,20,10" VerticalAlignment="Center" FontSize="16"/>
+            <CheckBox x:Name="PrintNamesCheckBox" Content="Print Names" IsChecked="True" Margin="0,0,20,10" VerticalAlignment="Center" FontSize="16"/>
             <Button Content="Open File" Width="150" Height="40" FontSize="16" Click="OpenFileButton_Click"/>
         </StackPanel>
     </Grid>
