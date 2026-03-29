@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/XpsCreator/bin/Debug/net8.0-windows/XpsCreator.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/XpsCreator",
+            "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopAtEntry": false
         }

@@ -6,18 +6,26 @@
         xmlns:local="clr-namespace:XpsCreator"
         mc:Ignorable="d"
         Title="A3 XPS Creator" Height="450" Width="800">
-    <Grid>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <ComboBox x:Name="TypeComboBox" Width="150" Height="40" FontSize="16" VerticalContentAlignment="Center" Margin="0,0,20,0" SelectedIndex="0">
-                <ComboBoxItem Content="长生"/>
-                <ComboBoxItem Content="冤亲"/>
-                <ComboBoxItem Content="往生"/>
-                <ComboBoxItem Content="祖先"/>
-            </ComboBox>
-            <CheckBox x:Name="PrintBorderCheckBox" Content="Print border" Margin="0,0,20,10" VerticalAlignment="Center" FontSize="16"/>
-            <CheckBox x:Name="PrintRedStampCheckBox" Content="Print Red Stamp" Margin="0,0,20,10" VerticalAlignment="Center" FontSize="16"/>
-            <CheckBox x:Name="PrintNamesCheckBox" Content="Print Names" IsChecked="True" Margin="0,0,20,10" VerticalAlignment="Center" FontSize="16"/>
-            <Button Content="Open File" Width="150" Height="40" FontSize="16" Click="OpenFileButton_Click"/>
-        </StackPanel>
-    </Grid>
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button Content="New"/>
+                <Button Content="Open"/>
+                <Button Content="Save"/>
+                <Separator/>
+                <Button Content="Exit"/>
+            </ToolBar>
+        </ToolBarTray>
+        <TabControl x:Name="MainTabControl">
+            <TabItem Header="Text Input">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+            <TabItem Header="Position Configure">
+                <local:PositionConfigure />
+            </TabItem>
+            <TabItem Header="Generate &amp; Print">
+                <local:GenerateXPS />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>
