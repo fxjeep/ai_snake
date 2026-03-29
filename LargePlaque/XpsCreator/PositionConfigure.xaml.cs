@@ -17,6 +17,42 @@ public partial class PositionConfigure : UserControl
     {
         InitializeComponent();
         this.Loaded += PositionConfigure_Loaded;
+        Designer.ElementMoved += (name, leftPx, topPx) =>
+        {
+            string leftCm = UnitConverter.ToCm(leftPx).ToString("F1");
+            string topCm = UnitConverter.ToCm(topPx).ToString("F1");
+            switch (name)
+            {
+                case "Stamp":
+                    StampLeftTxt.Text = leftCm;
+                    StampTopTxt.Text = topCm;
+                    break;
+                case "Main":
+                    MainLeftTxt.Text = leftCm;
+                    MainTopTxt.Text = topCm;
+                    break;
+                case "Side":
+                    SideLeftTxt.Text = leftCm;
+                    SideTopTxt.Text = topCm;
+                    break;
+            }
+        };
+        Designer.ElementResized += (name, widthPx, heightPx) =>
+        {
+            string widthCm = UnitConverter.ToCm(widthPx).ToString("F1");
+            string heightCm = UnitConverter.ToCm(heightPx).ToString("F1");
+            switch (name)
+            {
+                case "Main":
+                    MainWidthTxt.Text = widthCm;
+                    MainHeightTxt.Text = heightCm;
+                    break;
+                case "Side":
+                    SideWidthTxt.Text = widthCm;
+                    SideHeightTxt.Text = heightCm;
+                    break;
+            }
+        };
     }
 
     private void PositionConfigure_Loaded(object sender, RoutedEventArgs e)
@@ -60,6 +96,20 @@ public partial class PositionConfigure : UserControl
         var currentType = GetCurrentTypeConfig();
         if (currentType != null)
         {
+            bool hasSideBox = currentType.TypeName != "长生" && currentType.TypeName != "冤亲";
+            SideBoxGroup.Visibility = hasSideBox ? Visibility.Visible : Visibility.Collapsed;
+            Designer.SetSideBoxVisible(hasSideBox);
+
+            if (!hasSideBox)
+            {
+                currentType.SideTextBox = new ElementRect(0, 0, 0, 0);
+            }
+            else
+            {
+                if (currentType.SideTextBox.Width == 0 || currentType.SideTextBox.Height == 0)
+                    currentType.SideTextBox = new ElementRect(8.1, 21.0, 2.2, 10.0);
+            }
+
             FontSizeLargeTxt.Text = currentType.FontSettings.Large.ToString();
             FontSizeMediumTxt.Text = currentType.FontSettings.Medium.ToString();
             FontSizeSmallTxt.Text = currentType.FontSettings.Small.ToString();
@@ -70,6 +120,18 @@ public partial class PositionConfigure : UserControl
             BgHeightTxt.Text = currentType.Background.Height.ToString();
             StampWidthTxt.Text = currentType.Stamp.Width.ToString();
             StampHeightTxt.Text = currentType.Stamp.Height.ToString();
+            StampLeftTxt.Text = currentType.Stamp.Left.ToString("F1");
+            StampTopTxt.Text = currentType.Stamp.Top.ToString("F1");
+
+            MainLeftTxt.Text = currentType.MainTextBox.Left.ToString("F1");
+            MainTopTxt.Text = currentType.MainTextBox.Top.ToString("F1");
+            MainWidthTxt.Text = currentType.MainTextBox.Width.ToString("F1");
+            MainHeightTxt.Text = currentType.MainTextBox.Height.ToString("F1");
+
+            SideLeftTxt.Text = currentType.SideTextBox.Left.ToString("F1");
+            SideTopTxt.Text = currentType.SideTextBox.Top.ToString("F1");
+            SideWidthTxt.Text = currentType.SideTextBox.Width.ToString("F1");
+            SideHeightTxt.Text = currentType.SideTextBox.Height.ToString("F1");
 
             Designer.SetElementValues(
                 ToRect(currentType.MainTextBox),

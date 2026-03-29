@@ -15,6 +15,9 @@ public partial class DesignCanvas : UserControl
     private double _leftPos;
     private double _topPos;
 
+    public event Action<string, double, double>? ElementMoved;
+    public event Action<string, double, double>? ElementResized;
+
     public DesignCanvas()
     {
         InitializeComponent();
@@ -54,6 +57,11 @@ public partial class DesignCanvas : UserControl
         {
             MessageBox.Show($"Error loading background: {ex.Message}");
         }
+    }
+
+    public void SetSideBoxVisible(bool visible)
+    {
+        SideBoxControl.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public void SetScale(double scale)
@@ -118,6 +126,13 @@ public partial class DesignCanvas : UserControl
             Canvas.SetLeft(_selectedElement, newLeft);
             Canvas.SetTop(_selectedElement, newTop);
 
+            string? name = null;
+            if (_selectedElement == StampControl) name = "Stamp";
+            else if (_selectedElement == MainBoxControl) name = "Main";
+            else if (_selectedElement == SideBoxControl) name = "Side";
+            if (name != null)
+                ElementMoved?.Invoke(name, newLeft, newTop);
+
             UpdateResizeThumb();
         }
     }
@@ -153,6 +168,13 @@ public partial class DesignCanvas : UserControl
 
             if (newWidth > 10) _selectedElement.Width = newWidth;
             if (newHeight > 10) _selectedElement.Height = newHeight;
+
+            string? name = null;
+            if (_selectedElement == MainBoxControl) name = "Main";
+            else if (_selectedElement == SideBoxControl) name = "Side";
+            else if (_selectedElement == StampControl) name = "Stamp";
+            if (name != null)
+                ElementResized?.Invoke(name, _selectedElement.Width, _selectedElement.Height);
 
             UpdateResizeThumb();
         }

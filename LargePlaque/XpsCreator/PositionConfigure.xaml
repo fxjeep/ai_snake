@@ -46,23 +46,90 @@
             </GroupBox>
 
             <GroupBox Header="Background Image">
-                <StackPanel Margin="5">
-                    <Button Content="Select Background" Click="SelectBackground_Click"/>
-                    <Label Content="Width (cm):"/>
-                    <TextBox x:Name="BgWidthTxt" Text="29.7" TextChanged="Bg_Changed"/>
-                    <Label Content="Height (cm):"/>
-                    <TextBox x:Name="BgHeightTxt" Text="42.0" TextChanged="Bg_Changed"/>
-                </StackPanel>
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="Select Background" Click="SelectBackground_Click" VerticalAlignment="Stretch"/>
+                    <StackPanel Grid.Column="1">
+                        <Label Content="Width (cm):" Padding="2"/>
+                        <TextBox x:Name="BgWidthTxt" Text="29.7" TextChanged="Bg_Changed"/>
+                        <Label Content="Height (cm):" Padding="2"/>
+                        <TextBox x:Name="BgHeightTxt" Text="42.0" TextChanged="Bg_Changed"/>
+                    </StackPanel>
+                </Grid>
             </GroupBox>
 
             <GroupBox Header="Stamp Image">
-                <StackPanel Margin="5">
-                    <Button Content="Select Stamp" Click="SelectStamp_Click"/>
-                    <Label Content="Width (cm):"/>
-                    <TextBox x:Name="StampWidthTxt" Text="6.0" TextChanged="Stamp_Changed"/>
-                    <Label Content="Height (cm):"/>
-                    <TextBox x:Name="StampHeightTxt" Text="6.0" TextChanged="Stamp_Changed"/>
-                </StackPanel>
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Content="Select Stamp" Click="SelectStamp_Click" Grid.ColumnSpan="2" Grid.Row="0"/>
+                    <Label Content="Left (cm):" Padding="2" Grid.Row="1" Grid.Column="0"/>
+                    <Label Content="Width (cm):" Padding="2" Grid.Row="1" Grid.Column="1"/>
+                    <TextBox x:Name="StampLeftTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="2" Grid.Column="0"/>
+                    <TextBox x:Name="StampWidthTxt" Text="6.0" TextChanged="Stamp_Changed" Grid.Row="2" Grid.Column="1"/>
+                    <Label Content="Top (cm):" Padding="2" Grid.Row="3" Grid.Column="0"/>
+                    <Label Content="Height (cm):" Padding="2" Grid.Row="3" Grid.Column="1"/>
+                    <TextBox x:Name="StampTopTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="4" Grid.Column="0"/>
+                    <TextBox x:Name="StampHeightTxt" Text="6.0" TextChanged="Stamp_Changed" Grid.Row="4" Grid.Column="1"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Main Box">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Label Content="Left (cm):" Padding="2" Grid.Row="0" Grid.Column="0"/>
+                    <Label Content="Width (cm):" Padding="2" Grid.Row="0" Grid.Column="1"/>
+                    <TextBox x:Name="MainLeftTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="0"/>
+                    <TextBox x:Name="MainWidthTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="1"/>
+                    <Label Content="Top (cm):" Padding="2" Grid.Row="2" Grid.Column="0"/>
+                    <Label Content="Height (cm):" Padding="2" Grid.Row="2" Grid.Column="1"/>
+                    <TextBox x:Name="MainTopTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="0"/>
+                    <TextBox x:Name="MainHeightTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="1"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox x:Name="SideBoxGroup" Header="Side Box">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Label Content="Left (cm):" Padding="2" Grid.Row="0" Grid.Column="0"/>
+                    <Label Content="Width (cm):" Padding="2" Grid.Row="0" Grid.Column="1"/>
+                    <TextBox x:Name="SideLeftTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="0"/>
+                    <TextBox x:Name="SideWidthTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="1"/>
+                    <Label Content="Top (cm):" Padding="2" Grid.Row="2" Grid.Column="0"/>
+                    <Label Content="Height (cm):" Padding="2" Grid.Row="2" Grid.Column="1"/>
+                    <TextBox x:Name="SideTopTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="0"/>
+                    <TextBox x:Name="SideHeightTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="1"/>
+                </Grid>
             </GroupBox>
 
             <GroupBox Header="Font Sizes">
