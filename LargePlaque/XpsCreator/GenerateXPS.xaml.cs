@@ -46,16 +46,19 @@ public partial class GenerateXPS : UserControl
                 StampPosition = UnitConverter.ToStampConfig(typeConfig.Stamp) ?? new StampPositionConfig()
             };
 
-            var fontSize = UnitConverter.ToFontSize(typeConfig.FontSettings);
+            // Determine max font sizes based on type
+            double mainMaxFontSize = typeConfig.MainMaxFontSize;
+            double sideMaxFontSize = typeConfig.SideMaxFontSize;
 
-            if (selectedType == "长生" || selectedType == "冤亲")
+            if (selectedType == "长生")
             {
-                LivePrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, mainConfig, fontSize);
+                LivePrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, mainConfig, mainMaxFontSize);
             }
-            else if (selectedType == "往生" || selectedType == "祖先")
+            else if (selectedType == "冤亲" || selectedType == "往生" || selectedType == "祖先")
             {
                 var sideConfig = UnitConverter.ToTextConfig(typeConfig.SideTextBox);
-                TwoSectionPrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, mainConfig, sideConfig);
+                sideConfig.ColumnGap = 5;
+                TwoSectionPrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, mainConfig, sideConfig, mainMaxFontSize, sideMaxFontSize);
             }
             else
             {

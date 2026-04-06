@@ -30,7 +30,7 @@
                 <ContentControl x:Name="MainBoxControl" Canvas.Left="0" Canvas.Top="0" Width="200" Height="300" Panel.ZIndex="11">
                     <Grid>
                         <Border x:Name="MainBoxBorder" BorderBrush="Blue" BorderThickness="2" Background="#220000FF" MouseLeftButtonDown="Element_MouseLeftButtonDown">
-                            <TextBlock Text="Main Area" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Blue"/>
+                            <Canvas x:Name="MainBoxCanvas"/>
                         </Border>
                     </Grid>
                 </ContentControl>
@@ -39,7 +39,7 @@
                 <ContentControl x:Name="SideBoxControl" Canvas.Left="0" Canvas.Top="0" Width="100" Height="200" Panel.ZIndex="12">
                     <Grid>
                         <Border x:Name="SideBoxBorder" BorderBrush="Green" BorderThickness="2" Background="#2200FF00" MouseLeftButtonDown="Element_MouseLeftButtonDown">
-                            <TextBlock Text="Side Area" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Green"/>
+                            <Canvas x:Name="SideBoxCanvas"/>
                         </Border>
                     </Grid>
                 </ContentControl>

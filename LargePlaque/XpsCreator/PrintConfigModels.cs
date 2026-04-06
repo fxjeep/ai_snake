@@ -31,15 +31,6 @@ public class ImageElement : ElementRect
     }
 }
 
-public class FontConfig
-{
-    public double Large { get; set; }
-    public double Medium { get; set; }
-    public double Small { get; set; }
-    public int LargeLinesThreshold { get; set; }
-    public int MediumLinesThreshold { get; set; }
-}
-
 public class TypeLayoutConfig
 {
     public string TypeName { get; set; } = string.Empty;
@@ -47,7 +38,8 @@ public class TypeLayoutConfig
     public ElementRect SideTextBox { get; set; } = new ElementRect();
     public ImageElement Stamp { get; set; } = new ImageElement();
     public ImageElement Background { get; set; } = new ImageElement();
-    public FontConfig FontSettings { get; set; } = new FontConfig();
+    public double MainMaxFontSize { get; set; } = 1000.0;
+    public double SideMaxFontSize { get; set; } = 1000.0;
 }
 
 [XmlRoot("PrintLayoutSettings")]
@@ -111,15 +103,4 @@ public static class UnitConverter
         };
     }
 
-    public static FontSize ToFontSize(FontConfig fc)
-    {
-        return new FontSize
-        {
-            Large = fc.Large,
-            Medium = fc.Medium,
-            Small = fc.Small,
-            LargeLines = fc.LargeLinesThreshold,
-            MediumLines = fc.MediumLinesThreshold
-        };
-    }
 }

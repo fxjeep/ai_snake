@@ -43,7 +43,7 @@ public class PrintConfigure
     private const double cmToPx = 37.79527559;
 
     public static FontSize Main { get; } = new FontSize { Large = 47, Medium = 37, Small = 30, LargeLines = 7, MediumLines = 10 };
-    public static FontSize Side { get; } = new FontSize { Large = 25, Medium = 25, Small = 20, LargeLines = 5, MediumLines = 9 };
+    public static FontSize Side { get; } = new FontSize { Large = 30, Medium = 25, Small = 20, LargeLines = 6, MediumLines = 9 };
 
     public static FontSize SideYuanQin { get; } = new FontSize { Large = 33, Medium = 28, Small = 25, LargeLines = 5, MediumLines = 8 };
 
@@ -106,7 +106,7 @@ public class PrintConfigure
     {
         Left = 8.1 * cmToPx,
         Top = 23.1 * cmToPx,
-        Width = 2.5 * cmToPx,
+        Width = 1.8 * cmToPx,
         Height = 7 * cmToPx,
         ColumnAlign = EnumColumnAlign.Right,
         ColumnGap = 5

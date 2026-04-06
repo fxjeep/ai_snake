@@ -64,6 +64,39 @@ public partial class DesignCanvas : UserControl
         SideBoxControl.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    public void SetMainBoxVisible(bool visible)
+    {
+        MainBoxControl.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public void SetSampleTexts(string mainText, string sideText, double mainMaxFontSize, double sideMaxFontSize)
+    {
+        MainBoxCanvas.Children.Clear();
+        SideBoxCanvas.Children.Clear();
+
+        if (!string.IsNullOrWhiteSpace(mainText))
+        {
+            var lines = mainText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var textConfig = new TextPrintBoxConfigure
+            {
+                Left = 0, Top = 0, Width = MainBoxControl.ActualWidth, Height = MainBoxControl.ActualHeight,
+                ColumnAlign = EnumColumnAlign.Center, ColumnGap = 20
+            };
+            VerticalTextRenderer.RenderText(MainBoxCanvas, lines, textConfig, mainMaxFontSize, true);
+        }
+
+        if (!string.IsNullOrWhiteSpace(sideText) && SideBoxControl.Visibility == Visibility.Visible)
+        {
+            var lines = sideText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var textConfig = new TextPrintBoxConfigure
+            {
+                Left = 0, Top = 0, Width = SideBoxControl.ActualWidth, Height = SideBoxControl.ActualHeight,
+                ColumnAlign = EnumColumnAlign.Center, ColumnGap = 5
+            };
+            VerticalTextRenderer.RenderText(SideBoxCanvas, lines, textConfig, sideMaxFontSize, false);
+        }
+    }
+
     public void SetScale(double scale)
     {
         CanvasScaleTransform.ScaleX = scale;

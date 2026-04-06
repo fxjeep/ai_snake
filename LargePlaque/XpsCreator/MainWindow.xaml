@@ -9,19 +9,15 @@
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
-                <Button Content="New"/>
-                <Button Content="Open"/>
-                <Button Content="Save"/>
-                <Separator/>
                 <Button Content="Exit"/>
             </ToolBar>
         </ToolBarTray>
         <TabControl x:Name="MainTabControl">
-            <TabItem Header="Text Input">
-                <Grid Background="#FFE5E5E5"/>
-            </TabItem>
             <TabItem Header="Position Configure">
                 <local:PositionConfigure />
+            </TabItem>
+            <TabItem Header="Text Input">
+                <local:TextInput />
             </TabItem>
             <TabItem Header="Generate &amp; Print">
                 <local:GenerateXPS />

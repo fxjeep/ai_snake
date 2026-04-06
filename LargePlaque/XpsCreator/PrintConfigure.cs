@@ -29,23 +29,9 @@ public class StampPositionConfig
     public double Size { get; set; }
 }
 
-public class FontSize
-{
-    public double Large { get; set; }
-    public double Medium { get; set; }
-    public double Small { get; set; }
-    public int LargeLines { get; set; }
-    public int MediumLines { get; set; }
-}
-
 public class PrintConfigure
 {
     private const double cmToPx = 37.79527559;
-
-    public static FontSize Main { get; } = new FontSize { Large = 47, Medium = 37, Small = 30, LargeLines = 7, MediumLines = 10 };
-    public static FontSize Side { get; } = new FontSize { Large = 25, Medium = 25, Small = 20, LargeLines = 5, MediumLines = 9 };
-
-    public static FontSize SideYuanQin { get; } = new FontSize { Large = 33, Medium = 28, Small = 25, LargeLines = 5, MediumLines = 8 };
 
     public static MainBoxConfigure ChangeShengConfig { get; } = new MainBoxConfigure
     {

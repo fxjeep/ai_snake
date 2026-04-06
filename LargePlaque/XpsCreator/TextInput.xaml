@@ -1,0 +1,102 @@
+<UserControl x:Class="XpsCreator.TextInput"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:XpsCreator"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top bar: file path + open button -->
+        <DockPanel Grid.Row="0" Margin="8,8,8,4">
+            <Button x:Name="NewFileButton" Content="New" DockPanel.Dock="Left"
+                    Width="60" Margin="0,0,6,0" Click="NewFileButton_Click"/>
+            <Button x:Name="BrowseButton" Content="Open File..." DockPanel.Dock="Left"
+                    Width="100" Margin="0,0,6,0" Click="BrowseButton_Click"/>
+            <TextBox x:Name="FilePathTxt" IsReadOnly="True" VerticalContentAlignment="Center"
+                     Background="#F5F5F5" Padding="4,2"/>
+        </DockPanel>
+
+        <!-- Main content area -->
+        <Grid Grid.Row="1" Margin="8,4,8,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" MinWidth="120"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: item list -->
+            <DockPanel Grid.Column="0">
+                <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
+                    <Label Content="Items" FontWeight="SemiBold" Padding="0"/>
+                </DockPanel>
+                <ListBox x:Name="ItemListBox" SelectionChanged="ItemListBox_SelectionChanged"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+            </DockPanel>
+
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#DDDDDD"/>
+
+            <!-- Right: type selector + editors -->
+            <DockPanel Grid.Column="2" Margin="8,0,0,0" LastChildFill="False">
+
+                <!-- Type selector row -->
+                <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <Label Content="Type:" VerticalAlignment="Center" Padding="0,0,6,0"/>
+                    <ComboBox x:Name="TypeComboBox" Width="120" SelectedIndex="0"
+                              SelectionChanged="TypeComboBox_SelectionChanged">
+                        <ComboBoxItem Content="长生"/>
+                        <ComboBoxItem Content="冤亲"/>
+                        <ComboBoxItem Content="往生"/>
+                        <ComboBoxItem Content="祖先"/>
+                    </ComboBox>
+                    <Button x:Name="SaveButton" Content="Save" Margin="12,0,0,0"
+                            Width="80" Click="SaveButton_Click"/>
+                    <Button x:Name="AddItemButton" Content="+ Add" Margin="6,0,0,0"
+                            Width="70" Click="AddItemButton_Click"/>
+                    <Button x:Name="DeleteItemButton" Content="Delete" Margin="6,0,0,0"
+                            Width="70" Click="DeleteItemButton_Click"/>
+                </DockPanel>
+
+                <!-- Main text editor -->
+                <GroupBox x:Name="MainTextGroup" Header="Main Text"
+                          DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <TextBox x:Name="MainTextBox"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             Height="80" Padding="4"
+                             FontSize="14"
+                             TextChanged="MainTextBox_TextChanged"/>
+                </GroupBox>
+
+                <!-- Side text editor -->
+                <GroupBox x:Name="SideTextGroup" Header="Side Text"
+                          DockPanel.Dock="Top">
+                    <TextBox x:Name="SideTextBox"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             Height="80" Padding="4"
+                             FontSize="14"
+                             TextChanged="SideTextBox_TextChanged"/>
+                </GroupBox>
+                
+                <!-- Print & Test tools -->
+                <GroupBox Header="Print &amp; Test" DockPanel.Dock="Top" Margin="0,8,0,0">
+                    <StackPanel Orientation="Horizontal" Margin="6">
+                        <CheckBox x:Name="PrintBorderCheckBox" Content="Border" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <CheckBox x:Name="PrintRedStampCheckBox" Content="Red Stamp" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <CheckBox x:Name="PrintNamesCheckBox" Content="Names" IsChecked="True" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <Button x:Name="QuickPrintButton" Content="Print" Padding="12,2" 
+                                Width="80" Click="QuickPrintButton_Click"/>
+                    </StackPanel>
+                </GroupBox>
+
+            </DockPanel>
+        </Grid>
+    </Grid>
+</UserControl>

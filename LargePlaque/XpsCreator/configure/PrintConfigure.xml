@@ -4,16 +4,16 @@
     <TypeLayoutConfig>
       <TypeName>长生</TypeName>
       <MainTextBox>
-        <Left>11.494166666666667</Left>
-        <Top>15.153333333333332</Top>
-        <Width>6.5</Width>
-        <Height>10.5</Height>
+        <Left>11.482916666666668</Left>
+        <Top>16.61583333333333</Top>
+        <Width>6.508750000000006</Width>
+        <Height>10.84791666666661</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>8.1</Left>
-        <Top>21</Top>
-        <Width>2.2</Width>
-        <Height>10</Height>
+        <Left>0</Left>
+        <Top>0</Top>
+        <Width>0</Width>
+        <Height>0</Height>
       </SideTextBox>
       <Stamp>
         <Left>11.8</Left>
@@ -25,25 +25,20 @@
       <Background>
         <Left>0</Left>
         <Top>0</Top>
-        <Width>27.3</Width>
-        <Height>39</Height>
+        <Width>29.7</Width>
+        <Height>42</Height>
         <FileName>ChangShengBG.jpg</FileName>
       </Background>
-      <FontSettings>
-        <Large>47</Large>
-        <Medium>37</Medium>
-        <Small>30</Small>
-        <LargeLinesThreshold>7</LargeLinesThreshold>
-        <MediumLinesThreshold>10</MediumLinesThreshold>
-      </FontSettings>
+      <MainMaxFontSize>60</MainMaxFontSize>
+      <SideMaxFontSize>30</SideMaxFontSize>
     </TypeLayoutConfig>
     <TypeLayoutConfig>
       <TypeName>冤亲</TypeName>
       <MainTextBox>
-        <Left>11.6</Left>
-        <Top>16</Top>
-        <Width>6.5</Width>
-        <Height>10.5</Height>
+        <Left>0</Left>
+        <Top>0</Top>
+        <Width>0</Width>
+        <Height>0</Height>
       </MainTextBox>
       <SideTextBox>
         <Left>8.1</Left>
@@ -63,29 +58,24 @@
         <Top>0</Top>
         <Width>29.7</Width>
         <Height>42</Height>
-        <FileName />
+        <FileName>yuanqingbg.JPG</FileName>
       </Background>
-      <FontSettings>
-        <Large>47</Large>
-        <Medium>37</Medium>
-        <Small>30</Small>
-        <LargeLinesThreshold>7</LargeLinesThreshold>
-        <MediumLinesThreshold>10</MediumLinesThreshold>
-      </FontSettings>
+      <MainMaxFontSize>30</MainMaxFontSize>
+      <SideMaxFontSize>30</SideMaxFontSize>
     </TypeLayoutConfig>
     <TypeLayoutConfig>
       <TypeName>往生</TypeName>
       <MainTextBox>
-        <Left>11.6</Left>
-        <Top>16</Top>
-        <Width>6.5</Width>
-        <Height>10.5</Height>
+        <Left>11.335416666666667</Left>
+        <Top>17.41111111111111</Top>
+        <Width>6.905694444444439</Width>
+        <Height>11.364305555555555</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>8.1</Left>
-        <Top>21</Top>
-        <Width>2.2</Width>
-        <Height>10</Height>
+        <Left>7.817777777777776</Left>
+        <Top>25.004027777777775</Top>
+        <Width>2.0412500000000047</Width>
+        <Height>7.477638888888893</Height>
       </SideTextBox>
       <Stamp>
         <Left>11.8</Left>
@@ -99,29 +89,24 @@
         <Top>0</Top>
         <Width>29.7</Width>
         <Height>42</Height>
-        <FileName />
+        <FileName>wangshengbg.JPG</FileName>
       </Background>
-      <FontSettings>
-        <Large>47</Large>
-        <Medium>37</Medium>
-        <Small>30</Small>
-        <LargeLinesThreshold>7</LargeLinesThreshold>
-        <MediumLinesThreshold>10</MediumLinesThreshold>
-      </FontSettings>
+      <MainMaxFontSize>60</MainMaxFontSize>
+      <SideMaxFontSize>30</SideMaxFontSize>
     </TypeLayoutConfig>
     <TypeLayoutConfig>
       <TypeName>祖先</TypeName>
       <MainTextBox>
-        <Left>11.6</Left>
-        <Top>16</Top>
-        <Width>6.5</Width>
-        <Height>10.5</Height>
+        <Left>11.9175</Left>
+        <Top>14.730000000000002</Top>
+        <Width>5.670972222222236</Width>
+        <Height>4.9084722222222394</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>8.1</Left>
-        <Top>21</Top>
-        <Width>2.2</Width>
-        <Height>10</Height>
+        <Left>8.064722222222223</Left>
+        <Top>20.629583333333333</Top>
+        <Width>2.2705555555555548</Width>
+        <Height>10.17638888888889</Height>
       </SideTextBox>
       <Stamp>
         <Left>11.8</Left>
@@ -135,15 +120,10 @@
         <Top>0</Top>
         <Width>29.7</Width>
         <Height>42</Height>
-        <FileName />
+        <FileName>zhuxianbg.JPG</FileName>
       </Background>
-      <FontSettings>
-        <Large>47</Large>
-        <Medium>37</Medium>
-        <Small>30</Small>
-        <LargeLinesThreshold>7</LargeLinesThreshold>
-        <MediumLinesThreshold>10</MediumLinesThreshold>
-      </FontSettings>
+      <MainMaxFontSize>60</MainMaxFontSize>
+      <SideMaxFontSize>30</SideMaxFontSize>
     </TypeLayoutConfig>
   </TypeConfigs>
 </PrintLayoutSettings>

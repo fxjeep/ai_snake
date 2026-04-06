@@ -86,7 +86,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Header="Main Box">
+            <GroupBox x:Name="MainBoxGroup" Header="Main Box">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -132,44 +132,46 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Header="Font Sizes">
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Label Content="Large" Grid.Column="0"/>
-                    <Label Content="Medium" Grid.Column="1"/>
-                    <Label Content="Small" Grid.Column="2"/>
-                    <TextBox x:Name="FontSizeLargeTxt" Grid.Row="1" Grid.Column="0" Text="47"/>
-                    <TextBox x:Name="FontSizeMediumTxt" Grid.Row="1" Grid.Column="1" Text="37"/>
-                    <TextBox x:Name="FontSizeSmallTxt" Grid.Row="1" Grid.Column="2" Text="30"/>
-                </Grid>
+
+
+            <GroupBox Header="Sample Texts &amp; Constraints">
+                <StackPanel Margin="5">
+                    <Grid x:Name="SampleMainTextsPanel">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <Label Content="Sample Main Texts"/>
+                            <TextBox x:Name="SampleMainTextsTxt" Text="佛弟子" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Height="60"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <Label Content="Max Main Font Size"/>
+                            <TextBox x:Name="MainMaxFontSizeTxt" Text="1000" Width="80"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <Grid x:Name="SampleSideTextsPanel" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <Label Content="Sample Side Texts"/>
+                            <TextBox x:Name="SampleSideTextsTxt" Text="友 佛弟子" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Height="60"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <Label Content="Max Side Font Size"/>
+                            <TextBox x:Name="SideMaxFontSizeTxt" Text="1000" Width="80"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Line Thresholds">
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Label Content="Large Lines" Grid.Column="0"/>
-                    <Label Content="Medium Lines" Grid.Column="1"/>
-                    <TextBox x:Name="LargeLinesTxt" Grid.Row="1" Grid.Column="0" Text="7"/>
-                    <TextBox x:Name="MediumLinesTxt" Grid.Row="1" Grid.Column="1" Text="10"/>
-                </Grid>
-            </GroupBox>
-
-            <Button Content="Save Configuration" Click="Save_Click" Height="40" Margin="0,20,0,0" FontWeight="Bold"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,20,0,0">
+                <Button x:Name="DisplayTextsBtn" Content="Display Texts" Click="DisplayTexts_Click" Height="40" Width="120" Margin="0,0,10,0" FontWeight="Bold"/>
+                <Button Content="Save Configuration" Click="Save_Click" Height="40" Width="160" FontWeight="Bold"/>
+            </StackPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -78,7 +78,8 @@ public partial class PositionConfigure : UserControl
                 SideTextBox = new ElementRect(8.1, 21.0, 2.2, 10.0),
                 Stamp = new ImageElement("stamp.png", 11.8, 2.0, 6.0, 6.0),
                 Background = new ImageElement("", 0, 0, 29.7, 42.0),
-                FontSettings = new FontConfig { Large = 47, Medium = 37, Small = 30, LargeLinesThreshold = 7, MediumLinesThreshold = 10 }
+                MainMaxFontSize = type == "长生" ? 60.0 : 1000.0,
+                SideMaxFontSize = 1000.0
             });
         }
     }
@@ -86,7 +87,14 @@ public partial class PositionConfigure : UserControl
     private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isUpdating) return;
-        SaveCurrentTypeToSettings();
+
+        string oldType = null;
+        if (e.RemovedItems != null && e.RemovedItems.Count > 0 && e.RemovedItems[0] is ComboBoxItem cbiOld)
+        {
+            oldType = cbiOld.Content.ToString();
+        }
+
+        SaveCurrentTypeToSettings(oldType);
         UpdateUIFromCurrentType();
     }
 
@@ -96,9 +104,21 @@ public partial class PositionConfigure : UserControl
         var currentType = GetCurrentTypeConfig();
         if (currentType != null)
         {
-            bool hasSideBox = currentType.TypeName != "长生" && currentType.TypeName != "冤亲";
+            bool hasMainBox = currentType.TypeName != "冤亲";
+            bool hasSideBox = currentType.TypeName != "长生";
+
+            MainBoxGroup.Visibility = hasMainBox ? Visibility.Visible : Visibility.Collapsed;
+            SampleMainTextsPanel.Visibility = hasMainBox ? Visibility.Visible : Visibility.Collapsed;
+            Designer.SetMainBoxVisible(hasMainBox);
+
             SideBoxGroup.Visibility = hasSideBox ? Visibility.Visible : Visibility.Collapsed;
+            SampleSideTextsPanel.Visibility = hasSideBox ? Visibility.Visible : Visibility.Collapsed;
             Designer.SetSideBoxVisible(hasSideBox);
+
+            if (!hasMainBox)
+            {
+                currentType.MainTextBox = new ElementRect(0, 0, 0, 0);
+            }
 
             if (!hasSideBox)
             {
@@ -109,12 +129,6 @@ public partial class PositionConfigure : UserControl
                 if (currentType.SideTextBox.Width == 0 || currentType.SideTextBox.Height == 0)
                     currentType.SideTextBox = new ElementRect(8.1, 21.0, 2.2, 10.0);
             }
-
-            FontSizeLargeTxt.Text = currentType.FontSettings.Large.ToString();
-            FontSizeMediumTxt.Text = currentType.FontSettings.Medium.ToString();
-            FontSizeSmallTxt.Text = currentType.FontSettings.Small.ToString();
-            LargeLinesTxt.Text = currentType.FontSettings.LargeLinesThreshold.ToString();
-            MediumLinesTxt.Text = currentType.FontSettings.MediumLinesThreshold.ToString();
 
             BgWidthTxt.Text = currentType.Background.Width.ToString();
             BgHeightTxt.Text = currentType.Background.Height.ToString();
@@ -133,6 +147,9 @@ public partial class PositionConfigure : UserControl
             SideWidthTxt.Text = currentType.SideTextBox.Width.ToString("F1");
             SideHeightTxt.Text = currentType.SideTextBox.Height.ToString("F1");
 
+            MainMaxFontSizeTxt.Text = currentType.MainMaxFontSize.ToString();
+            SideMaxFontSizeTxt.Text = currentType.SideMaxFontSize.ToString();
+
             Designer.SetElementValues(
                 ToRect(currentType.MainTextBox),
                 ToRect(currentType.SideTextBox),
@@ -147,17 +164,11 @@ public partial class PositionConfigure : UserControl
         _isUpdating = false;
     }
 
-    private void SaveCurrentTypeToSettings()
+    private void SaveCurrentTypeToSettings(string typeName = null)
     {
-        var currentType = GetCurrentTypeConfig();
+        var currentType = typeName != null ? _settings.GetConfig(typeName) : GetCurrentTypeConfig();
         if (currentType != null)
         {
-            currentType.FontSettings.Large = TryParse(FontSizeLargeTxt.Text, 47);
-            currentType.FontSettings.Medium = TryParse(FontSizeMediumTxt.Text, 37);
-            currentType.FontSettings.Small = TryParse(FontSizeSmallTxt.Text, 30);
-            currentType.FontSettings.LargeLinesThreshold = (int)TryParse(LargeLinesTxt.Text, 7);
-            currentType.FontSettings.MediumLinesThreshold = (int)TryParse(MediumLinesTxt.Text, 10);
-
             currentType.Background.Width = TryParse(BgWidthTxt.Text, 29.7);
             currentType.Background.Height = TryParse(BgHeightTxt.Text, 42.0);
             currentType.Stamp.Width = TryParse(StampWidthTxt.Text, 6.0);
@@ -170,6 +181,9 @@ public partial class PositionConfigure : UserControl
             currentType.Stamp.Top = UnitConverter.ToCm(stamp.Top);
             currentType.Stamp.Width = UnitConverter.ToCm(stamp.Width);
             currentType.Stamp.Height = UnitConverter.ToCm(stamp.Height);
+
+            currentType.MainMaxFontSize = TryParse(MainMaxFontSizeTxt.Text, 1000.0);
+            currentType.SideMaxFontSize = TryParse(SideMaxFontSizeTxt.Text, 1000.0);
         }
     }
 
@@ -236,6 +250,15 @@ public partial class PositionConfigure : UserControl
         SaveCurrentTypeToSettings();
         PrintLayoutSettings.Save(_configBasePath + "/PrintConfigure.xml", _settings);
         MessageBox.Show("Configuration saved successfully!");
+    }
+
+    private void DisplayTexts_Click(object sender, RoutedEventArgs e)
+    {
+        Designer.SetSampleTexts(
+            SampleMainTextsTxt.Text, 
+            SampleSideTextsTxt.Text, 
+            TryParse(MainMaxFontSizeTxt.Text, 1000.0), 
+            TryParse(SideMaxFontSizeTxt.Text, 1000.0));
     }
 
     private double TryParse(string text, double defaultValue)
