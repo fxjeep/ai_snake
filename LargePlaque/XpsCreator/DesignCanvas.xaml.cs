@@ -24,9 +24,33 @@ public partial class DesignCanvas : UserControl
         this.Loaded += DesignCanvas_Loaded;
     }
 
+    private double _currentBgWidthPx = 0;
+    private string? _sampleMainText;
+    private string? _sampleSideText;
+    private double _sampleMainFontSize;
+    private double _sampleSideFontSize;
+
     private void DesignCanvas_Loaded(object sender, RoutedEventArgs e)
     {
         // Initial setup
+    }
+
+    private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        CenterBackground();
+        if (_sampleMainText != null || _sampleSideText != null)
+        {
+            RefreshSampleTexts();
+        }
+    }
+
+    private void CenterBackground()
+    {
+        if (_currentBgWidthPx > 0)
+        {
+            Canvas.SetLeft(BackgroundImage, (this.ActualWidth - _currentBgWidthPx) / 2);
+            Canvas.SetTop(BackgroundImage, 0);
+        }
     }
 
     public void UpdateBackground(string fileName, double widthCm, double heightCm)
@@ -35,6 +59,7 @@ public partial class DesignCanvas : UserControl
         if (string.IsNullOrEmpty(fileName) || !File.Exists(fullPath))
         {
             BackgroundImage.Source = null;
+            _currentBgWidthPx = 0;
             return;
         }
 
@@ -43,15 +68,13 @@ public partial class DesignCanvas : UserControl
             var bitmap = new BitmapImage(new Uri(fullPath, UriKind.Absolute));
             BackgroundImage.Source = bitmap;
 
-            double widthPx = UnitConverter.ToPx(widthCm);
+            _currentBgWidthPx = UnitConverter.ToPx(widthCm);
             double heightPx = UnitConverter.ToPx(heightCm);
 
-            BackgroundImage.Width = widthPx;
+            BackgroundImage.Width = _currentBgWidthPx;
             BackgroundImage.Height = heightPx;
 
-            // Center horizontally, Top vertically
-            Canvas.SetLeft(BackgroundImage, (this.ActualWidth - widthPx) / 2);
-            Canvas.SetTop(BackgroundImage, 0);
+            CenterBackground();
         }
         catch (Exception ex)
         {
@@ -71,29 +94,31 @@ public partial class DesignCanvas : UserControl
 
     public void SetSampleTexts(string mainText, string sideText, double mainMaxFontSize, double sideMaxFontSize)
     {
+        _sampleMainText = mainText;
+        _sampleSideText = sideText;
+        _sampleMainFontSize = mainMaxFontSize;
+        _sampleSideFontSize = sideMaxFontSize;
+
+        RefreshSampleTexts();
+    }
+
+    private void RefreshSampleTexts()
+    {
         MainBoxCanvas.Children.Clear();
         SideBoxCanvas.Children.Clear();
 
-        if (!string.IsNullOrWhiteSpace(mainText))
+        if (!string.IsNullOrWhiteSpace(_sampleMainText))
         {
-            var lines = mainText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-            var textConfig = new TextPrintBoxConfigure
-            {
-                Left = 0, Top = 0, Width = MainBoxControl.ActualWidth, Height = MainBoxControl.ActualHeight,
-                ColumnAlign = EnumColumnAlign.Center, ColumnGap = 20
-            };
-            VerticalTextRenderer.RenderText(MainBoxCanvas, lines, textConfig, mainMaxFontSize, true);
+            var lines = _sampleMainText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var rect = new ElementRect(0, 0, UnitConverter.ToCm(MainBoxControl.ActualWidth), UnitConverter.ToCm(MainBoxControl.ActualHeight));
+            VerticalTextRenderer.RenderText(MainBoxCanvas, lines, rect, _sampleMainFontSize, true, 20);
         }
 
-        if (!string.IsNullOrWhiteSpace(sideText) && SideBoxControl.Visibility == Visibility.Visible)
+        if (!string.IsNullOrWhiteSpace(_sampleSideText) && SideBoxControl.Visibility == Visibility.Visible)
         {
-            var lines = sideText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-            var textConfig = new TextPrintBoxConfigure
-            {
-                Left = 0, Top = 0, Width = SideBoxControl.ActualWidth, Height = SideBoxControl.ActualHeight,
-                ColumnAlign = EnumColumnAlign.Center, ColumnGap = 5
-            };
-            VerticalTextRenderer.RenderText(SideBoxCanvas, lines, textConfig, sideMaxFontSize, false);
+            var lines = _sampleSideText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var rect = new ElementRect(0, 0, UnitConverter.ToCm(SideBoxControl.ActualWidth), UnitConverter.ToCm(SideBoxControl.ActualHeight));
+            VerticalTextRenderer.RenderText(SideBoxCanvas, lines, rect, _sampleSideFontSize, false, 5);
         }
     }
 
