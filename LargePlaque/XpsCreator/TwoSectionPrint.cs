@@ -11,7 +11,7 @@ namespace XpsCreator;
 
 public static class TwoSectionPrint
 {
-    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, MainBoxConfigure config, TextPrintBoxConfigure sideConfig, double mainMaxFontSize, double sideMaxFontSize)
+    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, TypeLayoutConfig config)
     {
         try
         {
@@ -43,7 +43,7 @@ public static class TwoSectionPrint
                     if (mainElement != null)
                     {
                         var mainLines = printNames ? GetLinesFromElement(mainElement) : new System.Collections.Generic.List<string>();
-                        PrintTextBox.Print(canvas, mainLines.ToArray(), printBorder, printStamp, printNames, config.TextPrintBox, config.StampPosition, mainMaxFontSize);
+                        PrintTextBox.Print(canvas, mainLines.ToArray(), printBorder, printStamp, printNames, config.MainTextBox, config.Stamp, config.MainMaxFontSize);
                     }
 
                     // 2. Draw Side Section
@@ -51,7 +51,7 @@ public static class TwoSectionPrint
                     if (sideElement != null)
                     {
                         var sideLines = printNames ? GetLinesFromElement(sideElement) : new System.Collections.Generic.List<string>();
-                        PrintTextBox.Print(canvas, sideLines.ToArray(), printBorder, false, printNames, sideConfig, null, sideMaxFontSize);
+                        PrintTextBox.Print(canvas, sideLines.ToArray(), printBorder, mainElement == null && printStamp, printNames, config.SideTextBox, config.Stamp, config.SideMaxFontSize, 5);
                     }
 
                     fixedPage.Children.Add(canvas);

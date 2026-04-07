@@ -19,9 +19,6 @@
             <TabItem Header="Text Input">
                 <local:TextInput />
             </TabItem>
-            <TabItem Header="Generate &amp; Print">
-                <local:GenerateXPS />
-            </TabItem>
         </TabControl>
     </DockPanel>
 </Window>

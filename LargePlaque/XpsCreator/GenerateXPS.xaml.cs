@@ -40,25 +40,13 @@ public partial class GenerateXPS : UserControl
                 return;
             }
 
-            var mainConfig = new MainBoxConfigure
-            {
-                TextPrintBox = UnitConverter.ToTextConfig(typeConfig.MainTextBox),
-                StampPosition = UnitConverter.ToStampConfig(typeConfig.Stamp) ?? new StampPositionConfig()
-            };
-
-            // Determine max font sizes based on type
-            double mainMaxFontSize = typeConfig.MainMaxFontSize;
-            double sideMaxFontSize = typeConfig.SideMaxFontSize;
-
             if (selectedType == "长生")
             {
-                LivePrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, mainConfig, mainMaxFontSize);
+                LivePrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, typeConfig);
             }
             else if (selectedType == "冤亲" || selectedType == "往生" || selectedType == "祖先")
             {
-                var sideConfig = UnitConverter.ToTextConfig(typeConfig.SideTextBox);
-                sideConfig.ColumnGap = 5;
-                TwoSectionPrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, mainConfig, sideConfig, mainMaxFontSize, sideMaxFontSize);
+                TwoSectionPrint.GenerateXps(openFileDialog.FileName, printBorder, printStamp, printNames, typeConfig);
             }
             else
             {

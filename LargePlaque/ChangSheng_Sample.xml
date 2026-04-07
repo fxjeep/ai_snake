@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<list>
+<list type="长生">
   <item>
     <main>
       <line>邱福安</line>
     </main>
+    <side>
+      <line />
+    </side>
   </item>
   <item>
     <main>

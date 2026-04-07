@@ -12,53 +12,52 @@ public static class PrintTextBox
 {
     // Helper logic moved to VerticalTextRenderer
 
-    public static void Print(Canvas canvas, string[] lines, bool printBorder, bool printStamp, bool printNames, TextPrintBoxConfigure textConfig, StampPositionConfig? stampConfig, double maxAllowedFontSize)
+    public static void Print(Canvas canvas, string[] lines, bool printBorder, bool printStamp, bool printNames, ElementRect textRect, ImageElement? stamp, double maxAllowedFontSize, double columnGap = 20)
     {
         if (printBorder)
         {
-            DrawBorder(canvas, textConfig);
+            DrawBorder(canvas, textRect);
         }
 
-        if (printStamp && stampConfig != null)
+        if (printStamp && stamp != null && !string.IsNullOrEmpty(stamp.FileName))
         {
-            DrawStamp(canvas, stampConfig);
+            DrawStamp(canvas, stamp);
         }
 
         if (lines == null || lines.Length == 0 || !printNames) return;
 
-        var lineSegments = lines.Select(l => VerticalTextRenderer.ParseSegments(l)).ToList();
-
         // Process all lines as individual columns
-        VerticalTextRenderer.RenderText(canvas, lines, textConfig, maxAllowedFontSize, false);
+        VerticalTextRenderer.RenderText(canvas, lines, textRect, maxAllowedFontSize, false, columnGap);
     }
 
-    public static void DrawBorder(Canvas canvas, TextPrintBoxConfigure config)
+    public static void DrawBorder(Canvas canvas, ElementRect rect)
     {
-        var rect = new Rectangle();
-        rect.Width = config.Width;
-        rect.Height = config.Height;
-        rect.Stroke = Brushes.Black;
-        rect.StrokeThickness = 1;
-        Canvas.SetLeft(rect, config.Left);
-        Canvas.SetTop(rect, config.Top);
-        canvas.Children.Add(rect);
+        var r = new Rectangle();
+        r.Width = UnitConverter.ToPx(rect.Width);
+        r.Height = UnitConverter.ToPx(rect.Height);
+        r.Stroke = Brushes.Black;
+        r.StrokeThickness = 1;
+        Canvas.SetLeft(r, UnitConverter.ToPx(rect.Left));
+        Canvas.SetTop(r, UnitConverter.ToPx(rect.Top));
+        canvas.Children.Add(r);
     }
 
-    public static void DrawStamp(Canvas canvas, StampPositionConfig config)
+    public static void DrawStamp(Canvas canvas, ImageElement stamp)
     {
         var stampImage = new Image();
         var bitmap = new System.Windows.Media.Imaging.BitmapImage();
         bitmap.BeginInit();
-        string stampPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "stamp.png");
+        string stampPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "\\configure", stamp.FileName);
         if (System.IO.File.Exists(stampPath))
         {
             bitmap.UriSource = new Uri(stampPath);
             bitmap.EndInit();
             stampImage.Source = bitmap;
-            stampImage.Width = config.Size;
-            stampImage.Height = config.Size;
-            Canvas.SetLeft(stampImage, config.Left);
-            Canvas.SetTop(stampImage, config.Top);
+            double size = UnitConverter.ToPx(stamp.Width);
+            stampImage.Width = size;
+            stampImage.Height = size;
+            Canvas.SetLeft(stampImage, UnitConverter.ToPx(stamp.Left));
+            Canvas.SetTop(stampImage, UnitConverter.ToPx(stamp.Top));
             canvas.Children.Add(stampImage);
         }
     }

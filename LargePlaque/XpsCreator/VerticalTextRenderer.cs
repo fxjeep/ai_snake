@@ -72,12 +72,15 @@ public static class VerticalTextRenderer
         return count;
     }
 
-    public static void RenderText(Canvas canvas, string[] lines, TextPrintBoxConfigure textConfig, double maxAllowedFontSize, bool centerVertically)
+    public static void RenderText(Canvas canvas, string[] lines, ElementRect rect, double maxAllowedFontSize, bool centerVertically, double columnGap)
     {
         if (lines == null || lines.Length == 0) return;
 
         var lineSegments = lines.Select(l => ParseSegments(l)).ToList();
         if (!lineSegments.Any()) return;
+
+        double rectWidth = UnitConverter.ToPx(rect.Width);
+        double rectHeight = UnitConverter.ToPx(rect.Height);
 
         double minFont = 5;
         double maxFont = maxAllowedFontSize;
@@ -87,7 +90,7 @@ public static class VerticalTextRenderer
         {
             double mid = (minFont + maxFont) / 2.0;
             bool fits = true;
-            
+
             double maxColHeight = 0;
             double totalWidth = 0;
             for (int i = 0; i < lineSegments.Count; i++)
@@ -97,11 +100,10 @@ public static class VerticalTextRenderer
                 if (h > maxColHeight) maxColHeight = h;
                 totalWidth += w;
             }
-            
-            double gap = textConfig.ColumnGap;
-            double totalWidthWithGaps = totalWidth + gap * (lineSegments.Count - 1);
 
-            if (maxColHeight > textConfig.Height || totalWidthWithGaps > textConfig.Width)
+            double totalWidthWithGaps = totalWidth + columnGap * (lineSegments.Count - 1);
+
+            if (maxColHeight > rectHeight || totalWidthWithGaps > rectWidth)
             {
                 fits = false;
             }
@@ -117,10 +119,10 @@ public static class VerticalTextRenderer
             }
         }
 
-        DrawColumns(canvas, lineSegments, fontSize, textConfig, centerVertically);
+        DrawColumns(canvas, lineSegments, fontSize, rect, centerVertically, columnGap);
     }
 
-    private static void DrawColumns(Canvas canvas, System.Collections.Generic.List<System.Collections.Generic.List<TextSegment>> lineSegments, double fontSize, TextPrintBoxConfigure config, bool centerVertically)
+    private static void DrawColumns(Canvas canvas, System.Collections.Generic.List<System.Collections.Generic.List<TextSegment>> lineSegments, double fontSize, ElementRect rect, bool centerVertically, double columnGap)
     {
         double[] colWidths = new double[lineSegments.Count];
         double[] colHeights = new double[lineSegments.Count];
@@ -131,28 +133,24 @@ public static class VerticalTextRenderer
             colHeights[i] = MeasureColumnHeight(lineSegments[i], fontSize);
         }
 
-        double gap = config.ColumnGap;
-        double totalWidthWithGaps = colWidths.Sum() + gap * (lineSegments.Count - 1);
+        double rectLeft = UnitConverter.ToPx(rect.Left);
+        double rectTop = UnitConverter.ToPx(rect.Top);
+        double rectWidth = UnitConverter.ToPx(rect.Width);
+        double rectHeight = UnitConverter.ToPx(rect.Height);
+
+        double totalWidthWithGaps = colWidths.Sum() + columnGap * (lineSegments.Count - 1);
 
         double startRight;
-        if (config.ColumnAlign == EnumColumnAlign.Right)
-        {
-            startRight = config.Left + config.Width;
-        }
-        else
-        {
-            // Center
-            startRight = config.Left + (config.Width + totalWidthWithGaps) / 2;
-        }
-        
+        startRight = rectLeft + (rectWidth + totalWidthWithGaps) / 2;
+
         double currentXCenter = startRight;
 
-        double startY = config.Top;
+        double startY = rectTop;
         if (centerVertically && colHeights.Length > 0)
         {
             double maxHeight = colHeights.Max();
-            startY = config.Top + (config.Height - maxHeight) / 2;
-            if (startY < config.Top) startY = config.Top; // don't overflow top
+            startY = rectTop + (rectHeight - maxHeight) / 2;
+            if (startY < rectTop) startY = rectTop; // don't overflow top
         }
 
         for (int i = 0; i < lineSegments.Count; i++)
@@ -163,7 +161,7 @@ public static class VerticalTextRenderer
             }
             else
             {
-                currentXCenter -= (colWidths[i - 1] / 2 + gap + colWidths[i] / 2);
+                currentXCenter -= (colWidths[i - 1] / 2 + columnGap + colWidths[i] / 2);
             }
 
             DrawVerticalString(canvas, lineSegments[i], currentXCenter, colWidths[i], fontSize, startY);

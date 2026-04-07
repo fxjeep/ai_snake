@@ -229,8 +229,8 @@ public partial class TextInput : UserControl
             // Commit any pending edit in the currently selected text box
             if (ItemListBox.SelectedItem is InputItem selected)
             {
-                selected.MainLines = SplitLines(MainTextBox.Text);
-                selected.SideLines = SplitLines(SideTextBox.Text);
+                selected.MainLines = String.IsNullOrEmpty(MainTextBox.Text) ? new List<string>() : SplitLines(MainTextBox.Text);
+                selected.SideLines = String.IsNullOrEmpty(SideTextBox.Text) ? new List<string>() : SplitLines(SideTextBox.Text);
             }
 
             string currentType = (TypeComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "长生";
@@ -284,18 +284,15 @@ public partial class TextInput : UserControl
             return;
         }
 
-        // Auto-save before printing to ensure latest changes are reflected
-        SaveButton_Click(sender, e);
-
         try
         {
             string selectedType = (TypeComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
-            
+
             bool printBorder = PrintBorderCheckBox.IsChecked == true;
             bool printStamp = PrintRedStampCheckBox.IsChecked == true;
             bool printNames = PrintNamesCheckBox.IsChecked == true;
 
-            var settings = PrintLayoutSettings.Load(PrintLayoutSettings.DefaultConfigPath);
+            var settings = PrintLayoutSettings.Load(".\\configure\\" + PrintLayoutSettings.DefaultConfigPath);
             var typeConfig = settings.GetConfig(selectedType);
 
             if (typeConfig == null)
@@ -304,25 +301,7 @@ public partial class TextInput : UserControl
                 return;
             }
 
-            var mainConfig = new MainBoxConfigure
-            {
-                TextPrintBox = UnitConverter.ToTextConfig(typeConfig.MainTextBox),
-                StampPosition = UnitConverter.ToStampConfig(typeConfig.Stamp) ?? new StampPositionConfig()
-            };
-
-            double mainMaxFontSize = typeConfig.MainMaxFontSize;
-            double sideMaxFontSize = typeConfig.SideMaxFontSize;
-
-            if (selectedType == "长生")
-            {
-                LivePrint.GenerateXps(_filePath, printBorder, printStamp, printNames, mainConfig, mainMaxFontSize);
-            }
-            else if (selectedType == "冤亲" || selectedType == "往生" || selectedType == "祖先")
-            {
-                var sideConfig = UnitConverter.ToTextConfig(typeConfig.SideTextBox);
-                sideConfig.ColumnGap = 5;
-                TwoSectionPrint.GenerateXps(_filePath, printBorder, printStamp, printNames, mainConfig, sideConfig, mainMaxFontSize, sideMaxFontSize);
-            }
+            TwoSectionPrint.GenerateXps(_filePath, printBorder, printStamp, printNames, typeConfig);
         }
         catch (Exception ex)
         {

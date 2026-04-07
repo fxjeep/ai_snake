@@ -38,8 +38,8 @@ public class TypeLayoutConfig
     public ElementRect SideTextBox { get; set; } = new ElementRect();
     public ImageElement Stamp { get; set; } = new ImageElement();
     public ImageElement Background { get; set; } = new ImageElement();
-    public double MainMaxFontSize { get; set; } = 1000.0;
-    public double SideMaxFontSize { get; set; } = 1000.0;
+    public double MainMaxFontSize { get; set; } = 60.0;
+    public double SideMaxFontSize { get; set; } = 30.0;
 }
 
 [XmlRoot("PrintLayoutSettings")]
@@ -79,28 +79,4 @@ public static class UnitConverter
     public const double CmToPx = 96.0 / 2.54; // 37.79527559055118
     public static double ToPx(double cm) => cm * CmToPx;
     public static double ToCm(double px) => px / CmToPx;
-
-    public static TextPrintBoxConfigure ToTextConfig(ElementRect rect)
-    {
-        return new TextPrintBoxConfigure
-        {
-            Left = ToPx(rect.Left),
-            Top = ToPx(rect.Top),
-            Width = ToPx(rect.Width),
-            Height = ToPx(rect.Height),
-            ColumnAlign = EnumColumnAlign.Center // Default or add to config?
-        };
-    }
-
-    public static StampPositionConfig? ToStampConfig(ImageElement stamp)
-    {
-        if (string.IsNullOrEmpty(stamp.FileName)) return null;
-        return new StampPositionConfig
-        {
-            Left = ToPx(stamp.Left),
-            Top = ToPx(stamp.Top),
-            Size = ToPx(stamp.Width) // Assume horizontal size for now?
-        };
-    }
-
 }
