@@ -78,8 +78,8 @@ public partial class PositionConfigure : UserControl
                 SideTextBox = new ElementRect(8.1, 21.0, 2.2, 10.0),
                 Stamp = new ImageElement("stamp.png", 11.8, 2.0, 6.0, 6.0),
                 Background = new ImageElement("", 0, 0, 29.7, 42.0),
-                MainMaxFontSize = type == "长生" ? 60.0 : 1000.0,
-                SideMaxFontSize = 1000.0
+                MainMaxFontSize = type == "长生" ? 60.0 : 60.0,
+                SideMaxFontSize = 30.0
             });
         }
     }
@@ -94,7 +94,7 @@ public partial class PositionConfigure : UserControl
             oldType = cbiOld.Content.ToString();
         }
 
-        SaveCurrentTypeToSettings(oldType);
+        //SaveCurrentTypeToSettings(oldType);
         UpdateUIFromCurrentType();
     }
 
@@ -171,19 +171,24 @@ public partial class PositionConfigure : UserControl
         {
             currentType.Background.Width = TryParse(BgWidthTxt.Text, 29.7);
             currentType.Background.Height = TryParse(BgHeightTxt.Text, 42.0);
+
+            currentType.Stamp.Left = TryParse(StampLeftTxt.Text, currentType.Stamp.Left);
+            currentType.Stamp.Top = TryParse(StampTopTxt.Text, currentType.Stamp.Top);
             currentType.Stamp.Width = TryParse(StampWidthTxt.Text, 6.0);
             currentType.Stamp.Height = TryParse(StampHeightTxt.Text, 6.0);
 
-            Designer.GetElementValues(out Rect main, out Rect side, out Rect stamp);
-            currentType.MainTextBox = FromRect(main);
-            currentType.SideTextBox = FromRect(side);
-            currentType.Stamp.Left = UnitConverter.ToCm(stamp.Left);
-            currentType.Stamp.Top = UnitConverter.ToCm(stamp.Top);
-            currentType.Stamp.Width = UnitConverter.ToCm(stamp.Width);
-            currentType.Stamp.Height = UnitConverter.ToCm(stamp.Height);
+            currentType.MainTextBox.Left = TryParse(MainLeftTxt.Text, currentType.MainTextBox.Left);
+            currentType.MainTextBox.Top = TryParse(MainTopTxt.Text, currentType.MainTextBox.Top);
+            currentType.MainTextBox.Width = TryParse(MainWidthTxt.Text, currentType.MainTextBox.Width);
+            currentType.MainTextBox.Height = TryParse(MainHeightTxt.Text, currentType.MainTextBox.Height);
 
-            currentType.MainMaxFontSize = TryParse(MainMaxFontSizeTxt.Text, 1000.0);
-            currentType.SideMaxFontSize = TryParse(SideMaxFontSizeTxt.Text, 1000.0);
+            currentType.SideTextBox.Left = TryParse(SideLeftTxt.Text, currentType.SideTextBox.Left);
+            currentType.SideTextBox.Top = TryParse(SideTopTxt.Text, currentType.SideTextBox.Top);
+            currentType.SideTextBox.Width = TryParse(SideWidthTxt.Text, currentType.SideTextBox.Width);
+            currentType.SideTextBox.Height = TryParse(SideHeightTxt.Text, currentType.SideTextBox.Height);
+
+            currentType.MainMaxFontSize = TryParse(MainMaxFontSizeTxt.Text, 60.0);
+            currentType.SideMaxFontSize = TryParse(SideMaxFontSizeTxt.Text, 30.0);
         }
     }
 
@@ -255,9 +260,9 @@ public partial class PositionConfigure : UserControl
     private void DisplayTexts_Click(object sender, RoutedEventArgs e)
     {
         Designer.SetSampleTexts(
-            SampleMainTextsTxt.Text, 
-            SampleSideTextsTxt.Text, 
-            TryParse(MainMaxFontSizeTxt.Text, 1000.0), 
+            SampleMainTextsTxt.Text,
+            SampleSideTextsTxt.Text,
+            TryParse(MainMaxFontSizeTxt.Text, 1000.0),
             TryParse(SideMaxFontSizeTxt.Text, 1000.0));
     }
 

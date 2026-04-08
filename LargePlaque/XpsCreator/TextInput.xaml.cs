@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Xps.Packaging;
 using System.Xml.Linq;
 
 namespace XpsCreator;
@@ -28,12 +30,67 @@ public partial class TextInput : UserControl
     private string _filePath = "";
     private ObservableCollection<InputItem> _items = new();
     private bool _isUpdating = false;
+    private System.Windows.Xps.Packaging.XpsDocument? _currentXpsDoc;
 
     public TextInput()
     {
         InitializeComponent();
         ItemListBox.ItemsSource = _items;
         UpdateEditorVisibility();
+        
+        // Hook viewer events
+        XpsViewer.PageViewsChanged += (s, e) => UpdatePageInfo();
+    }
+
+    private void UpdatePageInfo()
+    {
+        CurrentPageTxt.Text = XpsViewer.MasterPageNumber.ToString();
+        if (XpsViewer.Document != null)
+        {
+            TotalPagesTxt.Text = $"/ {XpsViewer.PageCount}";
+        }
+    }
+
+    private void PrevPageButton_Click(object sender, RoutedEventArgs e) => XpsViewer.PreviousPage();
+    private void NextPageButton_Click(object sender, RoutedEventArgs e) => XpsViewer.NextPage();
+
+    private void JumpToPageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (int.TryParse(CurrentPageTxt.Text, out int pageNum))
+        {
+            XpsViewer.GoToPage(pageNum);
+        }
+    }
+
+    private void PrintCurrentPageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (XpsViewer.Document == null) return;
+
+        var printDialog = new PrintDialog();
+        if (printDialog.ShowDialog() == true)
+        {
+            // Apply color mode
+            var ticket = printDialog.PrintTicket;
+            if (ColorModeComboBox.SelectedIndex == 1) // Black/White
+            {
+                ticket.OutputColor = System.Printing.OutputColor.Monochrome;
+            }
+            else
+            {
+                ticket.OutputColor = System.Printing.OutputColor.Color;
+            }
+
+            // Print only current page
+            var paginator = XpsViewer.Document.DocumentPaginator;
+            int pageIdx = XpsViewer.MasterPageNumber - 1;
+            
+            // Note: DocumentViewer doesn't give easy access to a single-page paginator
+            // but we can wrap it or just use the whole document and set page range
+            printDialog.PageRangeSelection = PageRangeSelection.UserPages;
+            printDialog.PageRange = new PageRange(XpsViewer.MasterPageNumber);
+            
+            printDialog.PrintDocument(paginator, "Plaque Current Page");
+        }
     }
 
     // ── File open ────────────────────────────────────────────────────────────
@@ -301,11 +358,40 @@ public partial class TextInput : UserControl
                 return;
             }
 
-            TwoSectionPrint.GenerateXps(_filePath, printBorder, printStamp, printNames, typeConfig);
+            string xpsPath = TwoSectionPrint.GenerateXps(_filePath, printBorder, printStamp, printNames, typeConfig);
+            if (!string.IsNullOrEmpty(xpsPath))
+            {
+                LoadXps(xpsPath);
+            }
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error during printing:\n{ex.Message}", "Print & Test Error");
+        }
+    }
+
+    private void LoadXps(string xpsPath)
+    {
+        try
+        {
+            // Close previous document to unlock file
+            if (_currentXpsDoc != null)
+            {
+                XpsViewer.Document = null;
+                _currentXpsDoc.Close();
+                _currentXpsDoc = null;
+            }
+
+            if (File.Exists(xpsPath))
+            {
+                _currentXpsDoc = new System.Windows.Xps.Packaging.XpsDocument(xpsPath, FileAccess.Read);
+                XpsViewer.Document = _currentXpsDoc.GetFixedDocumentSequence();
+                UpdatePageInfo();
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading preview:\n{ex.Message}", "Viewer Error");
         }
     }
 }

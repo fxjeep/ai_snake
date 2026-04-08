@@ -27,7 +27,9 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200" MinWidth="120"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MinWidth="300"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*" MinWidth="300"/>
             </Grid.ColumnDefinitions>
 
             <!-- Left: item list -->
@@ -91,11 +93,37 @@
                         <CheckBox x:Name="PrintBorderCheckBox" Content="Border" VerticalAlignment="Center" Margin="0,0,12,0"/>
                         <CheckBox x:Name="PrintRedStampCheckBox" Content="Red Stamp" VerticalAlignment="Center" Margin="0,0,12,0"/>
                         <CheckBox x:Name="PrintNamesCheckBox" Content="Names" IsChecked="True" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                        <Button x:Name="QuickPrintButton" Content="Print" Padding="12,2" 
-                                Width="80" Click="QuickPrintButton_Click"/>
+                        <Button x:Name="QuickPrintButton" Content="Preview &amp; Load" Padding="12,2" 
+                                Width="100" Click="QuickPrintButton_Click"/>
                     </StackPanel>
                 </GroupBox>
 
+            </DockPanel>
+
+            <!-- Splitter 2 -->
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#DDDDDD"/>
+
+            <!-- Right: XPS Viewer -->
+            <DockPanel Grid.Column="4" Margin="8,0,0,0">
+                <ToolBarTray DockPanel.Dock="Top">
+                    <ToolBar>
+                        <Button x:Name="PrevPageButton" Content="&lt;" Click="PrevPageButton_Click" ToolTip="Previous Page" Width="30"/>
+                        <Button x:Name="NextPageButton" Content="&gt;" Click="NextPageButton_Click" ToolTip="Next Page" Width="30"/>
+                        <Separator/>
+                        <TextBlock Text="Page:" VerticalAlignment="Center" Margin="4,0"/>
+                        <TextBox x:Name="CurrentPageTxt" Width="30" Text="1" VerticalContentAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock x:Name="TotalPagesTxt" Text="/ 1" VerticalAlignment="Center" Margin="4,0"/>
+                        <Button x:Name="JumpToPageButton" Content="Go" Click="JumpToPageButton_Click" Margin="4,0"/>
+                        <Separator/>
+                        <ComboBox x:Name="ColorModeComboBox" Width="100" SelectedIndex="0">
+                            <ComboBoxItem Content="Color"/>
+                            <ComboBoxItem Content="Black/White"/>
+                        </ComboBox>
+                        <Separator/>
+                        <Button x:Name="PrintCurrentPageButton" Content="Print Current" Click="PrintCurrentPageButton_Click"/>
+                    </ToolBar>
+                </ToolBarTray>
+                <DocumentViewer x:Name="XpsViewer"/>
             </DockPanel>
         </Grid>
     </Grid>

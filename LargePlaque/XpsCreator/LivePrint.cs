@@ -10,12 +10,13 @@ namespace XpsCreator;
 
 public static class LivePrint
 {
-    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, TypeLayoutConfig config)
+    public static string GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, TypeLayoutConfig config)
     {
+        string outputXpsPath = "";
         try
         {
             var doc = System.Xml.Linq.XDocument.Load(filePath);
-            string outputXpsPath = System.IO.Path.Combine(
+            outputXpsPath = System.IO.Path.Combine(
                 System.IO.Path.GetDirectoryName(filePath) ?? "",
                 System.IO.Path.GetFileNameWithoutExtension(filePath) + "_live.xps");
 
@@ -64,11 +65,12 @@ public static class LivePrint
                 xpsDoc.Close();
             }
 
-            MessageBox.Show($"XPS file created:\n{outputXpsPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            return outputXpsPath;
         }
         catch (System.Exception ex)
         {
             MessageBox.Show($"Error generating XPS: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return "";
         }
     }
 

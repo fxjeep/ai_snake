@@ -11,12 +11,13 @@ namespace XpsCreator;
 
 public static class TwoSectionPrint
 {
-    public static void GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, TypeLayoutConfig config)
+    public static string GenerateXps(string filePath, bool printBorder, bool printStamp, bool printNames, TypeLayoutConfig config)
     {
+        string outputXpsPath = "";
         try
         {
             var doc = XDocument.Load(filePath);
-            string outputXpsPath = System.IO.Path.Combine(
+            outputXpsPath = System.IO.Path.Combine(
                 System.IO.Path.GetDirectoryName(filePath) ?? "",
                 System.IO.Path.GetFileNameWithoutExtension(filePath) + "_two_section.xps");
 
@@ -68,11 +69,12 @@ public static class TwoSectionPrint
                 xpsDoc.Close();
             }
 
-            MessageBox.Show($"XPS file created:\n{outputXpsPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            return outputXpsPath;
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error generating XPS: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return "";
         }
     }
 

@@ -53,7 +53,7 @@ public static class VerticalTextRenderer
         for (int i = 0; i < text.Length; i++)
         {
             char c = text[i];
-            bool isAsciiLetterOrDigit = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || char.IsDigit(c);
+            bool isAsciiLetterOrDigit = IsHorizontalSegmentChar(c);
 
             if (isAsciiLetterOrDigit)
             {
@@ -181,7 +181,7 @@ public static class VerticalTextRenderer
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
-                bool isAsciiLetterOrDigit = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || char.IsDigit(c);
+                bool isAsciiLetterOrDigit = IsHorizontalSegmentChar(c);
 
                 if (isAsciiLetterOrDigit)
                 {
@@ -244,7 +244,7 @@ public static class VerticalTextRenderer
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
-                bool isAsciiLetterOrDigit = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || char.IsDigit(c);
+                bool isAsciiLetterOrDigit = IsHorizontalSegmentChar(c);
 
                 if (isAsciiLetterOrDigit)
                 {
@@ -283,7 +283,7 @@ public static class VerticalTextRenderer
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
-                bool isAsciiLetterOrDigit = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || char.IsDigit(c);
+                bool isAsciiLetterOrDigit = IsHorizontalSegmentChar(c);
 
                 if (isAsciiLetterOrDigit)
                 {
@@ -332,5 +332,22 @@ public static class VerticalTextRenderer
         };
         textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         return textBlock.DesiredSize.Height;
+    }
+
+    private static bool IsHorizontalSegmentChar(char c)
+    {
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || char.IsDigit(c))
+            return true;
+
+        // Vietnamese characters (Latin characters with diacritics)
+        if (char.IsLetter(c))
+        {
+            if ((c >= '\u00C0' && c <= '\u017F') || // Latin-1 Supplement & Extended-A
+                (c >= '\u0180' && c <= '\u024F') || // Latin Extended-B
+                (c >= '\u1E00' && c <= '\u1EFF'))   // Latin Extended Additional
+                return true;
+        }
+
+        return false;
     }
 }
