@@ -17,6 +17,8 @@ class Contacts extends Table {
 
 enum ContactType { Live, Dead, Ancestor, Property }
 
+enum ImportStatus { imported, duplicate, skipped }
+
 class ContactDetails extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get contactId => integer().references(Contacts, #id)();
@@ -185,66 +187,98 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  Future<void> importRecords(List<ImportRecord> rows) async {
+  Future<ImportStatus> importSingleRecord(ImportRecord row) async {
+    // 1. Find or create contact
+    var contact = await (select(contacts)
+          ..where(
+            (t) =>
+                t.name.equals(row.contactName) & t.code.equals(row.contactCode),
+          )
+          ..limit(1))
+        .getSingleOrNull();
+
+    int contactId;
+    if (contact == null) {
+      contactId = await into(contacts).insert(
+        ContactsCompanion.insert(
+          name: row.contactName,
+          code: row.contactCode,
+          lastPrintDate: Value(row.contactLastPrintDate),
+          isPrinted: const Value(false),
+        ),
+      );
+    } else {
+      contactId = contact.id;
+    }
+
+    // 2. Map type string to enum
+    ContactType type;
+    switch (row.typeStr.toLowerCase()) {
+      case 'dead':
+        type = ContactType.Dead;
+        break;
+      case 'ancestor':
+        type = ContactType.Ancestor;
+        break;
+      case 'property':
+        type = ContactType.Property;
+        break;
+      case 'live':
+      default:
+        type = ContactType.Live;
+        break;
+    }
+
+    // 3. Check for duplicates
+    final existingDetail = await (select(contactDetails)
+          ..where(
+            (t) =>
+                t.contactId.equals(contactId) &
+                t.type.equalsValue(type) &
+                t.name1.equals(row.name1) &
+                t.name2.equals(row.name2) &
+                t.name3.equals(row.name3),
+          )
+          ..limit(1))
+        .getSingleOrNull();
+
+    if (existingDetail == null) {
+      // 4. Insert detail record
+      await into(contactDetails).insert(
+        ContactDetailsCompanion.insert(
+          contactId: contactId,
+          name1: row.name1,
+          name2: row.name2,
+          name3: row.name3,
+          type: type,
+          lastPrint: Value(row.detailLastPrintDate),
+          isPrinted: const Value(false),
+        ),
+      );
+      return ImportStatus.imported;
+    } else {
+      return ImportStatus.duplicate;
+    }
+  }
+
+  Future<ImportStats> importRecordsBatch(List<ImportRecord> rows) async {
+    int imported = 0;
+    int duplicates = 0;
     await transaction(() async {
       for (final row in rows) {
-        // 1. Find or create contact
-        var contact =
-            await (select(contacts)
-                  ..where(
-                    (t) =>
-                        t.name.equals(row.contactName) &
-                        t.code.equals(row.contactCode),
-                  )
-                  ..limit(1))
-                .getSingleOrNull();
-
-        int contactId;
-        if (contact == null) {
-          contactId = await into(contacts).insert(
-            ContactsCompanion.insert(
-              name: row.contactName,
-              code: row.contactCode,
-              lastPrintDate: Value(row.contactLastPrintDate),
-              isPrinted: const Value(false),
-            ),
-          );
-        } else {
-          contactId = contact.id;
+        final status = await importSingleRecord(row);
+        if (status == ImportStatus.imported) {
+          imported++;
+        } else if (status == ImportStatus.duplicate) {
+          duplicates++;
         }
-
-        // 2. Map type string to enum
-        ContactType type;
-        switch (row.typeStr.toLowerCase()) {
-          case 'dead':
-            type = ContactType.Dead;
-            break;
-          case 'ancestor':
-            type = ContactType.Ancestor;
-            break;
-          case 'property':
-            type = ContactType.Property;
-            break;
-          case 'live':
-          default:
-            type = ContactType.Live;
-            break;
-        }
-
-        // 3. Insert detail record
-        await into(contactDetails).insert(
-          ContactDetailsCompanion.insert(
-            contactId: contactId,
-            name1: row.name1,
-            name2: row.name2,
-            name3: row.name3,
-            type: type,
-            lastPrint: Value(row.detailLastPrintDate),
-            isPrinted: const Value(false),
-          ),
-        );
       }
     });
+    return ImportStats(imported: imported, duplicates: duplicates);
+  }
+
+  Future<void> importRecords(List<ImportRecord> rows) async {
+    await importRecordsBatch(rows);
   }
 
   Future<List<Contact>> getContactsByPrintDateAfter(DateTime date) async {
@@ -300,4 +334,11 @@ class ContactPrintData {
   final List<ContactDetail> details;
 
   ContactPrintData({required this.contact, required this.details});
+}
+
+class ImportStats {
+  final int imported;
+  final int duplicates;
+
+  ImportStats({required this.imported, required this.duplicates});
 }
