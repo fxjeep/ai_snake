@@ -19,6 +19,9 @@
             <TabItem Header="Text Input">
                 <local:TextInput />
             </TabItem>
+            <TabItem Header="Property">
+                <local:Property />
+            </TabItem>
         </TabControl>
     </DockPanel>
 </Window>

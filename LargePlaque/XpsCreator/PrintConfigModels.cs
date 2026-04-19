@@ -42,10 +42,32 @@ public class TypeLayoutConfig
     public double SideMaxFontSize { get; set; } = 30.0;
 }
 
+public class PropertyPrintConfig
+{
+    public double MarginLeftCm { get; set; } = 0.5;
+    public double MarginRightCm { get; set; } = 0.5;
+    public double MarginTopCm { get; set; } = 1.5;
+    public double MarginBottomCm { get; set; } = 0.7;
+    
+    public int Columns { get; set; } = 5;
+    public int Rows { get; set; } = 2;
+
+    public ElementRect Main { get; set; } = new ElementRect(0.5, 0.5, 3.0, 8.0);
+    public ElementRect Side { get; set; } = new ElementRect(1.0, 9.0, 2.0, 4.0);
+
+    public int MainFontLevel1MaxChars { get; set; } = 50;
+    public int MainFontLevel1Size { get; set; } = 18;
+    public int MainFontLevel2MaxChars { get; set; } = 100;
+    public int MainFontLevel2Size { get; set; } = 16;
+    public int MainFontSmallSize { get; set; } = 14;
+}
+
 [XmlRoot("PrintLayoutSettings")]
 public class PrintLayoutSettings
 {
     public List<TypeLayoutConfig> TypeConfigs { get; set; } = new List<TypeLayoutConfig>();
+    
+    public PropertyPrintConfig PropertyPrintConfig { get; set; } = new PropertyPrintConfig();
 
     public static string DefaultConfigPath => "PrintConfigure.xml";
 

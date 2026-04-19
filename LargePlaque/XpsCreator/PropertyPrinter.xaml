@@ -1,0 +1,82 @@
+<UserControl x:Class="XpsCreator.PropertyPrinter"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Side: Canvas with background image -->
+        <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Canvas x:Name="PrinterCanvas" Width="151.18" Height="510.24" Background="White">
+                <Image x:Name="BgImage" Width="151.18" Height="510.24" Stretch="UniformToFill" Canvas.Left="0" Canvas.Top="0" Panel.ZIndex="0" />
+                
+                <!-- Box 1 -->
+                <Grid x:Name="MainBox" Width="50" Height="50" Canvas.Left="10" Canvas.Top="10" Panel.ZIndex="1">
+                    <Rectangle Fill="#55FF0000" Stroke="Red" StrokeThickness="1" />
+                    <!-- Drag handle (covers the entire grid) -->
+                    <Thumb DragDelta="Box_DragDelta" DragCompleted="Box_DragCompleted" Background="Transparent" />
+                    <!-- Resize handle (bottom right corner) -->
+                    <Thumb DragDelta="BoxResize_DragDelta" DragCompleted="Box_DragCompleted" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Black" Cursor="SizeNWSE" />
+                </Grid>
+
+                <!-- Box 2 -->
+                <Grid x:Name="SideBox" Width="50" Height="50" Canvas.Left="10" Canvas.Top="70" Panel.ZIndex="1">
+                    <Rectangle Fill="#5500FF00" Stroke="Green" StrokeThickness="1" />
+                    <!-- Drag handle -->
+                    <Thumb DragDelta="Box_DragDelta" DragCompleted="Box_DragCompleted" Background="Transparent" />
+                    <!-- Resize handle -->
+                    <Thumb DragDelta="BoxResize_DragDelta" DragCompleted="Box_DragCompleted" Width="10" Height="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Black" Cursor="SizeNWSE" />
+                </Grid>
+            </Canvas>
+        </Border>
+
+        <!-- Right Side: Controls -->
+        <StackPanel Grid.Column="1" Margin="10">
+            <TextBlock Text="File Path:" Margin="0,0,0,5" />
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="FilePathTextBox" Grid.Column="0" Margin="0,0,10,0" IsReadOnly="True" VerticalContentAlignment="Center" />
+                <Button Grid.Column="1" Content="Browse..." Width="80" Height="25" Click="OpenFileButton_Click" />
+            </Grid>
+
+            <CheckBox x:Name="PrintBoxCheckBox" Content="Print box" Margin="0,0,0,20" />
+
+            <Button Content="Print" Width="100" Height="30" HorizontalAlignment="Left" Click="PrintButton_Click" />
+
+            <Separator Margin="0,20,0,10" />
+            <TextBlock Text="Main Box Font Size Setup:" FontWeight="Bold" Margin="0,0,0,10" />
+
+            <!-- Row 1 -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Max Char." VerticalAlignment="Center" Width="60"/>
+                <TextBox x:Name="L1MaxCharTextBox" Width="40" VerticalContentAlignment="Center"/>
+                <TextBlock Text="Font Size" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
+                <TextBox x:Name="L1FontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Row 2 -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Max Char." VerticalAlignment="Center" Width="60"/>
+                <TextBox x:Name="L2MaxCharTextBox" Width="40" VerticalContentAlignment="Center"/>
+                <TextBlock Text="Font Size" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
+                <TextBox x:Name="L2FontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Row 3 -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Small Font" VerticalAlignment="Center" Width="110"/>
+                <TextBlock Text="Font Size" VerticalAlignment="Center" Width="60"/>
+                <TextBox x:Name="SmallFontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

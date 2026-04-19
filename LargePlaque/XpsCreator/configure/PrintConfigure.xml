@@ -126,5 +126,24 @@
       <SideMaxFontSize>30</SideMaxFontSize>
     </TypeLayoutConfig>
   </TypeConfigs>
-  <DefaultColorModeIndex>0</DefaultColorModeIndex>
+  <PropertyPrintConfig>
+    <MarginLeftCm>0.5</MarginLeftCm>
+    <MarginRightCm>0.5</MarginRightCm>
+    <MarginTopCm>1.5</MarginTopCm>
+    <MarginBottomCm>0.7</MarginBottomCm>
+    <Columns>5</Columns>
+    <Rows>2</Rows>
+    <Main>
+      <Left>1.135</Left>
+      <Top>5.280138888888888</Top>
+      <Width>1.7829166666666667</Width>
+      <Height>4.172361111111109</Height>
+    </Main>
+    <Side>
+      <Left>0.08277777777777777</Left>
+      <Top>4.21986111111111</Top>
+      <Width>0.6418055555555554</Width>
+      <Height>6.24013888888889</Height>
+    </Side>
+  </PropertyPrintConfig>
 </PrintLayoutSettings>
