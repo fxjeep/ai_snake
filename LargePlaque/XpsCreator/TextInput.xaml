@@ -14,9 +14,9 @@
 
         <!-- Top bar: file path + open button -->
         <DockPanel Grid.Row="0" Margin="8,8,8,4">
-            <Button x:Name="NewFileButton" Content="New" DockPanel.Dock="Left"
+            <Button x:Name="NewFileButton" Content="{DynamicResource New}" DockPanel.Dock="Left"
                     Width="60" Margin="0,0,6,0" Click="NewFileButton_Click"/>
-            <Button x:Name="BrowseButton" Content="Open File..." DockPanel.Dock="Left"
+            <Button x:Name="BrowseButton" Content="{DynamicResource OpenFile}" DockPanel.Dock="Left"
                     Width="100" Margin="0,0,6,0" Click="BrowseButton_Click"/>
             <TextBox x:Name="FilePathTxt" IsReadOnly="True" VerticalContentAlignment="Center"
                      Background="#F5F5F5" Padding="4,2"/>
@@ -33,7 +33,7 @@
             <!-- Left: item list -->
             <DockPanel Grid.Column="0">
                 <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
-                    <Label Content="Items" FontWeight="SemiBold" Padding="0"/>
+                    <Label Content="{DynamicResource Items}" FontWeight="SemiBold" Padding="0"/>
                 </DockPanel>
                 <ListBox x:Name="ItemListBox" SelectionChanged="ItemListBox_SelectionChanged"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"/>
@@ -47,24 +47,24 @@
 
                 <!-- Type selector row -->
                 <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-                    <Label Content="Type:" VerticalAlignment="Center" Padding="0,0,6,0"/>
+                    <Label Content="{DynamicResource Type}" VerticalAlignment="Center" Padding="0,0,6,0"/>
                     <ComboBox x:Name="TypeComboBox" Width="120" SelectedIndex="0"
                               SelectionChanged="TypeComboBox_SelectionChanged">
-                        <ComboBoxItem Content="长生"/>
-                        <ComboBoxItem Content="冤亲"/>
-                        <ComboBoxItem Content="往生"/>
-                        <ComboBoxItem Content="祖先"/>
+                        <ComboBoxItem Content="{DynamicResource TypeChangsheng}"/>
+                        <ComboBoxItem Content="{DynamicResource TypeYuanqin}"/>
+                        <ComboBoxItem Content="{DynamicResource TypeWangsheng}"/>
+                        <ComboBoxItem Content="{DynamicResource TypeZuxian}"/>
                     </ComboBox>
-                    <Button x:Name="SaveButton" Content="Save" Margin="12,0,0,0"
+                    <Button x:Name="SaveButton" Content="{DynamicResource Save}" Margin="12,0,0,0"
                             Width="80" Click="SaveButton_Click"/>
-                    <Button x:Name="AddItemButton" Content="+ Add" Margin="6,0,0,0"
+                    <Button x:Name="AddItemButton" Content="{DynamicResource Add}" Margin="6,0,0,0"
                             Width="70" Click="AddItemButton_Click"/>
-                    <Button x:Name="DeleteItemButton" Content="Delete" Margin="6,0,0,0"
+                    <Button x:Name="DeleteItemButton" Content="{DynamicResource Delete}" Margin="6,0,0,0"
                             Width="70" Click="DeleteItemButton_Click"/>
                 </DockPanel>
 
                 <!-- Main text editor -->
-                <GroupBox x:Name="MainTextGroup" Header="Main Text"
+                <GroupBox x:Name="MainTextGroup" Header="{DynamicResource MainText}"
                           DockPanel.Dock="Top" Margin="0,0,0,8">
                     <TextBox x:Name="MainTextBox"
                              AcceptsReturn="True" TextWrapping="Wrap"
@@ -75,7 +75,7 @@
                 </GroupBox>
 
                 <!-- Side text editor -->
-                <GroupBox x:Name="SideTextGroup" Header="Side Text"
+                <GroupBox x:Name="SideTextGroup" Header="{DynamicResource SideText}"
                           DockPanel.Dock="Top">
                     <TextBox x:Name="SideTextBox"
                              AcceptsReturn="True" TextWrapping="Wrap"
@@ -86,12 +86,12 @@
                 </GroupBox>
                 
                 <!-- Print & Test tools -->
-                <GroupBox Header="Print &amp; Test" DockPanel.Dock="Top" Margin="0,8,0,0">
+                <GroupBox Header="{DynamicResource PrintTest}" DockPanel.Dock="Top" Margin="0,8,0,0">
                     <StackPanel Orientation="Horizontal" Margin="6">
-                        <CheckBox x:Name="PrintBorderCheckBox" Content="Border" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                        <CheckBox x:Name="PrintRedStampCheckBox" Content="Red Stamp" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                        <CheckBox x:Name="PrintNamesCheckBox" Content="Names" IsChecked="True" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                        <Button x:Name="QuickPrintButton" Content="Generate XPS" Padding="12,2" 
+                        <CheckBox x:Name="PrintBorderCheckBox" Content="{DynamicResource Border}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <CheckBox x:Name="PrintRedStampCheckBox" Content="{DynamicResource RedStamp}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <CheckBox x:Name="PrintNamesCheckBox" Content="{DynamicResource Names}" IsChecked="True" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <Button x:Name="QuickPrintButton" Content="{DynamicResource GenerateXps}" Padding="12,2" 
                                 Width="100" Click="QuickPrintButton_Click"/>
                     </StackPanel>
                 </GroupBox>

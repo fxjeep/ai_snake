@@ -1,0 +1,82 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <!-- MainWindow -->
+    <system:String x:Key="Title">A3 XPS Creator</system:String>
+    <system:String x:Key="Exit">Exit</system:String>
+    <system:String x:Key="TabPositionConfigure">Position Configure</system:String>
+    <system:String x:Key="TabTextInput">Large Plaque Text Input</system:String>
+    <system:String x:Key="TabPropertyFilePrint">Property File Print</system:String>
+    <system:String x:Key="TabWeeklyPlaqueData">Weekly Plaque Data</system:String>
+    
+    <!-- DataEntry -->
+    <system:String x:Key="DataEntryTitle">Data Entry</system:String>
+    <system:String x:Key="SearchContacts">Search Contacts</system:String>
+    <system:String x:Key="SearchPlaceholder">Search by name or code...</system:String>
+    <system:String x:Key="EditingDetails">Editing Details for: </system:String>
+    <system:String x:Key="Save">Save</system:String>
+    <system:String x:Key="TabLive">Live</system:String>
+    <system:String x:Key="TabDead">Dead</system:String>
+    <system:String x:Key="TabAncestor">Ancestor</system:String>
+    <system:String x:Key="TabProperty">Property</system:String>
+    <system:String x:Key="AddContact">Add Contact</system:String>
+    <system:String x:Key="Search">Search</system:String>
+    <system:String x:Key="Detail">Detail</system:String>
+    <system:String x:Key="Delete">Delete</system:String>
+    <system:String x:Key="Print">Print</system:String>
+    <system:String x:Key="Unprint">Unprint</system:String>
+    <system:String x:Key="CreateList">Create List</system:String>
+    <system:String x:Key="ContactName">Name</system:String>
+    <system:String x:Key="ContactCode">Code</system:String>
+    <system:String x:Key="LastPrintDate">Last Print Date</system:String>
+    <system:String x:Key="IsPrint">Print</system:String>
+
+    <!-- PositionConfigure -->
+    <system:String x:Key="ViewSettings">View Settings</system:String>
+    <system:String x:Key="GeneralSettings">General Settings</system:String>
+    <system:String x:Key="SelectType">Select Type:</system:String>
+    <system:String x:Key="TypeChangsheng">Changsheng</system:String>
+    <system:String x:Key="TypeYuanqin">Yuanqin</system:String>
+    <system:String x:Key="TypeWangsheng">Wangsheng</system:String>
+    <system:String x:Key="TypeZuxian">Zuxian</system:String>
+    <system:String x:Key="BackgroundImage">Background Image</system:String>
+    <system:String x:Key="SelectBackground">Select Background</system:String>
+    <system:String x:Key="WidthCm">Width (cm):</system:String>
+    <system:String x:Key="HeightCm">Height (cm):</system:String>
+    <system:String x:Key="StampImage">Stamp Image</system:String>
+    <system:String x:Key="SelectStamp">Select Stamp</system:String>
+    <system:String x:Key="LeftCm">Left (cm):</system:String>
+    <system:String x:Key="TopCm">Top (cm):</system:String>
+    <system:String x:Key="MainBox">Main Box</system:String>
+    <system:String x:Key="SideBox">Side Box</system:String>
+    <system:String x:Key="SampleTextsConstraints">Sample Texts &amp; Constraints</system:String>
+    <system:String x:Key="SampleMainTexts">Sample Main Texts</system:String>
+    <system:String x:Key="MaxMainFontSize">Max Main Font Size</system:String>
+    <system:String x:Key="SampleSideTexts">Sample Side Texts</system:String>
+    <system:String x:Key="MaxSideFontSize">Max Side Font Size</system:String>
+    <system:String x:Key="DisplayTexts">Display Texts</system:String>
+    <system:String x:Key="SaveConfiguration">Save Configuration</system:String>
+
+    <!-- TextInput -->
+    <system:String x:Key="New">New</system:String>
+    <system:String x:Key="OpenFile">Open File...</system:String>
+    <system:String x:Key="Items">Items</system:String>
+    <system:String x:Key="Type">Type:</system:String>
+    <system:String x:Key="Add">+ Add</system:String>
+    <system:String x:Key="PrintTest">Print &amp; Test</system:String>
+    <system:String x:Key="Border">Border</system:String>
+    <system:String x:Key="RedStamp">Red Stamp</system:String>
+    <system:String x:Key="Names">Names</system:String>
+    <system:String x:Key="GenerateXps">Generate XPS</system:String>
+
+    <!-- PropertyPrinter -->
+    <system:String x:Key="FilePath">File Path:</system:String>
+    <system:String x:Key="Browse">Browse...</system:String>
+    <system:String x:Key="PrintBox">Print box</system:String>
+    <system:String x:Key="MainBoxFontSizeSetup">Main Box Font Size Setup:</system:String>
+    <system:String x:Key="MaxChar">Max Char.</system:String>
+    <system:String x:Key="FontSize">Font Size</system:String>
+    <system:String x:Key="SmallFont">Small Font</system:String>
+    
+</ResourceDictionary>

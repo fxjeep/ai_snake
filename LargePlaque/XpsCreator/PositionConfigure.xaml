@@ -22,46 +22,49 @@
         <!-- Configuration Column -->
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="10" Orientation="Vertical">
-            <GroupBox Header="View Settings">
+            <GroupBox Header="{DynamicResource ViewSettings}">
                 <StackPanel Margin="5">
                     <DockPanel>
                         <Button Content="-" Click="ZoomOut_Click" Width="30" DockPanel.Dock="Left"/>
                         <Button Content="+" Click="ZoomIn_Click" Width="30" DockPanel.Dock="Right"/>
                         <Slider x:Name="ZoomSlider" Minimum="0.1" Maximum="3.0" Value="1.0" ValueChanged="ZoomSlider_ValueChanged"/>
                     </DockPanel>
-                    <TextBlock Text="{Binding Value, ElementName=ZoomSlider, StringFormat=Zoom: {0:P0}}" HorizontalAlignment="Center"/>
+                    <TextBlock HorizontalAlignment="Center">
+                        <Run Text="Zoom: "/>
+                        <Run Text="{Binding Value, ElementName=ZoomSlider, StringFormat=P0}"/>
+                    </TextBlock>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="General Settings">
+            <GroupBox Header="{DynamicResource GeneralSettings}">
                 <StackPanel Margin="5">
-                    <Label Content="Select Type:"/>
+                    <Label Content="{DynamicResource SelectType}"/>
                     <ComboBox x:Name="TypeComboBox" SelectionChanged="TypeComboBox_SelectionChanged">
-                        <ComboBoxItem Content="长生"/>
-                        <ComboBoxItem Content="冤亲"/>
-                        <ComboBoxItem Content="往生"/>
-                        <ComboBoxItem Content="祖先"/>
+                        <ComboBoxItem Content="{DynamicResource TypeChangsheng}"/>
+                        <ComboBoxItem Content="{DynamicResource TypeYuanqin}"/>
+                        <ComboBoxItem Content="{DynamicResource TypeWangsheng}"/>
+                        <ComboBoxItem Content="{DynamicResource TypeZuxian}"/>
                     </ComboBox>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Background Image">
+            <GroupBox Header="{DynamicResource BackgroundImage}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Content="Select Background" Click="SelectBackground_Click" VerticalAlignment="Stretch"/>
+                    <Button Content="{DynamicResource SelectBackground}" Click="SelectBackground_Click" VerticalAlignment="Stretch"/>
                     <StackPanel Grid.Column="1">
-                        <Label Content="Width (cm):" Padding="2"/>
+                        <Label Content="{DynamicResource WidthCm}" Padding="2"/>
                         <TextBox x:Name="BgWidthTxt" Text="29.7" TextChanged="Bg_Changed"/>
-                        <Label Content="Height (cm):" Padding="2"/>
+                        <Label Content="{DynamicResource HeightCm}" Padding="2"/>
                         <TextBox x:Name="BgHeightTxt" Text="42.0" TextChanged="Bg_Changed"/>
                     </StackPanel>
                 </Grid>
             </GroupBox>
 
-            <GroupBox Header="Stamp Image">
+            <GroupBox Header="{DynamicResource StampImage}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -74,19 +77,19 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Content="Select Stamp" Click="SelectStamp_Click" Grid.ColumnSpan="2" Grid.Row="0"/>
-                    <Label Content="Left (cm):" Padding="2" Grid.Row="1" Grid.Column="0"/>
-                    <Label Content="Width (cm):" Padding="2" Grid.Row="1" Grid.Column="1"/>
+                    <Button Content="{DynamicResource SelectStamp}" Click="SelectStamp_Click" Grid.ColumnSpan="2" Grid.Row="0"/>
+                    <Label Content="{DynamicResource LeftCm}" Padding="2" Grid.Row="1" Grid.Column="0"/>
+                    <Label Content="{DynamicResource WidthCm}" Padding="2" Grid.Row="1" Grid.Column="1"/>
                     <TextBox x:Name="StampLeftTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="2" Grid.Column="0"/>
                     <TextBox x:Name="StampWidthTxt" Text="6.0" TextChanged="Stamp_Changed" Grid.Row="2" Grid.Column="1"/>
-                    <Label Content="Top (cm):" Padding="2" Grid.Row="3" Grid.Column="0"/>
-                    <Label Content="Height (cm):" Padding="2" Grid.Row="3" Grid.Column="1"/>
+                    <Label Content="{DynamicResource TopCm}" Padding="2" Grid.Row="3" Grid.Column="0"/>
+                    <Label Content="{DynamicResource HeightCm}" Padding="2" Grid.Row="3" Grid.Column="1"/>
                     <TextBox x:Name="StampTopTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="4" Grid.Column="0"/>
                     <TextBox x:Name="StampHeightTxt" Text="6.0" TextChanged="Stamp_Changed" Grid.Row="4" Grid.Column="1"/>
                 </Grid>
             </GroupBox>
 
-            <GroupBox x:Name="MainBoxGroup" Header="Main Box">
+            <GroupBox x:Name="MainBoxGroup" Header="{DynamicResource MainBox}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -98,18 +101,18 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Label Content="Left (cm):" Padding="2" Grid.Row="0" Grid.Column="0"/>
-                    <Label Content="Width (cm):" Padding="2" Grid.Row="0" Grid.Column="1"/>
+                    <Label Content="{DynamicResource LeftCm}" Padding="2" Grid.Row="0" Grid.Column="0"/>
+                    <Label Content="{DynamicResource WidthCm}" Padding="2" Grid.Row="0" Grid.Column="1"/>
                     <TextBox x:Name="MainLeftTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="0"/>
                     <TextBox x:Name="MainWidthTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="1"/>
-                    <Label Content="Top (cm):" Padding="2" Grid.Row="2" Grid.Column="0"/>
-                    <Label Content="Height (cm):" Padding="2" Grid.Row="2" Grid.Column="1"/>
+                    <Label Content="{DynamicResource TopCm}" Padding="2" Grid.Row="2" Grid.Column="0"/>
+                    <Label Content="{DynamicResource HeightCm}" Padding="2" Grid.Row="2" Grid.Column="1"/>
                     <TextBox x:Name="MainTopTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="0"/>
                     <TextBox x:Name="MainHeightTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="1"/>
                 </Grid>
             </GroupBox>
 
-            <GroupBox x:Name="SideBoxGroup" Header="Side Box">
+            <GroupBox x:Name="SideBoxGroup" Header="{DynamicResource SideBox}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -121,20 +124,18 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Label Content="Left (cm):" Padding="2" Grid.Row="0" Grid.Column="0"/>
-                    <Label Content="Width (cm):" Padding="2" Grid.Row="0" Grid.Column="1"/>
+                    <Label Content="{DynamicResource LeftCm}" Padding="2" Grid.Row="0" Grid.Column="0"/>
+                    <Label Content="{DynamicResource WidthCm}" Padding="2" Grid.Row="0" Grid.Column="1"/>
                     <TextBox x:Name="SideLeftTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="0"/>
                     <TextBox x:Name="SideWidthTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="1" Grid.Column="1"/>
-                    <Label Content="Top (cm):" Padding="2" Grid.Row="2" Grid.Column="0"/>
-                    <Label Content="Height (cm):" Padding="2" Grid.Row="2" Grid.Column="1"/>
+                    <Label Content="{DynamicResource TopCm}" Padding="2" Grid.Row="2" Grid.Column="0"/>
+                    <Label Content="{DynamicResource HeightCm}" Padding="2" Grid.Row="2" Grid.Column="1"/>
                     <TextBox x:Name="SideTopTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="0"/>
                     <TextBox x:Name="SideHeightTxt" Text="0" IsReadOnly="True" Background="#F0F0F0" Grid.Row="3" Grid.Column="1"/>
                 </Grid>
             </GroupBox>
 
-
-
-            <GroupBox Header="Sample Texts &amp; Constraints">
+            <GroupBox Header="{DynamicResource SampleTextsConstraints}">
                 <StackPanel Margin="5">
                     <Grid x:Name="SampleMainTextsPanel">
                         <Grid.ColumnDefinitions>
@@ -142,11 +143,11 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <Label Content="Sample Main Texts"/>
+                            <Label Content="{DynamicResource SampleMainTexts}"/>
                             <TextBox x:Name="SampleMainTextsTxt" Text="佛弟子" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Height="60"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
-                            <Label Content="Max Main Font Size"/>
+                            <Label Content="{DynamicResource MaxMainFontSize}"/>
                             <TextBox x:Name="MainMaxFontSizeTxt" Text="1000" Width="80"/>
                         </StackPanel>
                     </Grid>
@@ -157,11 +158,11 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <Label Content="Sample Side Texts"/>
+                            <Label Content="{DynamicResource SampleSideTexts}"/>
                             <TextBox x:Name="SampleSideTextsTxt" Text="友 佛弟子" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Height="60"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
-                            <Label Content="Max Side Font Size"/>
+                            <Label Content="{DynamicResource MaxSideFontSize}"/>
                             <TextBox x:Name="SideMaxFontSizeTxt" Text="1000" Width="80"/>
                         </StackPanel>
                     </Grid>
@@ -169,8 +170,8 @@
             </GroupBox>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,20,0,0">
-                <Button x:Name="DisplayTextsBtn" Content="Display Texts" Click="DisplayTexts_Click" Height="40" Width="120" Margin="0,0,10,0" FontWeight="Bold"/>
-                <Button Content="Save Configuration" Click="Save_Click" Height="40" Width="160" FontWeight="Bold"/>
+                <Button x:Name="DisplayTextsBtn" Content="{DynamicResource DisplayTexts}" Click="DisplayTexts_Click" Height="40" Width="120" Margin="0,0,10,0" FontWeight="Bold"/>
+                <Button Content="{DynamicResource SaveConfiguration}" Click="Save_Click" Height="40" Width="160" FontWeight="Bold"/>
             </StackPanel>
             </StackPanel>
         </ScrollViewer>

@@ -4,23 +4,30 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XpsCreator"
+        xmlns:views="clr-namespace:XpsCreator.Views"
         mc:Ignorable="d"
-        Title="A3 XPS Creator" Height="450" Width="800">
+        Title="{DynamicResource Title}" Height="450" Width="800">
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
-                <Button Content="Exit"/>
+                <Button Content="{DynamicResource Exit}" Click="Exit_Click"/>
+                <Separator/>
+                <RadioButton Content="EN" IsChecked="True" Style="{StaticResource {x:Type ToggleButton}}" Click="Language_Click" Tag="en"/>
+                <RadioButton Content="CN" Style="{StaticResource {x:Type ToggleButton}}" Click="Language_Click" Tag="cn"/>
             </ToolBar>
         </ToolBarTray>
         <TabControl x:Name="MainTabControl">
-            <TabItem Header="Position Configure">
+            <TabItem Header="{DynamicResource TabPositionConfigure}">
                 <local:PositionConfigure />
             </TabItem>
-            <TabItem Header="Text Input">
+            <TabItem Header="{DynamicResource TabTextInput}">
                 <local:TextInput />
             </TabItem>
-            <TabItem Header="Property">
+            <TabItem Header="{DynamicResource TabPropertyFilePrint}">
                 <local:Property />
+            </TabItem>
+            <TabItem Header="{DynamicResource TabWeeklyPlaqueData}">
+                <views:DataEntry />
             </TabItem>
         </TabControl>
     </DockPanel>

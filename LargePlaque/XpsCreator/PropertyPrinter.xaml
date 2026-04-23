@@ -38,43 +38,43 @@
 
         <!-- Right Side: Controls -->
         <StackPanel Grid.Column="1" Margin="10">
-            <TextBlock Text="File Path:" Margin="0,0,0,5" />
+            <TextBlock Text="{DynamicResource FilePath}" Margin="0,0,0,5" />
             <Grid Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="FilePathTextBox" Grid.Column="0" Margin="0,0,10,0" IsReadOnly="True" VerticalContentAlignment="Center" />
-                <Button Grid.Column="1" Content="Browse..." Width="80" Height="25" Click="OpenFileButton_Click" />
+                <Button Grid.Column="1" Content="{DynamicResource Browse}" Width="80" Height="25" Click="OpenFileButton_Click" />
             </Grid>
 
-            <CheckBox x:Name="PrintBoxCheckBox" Content="Print box" Margin="0,0,0,20" />
+            <CheckBox x:Name="PrintBoxCheckBox" Content="{DynamicResource PrintBox}" Margin="0,0,0,20" />
 
-            <Button Content="Print" Width="100" Height="30" HorizontalAlignment="Left" Click="PrintButton_Click" />
+            <Button Content="{DynamicResource Print}" Width="100" Height="30" HorizontalAlignment="Left" Click="PrintButton_Click" />
 
             <Separator Margin="0,20,0,10" />
-            <TextBlock Text="Main Box Font Size Setup:" FontWeight="Bold" Margin="0,0,0,10" />
+            <TextBlock Text="{DynamicResource MainBoxFontSizeSetup}" FontWeight="Bold" Margin="0,0,0,10" />
 
             <!-- Row 1 -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="Max Char." VerticalAlignment="Center" Width="60"/>
+                <TextBlock Text="{DynamicResource MaxChar}" VerticalAlignment="Center" Width="60"/>
                 <TextBox x:Name="L1MaxCharTextBox" Width="40" VerticalContentAlignment="Center"/>
-                <TextBlock Text="Font Size" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
+                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
                 <TextBox x:Name="L1FontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
             </StackPanel>
 
             <!-- Row 2 -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="Max Char." VerticalAlignment="Center" Width="60"/>
+                <TextBlock Text="{DynamicResource MaxChar}" VerticalAlignment="Center" Width="60"/>
                 <TextBox x:Name="L2MaxCharTextBox" Width="40" VerticalContentAlignment="Center"/>
-                <TextBlock Text="Font Size" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
+                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
                 <TextBox x:Name="L2FontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
             </StackPanel>
 
             <!-- Row 3 -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="Small Font" VerticalAlignment="Center" Width="110"/>
-                <TextBlock Text="Font Size" VerticalAlignment="Center" Width="60"/>
+                <TextBlock Text="{DynamicResource SmallFont}" VerticalAlignment="Center" Width="110"/>
+                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="60"/>
                 <TextBox x:Name="SmallFontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
             </StackPanel>
         </StackPanel>
