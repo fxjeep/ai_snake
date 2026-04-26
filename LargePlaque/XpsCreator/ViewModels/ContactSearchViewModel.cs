@@ -49,7 +49,7 @@ namespace XpsCreator.ViewModels
             {
                 Name = "Test",
                 Code = "T0001",
-                IsPrint = 1,
+                IsPrint = false,
                 LastPrint = ""
             };
             await _dataService.SaveContactAsync(newContact);
@@ -61,21 +61,45 @@ namespace XpsCreator.ViewModels
         {
             if (contact != null)
             {
-                await _dataService.DeleteContactAsync(contact.Id);
-                await LoadContactsAsync();
+                var title = System.Windows.Application.Current.TryFindResource("Delete") as string ?? "Delete";
+                var format = System.Windows.Application.Current.TryFindResource("ConfirmDeleteContactFormat") as string ?? "Are you sure you want to delete the contact '{0}'?";
+                var message = string.Format(format, contact.Name);
+                
+                var result = System.Windows.MessageBox.Show(
+                    message,
+                    title,
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning);
+
+                if (result == System.Windows.MessageBoxResult.Yes)
+                {
+                    await _dataService.DeleteContactAsync(contact.Id);
+                    await LoadContactsAsync();
+                }
             }
         }
 
         [RelayCommand]
-        private async Task TogglePrintAsync(Contact contact)
+        private async Task PrintContactAsync(Contact contact)
         {
             if (contact != null)
             {
-                contact.IsPrint = contact.IsPrint == 1 ? 0 : 1;
+                contact.IsPrint = true;
                 await _dataService.SaveContactAsync(contact);
-                // No need to reload entire list if we just update the object in the collection
             }
         }
+
+        [RelayCommand]
+        private async Task UnprintContactAsync(Contact contact)
+        {
+            if (contact != null)
+            {
+                contact.IsPrint = false;
+                await _dataService.SaveContactAsync(contact);
+            }
+        }
+
+
 
         [RelayCommand]
         private async Task SaveContactAsync(Contact contact)
@@ -96,7 +120,7 @@ namespace XpsCreator.ViewModels
         {
             var filtered = string.IsNullOrWhiteSpace(SearchText)
                 ? _allContacts
-                : _allContacts.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || 
+                : _allContacts.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                                           c.Code.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
             FilteredContacts.Clear();

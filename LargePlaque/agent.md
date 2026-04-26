@@ -42,4 +42,7 @@ This project follows the **MVVM (Model-View-ViewModel)** pattern and uses a **Se
 3. Save English labels in `Strings.en.xaml` (default) 
 4. Save Chinese labels in `Strings.zh-Hans.xaml`.
 5. Add language switch function in UI, user can switch between English and Chinese.
+6. Do not hard code any text in XAML file, always use resource key to display the text.
+7. Do not hard code any text in cs files, always use resource key to display the text.
+
 

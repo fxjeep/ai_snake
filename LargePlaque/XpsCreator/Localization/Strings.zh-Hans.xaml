@@ -24,6 +24,7 @@
     <system:String x:Key="Search">搜索</system:String>
     <system:String x:Key="Detail">详情</system:String>
     <system:String x:Key="Delete">删除</system:String>
+    <system:String x:Key="ConfirmDeleteContactFormat">您确定要删除联系人“{0}”吗？</system:String>
     <system:String x:Key="Print">打印</system:String>
     <system:String x:Key="Unprint">取消打印</system:String>
     <system:String x:Key="CreateList">生成清单</system:String>
@@ -31,6 +32,13 @@
     <system:String x:Key="ContactCode">代码</system:String>
     <system:String x:Key="LastPrintDate">最后打印日期</system:String>
     <system:String x:Key="IsPrint">打印</system:String>
+    <system:String x:Key="Name">姓名</system:String>
+    <system:String x:Key="LastPrint">最后打印</system:String>
+    <system:String x:Key="DeadName">往生者姓名</system:String>
+    <system:String x:Key="LiveName">阳上人姓名</system:String>
+    <system:String x:Key="Relation">关系</system:String>
+    <system:String x:Key="Surname">姓氏</system:String>
+    <system:String x:Key="Address">地址</system:String>
 
     <!-- PositionConfigure -->
     <system:String x:Key="ViewSettings">视图设置</system:String>

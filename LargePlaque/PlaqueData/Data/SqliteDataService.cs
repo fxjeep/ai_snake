@@ -111,5 +111,29 @@ namespace PlaqueData.Data
             await InitializeAsync();
             await _database!.DeleteAsync<Contact>(contactId);
         }
+
+        public async Task DeleteLiveAsync(int id)
+        {
+            await InitializeAsync();
+            await _database!.DeleteAsync<Live>(id);
+        }
+
+        public async Task DeleteDeadAsync(int id)
+        {
+            await InitializeAsync();
+            await _database!.DeleteAsync<Dead>(id);
+        }
+
+        public async Task DeleteAncestorAsync(int id)
+        {
+            await InitializeAsync();
+            await _database!.DeleteAsync<Ancestor>(id);
+        }
+
+        public async Task DeletePropertyAsync(int id)
+        {
+            await InitializeAsync();
+            await _database!.DeleteAsync<Property>(id);
+        }
     }
 }

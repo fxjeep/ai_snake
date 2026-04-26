@@ -40,10 +40,10 @@
                 <StackPanel Margin="5">
                     <Label Content="{DynamicResource SelectType}"/>
                     <ComboBox x:Name="TypeComboBox" SelectionChanged="TypeComboBox_SelectionChanged">
-                        <ComboBoxItem Content="{DynamicResource TypeChangsheng}"/>
-                        <ComboBoxItem Content="{DynamicResource TypeYuanqin}"/>
-                        <ComboBoxItem Content="{DynamicResource TypeWangsheng}"/>
-                        <ComboBoxItem Content="{DynamicResource TypeZuxian}"/>
+                        <ComboBoxItem Content="{DynamicResource TypeChangsheng}" Tag="长生"/>
+                        <ComboBoxItem Content="{DynamicResource TypeYuanqin}" Tag="冤亲"/>
+                        <ComboBoxItem Content="{DynamicResource TypeWangsheng}" Tag="往生"/>
+                        <ComboBoxItem Content="{DynamicResource TypeZuxian}" Tag="祖先"/>
                     </ComboBox>
                 </StackPanel>
             </GroupBox>

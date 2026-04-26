@@ -21,5 +21,9 @@ namespace PlaqueData.Data
         Task<int> SavePropertyAsync(Property property);
 
         Task DeleteContactAsync(int contactId);
+        Task DeleteLiveAsync(int id);
+        Task DeleteDeadAsync(int id);
+        Task DeleteAncestorAsync(int id);
+        Task DeletePropertyAsync(int id);
     }
 }

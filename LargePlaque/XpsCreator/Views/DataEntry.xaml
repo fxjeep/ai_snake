@@ -11,6 +11,18 @@
         <vm:DataEntryViewModel />
     </UserControl.DataContext>
     
+    <UserControl.Resources>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <Style x:Key="VisibilityBySelectionStyle" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ContactSearch.SelectedContact}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
@@ -22,9 +34,11 @@
         <local:ContactSearch DataContext="{Binding ContactSearch}"/>
         
         <!-- Splitter -->
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="#e0e0e0"/>
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="#e0e0e0"
+                      Style="{StaticResource VisibilityBySelectionStyle}"/>
         
         <!-- Right: Detail Editor -->
-        <local:DetailEditor Grid.Column="2" DataContext="{Binding DetailEditor}"/>
+        <local:DetailEditor Grid.Column="2" DataContext="{Binding DetailEditor}"
+                            Style="{StaticResource VisibilityBySelectionStyle}"/>
     </Grid>
 </UserControl>

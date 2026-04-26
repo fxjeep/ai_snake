@@ -91,7 +91,7 @@ public partial class PositionConfigure : UserControl
         string oldType = null;
         if (e.RemovedItems != null && e.RemovedItems.Count > 0 && e.RemovedItems[0] is ComboBoxItem cbiOld)
         {
-            oldType = cbiOld.Content.ToString();
+            oldType = cbiOld.Tag?.ToString() ?? cbiOld.Content.ToString();
         }
 
         //SaveCurrentTypeToSettings(oldType);
@@ -196,7 +196,7 @@ public partial class PositionConfigure : UserControl
     {
         if (TypeComboBox.SelectedItem is ComboBoxItem cbi)
         {
-            string typeName = cbi.Content.ToString() ?? "";
+            string typeName = cbi.Tag?.ToString() ?? cbi.Content.ToString() ?? "";
             return _settings.TypeConfigs.FirstOrDefault(t => t.TypeName == typeName);
         }
         return null;

@@ -15,6 +15,6 @@ namespace PlaqueData.Models
         [MaxLength(10)]
         public string LastPrint { get; set; } = string.Empty;
         
-        public int IsPrint { get; set; }
+        public bool IsPrint { get; set; } = false;
     }
 }

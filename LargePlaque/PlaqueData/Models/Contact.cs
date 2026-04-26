@@ -1,9 +1,18 @@
 using SQLite;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace PlaqueData.Models
 {
-    public class Contact
+    public class Contact : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
         
@@ -16,6 +25,18 @@ namespace PlaqueData.Models
         [MaxLength(10)]
         public string LastPrint { get; set; } = string.Empty;
         
-        public int IsPrint { get; set; }
+        private bool _isPrint = false;
+        public bool IsPrint 
+        { 
+            get => _isPrint;
+            set
+            {
+                if (_isPrint != value)
+                {
+                    _isPrint = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
     }
 }

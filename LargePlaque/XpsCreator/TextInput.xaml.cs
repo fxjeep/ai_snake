@@ -49,7 +49,7 @@ public partial class TextInput : UserControl
         };
         if (dlg.ShowDialog() == true)
         {
-            string currentType = (TypeComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "长生";
+            string currentType = (TypeComboBox?.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? (TypeComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "长生";
             var doc = new XDocument(new XElement("list", new XAttribute("type", currentType)));
             doc.Save(dlg.FileName);
 
@@ -91,7 +91,7 @@ public partial class TextInput : UserControl
             {
                 foreach (ComboBoxItem item in TypeComboBox.Items)
                 {
-                    if (item.Content.ToString() == typeAttr)
+                    if (item.Tag?.ToString() == typeAttr || item.Content.ToString() == typeAttr)
                     {
                         TypeComboBox.SelectedItem = item;
                         break;
@@ -204,7 +204,7 @@ public partial class TextInput : UserControl
 
     private void UpdateEditorVisibility()
     {
-        string type = (TypeComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+        string type = (TypeComboBox?.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? (TypeComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
 
         bool showMain = type != "冤亲";
         bool showSide = type != "长生";
@@ -234,7 +234,7 @@ public partial class TextInput : UserControl
                 selected.SideLines = String.IsNullOrEmpty(SideTextBox.Text) ? new List<string>() : SplitLines(SideTextBox.Text);
             }
 
-            string currentType = (TypeComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "长生";
+            string currentType = (TypeComboBox?.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? (TypeComboBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "长生";
             var doc = new XDocument(new XElement("list",
                 new XAttribute("type", currentType),
                 _items.Select(item =>
@@ -287,7 +287,7 @@ public partial class TextInput : UserControl
 
         try
         {
-            string selectedType = (TypeComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+            string selectedType = (TypeComboBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? (TypeComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
 
             bool printBorder = PrintBorderCheckBox.IsChecked == true;
             bool printStamp = PrintRedStampCheckBox.IsChecked == true;

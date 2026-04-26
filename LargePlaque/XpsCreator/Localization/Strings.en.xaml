@@ -24,6 +24,7 @@
     <system:String x:Key="Search">Search</system:String>
     <system:String x:Key="Detail">Detail</system:String>
     <system:String x:Key="Delete">Delete</system:String>
+    <system:String x:Key="ConfirmDeleteContactFormat">Are you sure you want to delete the contact '{0}'?</system:String>
     <system:String x:Key="Print">Print</system:String>
     <system:String x:Key="Unprint">Unprint</system:String>
     <system:String x:Key="CreateList">Create List</system:String>
@@ -31,6 +32,13 @@
     <system:String x:Key="ContactCode">Code</system:String>
     <system:String x:Key="LastPrintDate">Last Print Date</system:String>
     <system:String x:Key="IsPrint">Print</system:String>
+    <system:String x:Key="Name">Name</system:String>
+    <system:String x:Key="LastPrint">Last Print</system:String>
+    <system:String x:Key="DeadName">Dead Name</system:String>
+    <system:String x:Key="LiveName">Live Name</system:String>
+    <system:String x:Key="Relation">Relation</system:String>
+    <system:String x:Key="Surname">Surname</system:String>
+    <system:String x:Key="Address">Address</system:String>
 
     <!-- PositionConfigure -->
     <system:String x:Key="ViewSettings">View Settings</system:String>
