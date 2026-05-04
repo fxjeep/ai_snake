@@ -12,11 +12,10 @@
     </UserControl.DataContext>
     
     <UserControl.Resources>
-        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <Style x:Key="VisibilityBySelectionStyle" TargetType="FrameworkElement">
             <Setter Property="Visibility" Value="Visible"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding ContactSearch.SelectedContact}" Value="{x:Null}">
+                <DataTrigger Binding="{Binding DataContext.ContactSearch.SelectedContact, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Null}">
                     <Setter Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
             </Style.Triggers>
