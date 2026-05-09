@@ -96,6 +96,41 @@ namespace XpsCreator.ViewModels
             {
                 contact.IsPrint = false;
                 await _dataService.SaveContactAsync(contact);
+
+                var lives = await _dataService.GetLiveRecordsByContactIdAsync(contact.Id);
+                foreach (var live in lives)
+                {
+                    live.IsPrint = false;
+                    await _dataService.SaveLiveAsync(live);
+                }
+
+                var deads = await _dataService.GetDeadRecordsByContactIdAsync(contact.Id);
+                foreach (var dead in deads)
+                {
+                    dead.IsPrint = false;
+                    await _dataService.SaveDeadAsync(dead);
+                }
+
+                var ancestors = await _dataService.GetAncestorRecordsByContactIdAsync(contact.Id);
+                foreach (var ancestor in ancestors)
+                {
+                    ancestor.IsPrint = false;
+                    await _dataService.SaveAncestorAsync(ancestor);
+                }
+
+                var properties = await _dataService.GetPropertyRecordsByContactIdAsync(contact.Id);
+                foreach (var property in properties)
+                {
+                    property.IsPrint = false;
+                    await _dataService.SavePropertyAsync(property);
+                }
+
+                if (SelectedContact?.Id == contact.Id)
+                {
+                    var temp = SelectedContact;
+                    SelectedContact = null;
+                    SelectedContact = temp;
+                }
             }
         }
 

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:XpsCreator"
         xmlns:views="clr-namespace:XpsCreator.Views"
         mc:Ignorable="d"
-        Title="{DynamicResource Title}" Height="450" Width="800">
+        Title="{DynamicResource Title}" Height="450" Width="800"
+        Loaded="Window_Loaded">
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
@@ -14,6 +15,9 @@
                 <Separator/>
                 <RadioButton Content="EN" IsChecked="True" Style="{StaticResource {x:Type ToggleButton}}" Click="Language_Click" Tag="en"/>
                 <RadioButton Content="CN" Style="{StaticResource {x:Type ToggleButton}}" Click="Language_Click" Tag="cn"/>
+                <Separator/>
+                <Button Content="📁" Click="SelectDatabase_Click" ToolTip="Select Database File"/>
+                <TextBox x:Name="DatabasePathTextBox" Width="250" IsReadOnly="True" VerticalContentAlignment="Center" Margin="5,0,0,0"/>
             </ToolBar>
         </ToolBarTray>
         <TabControl x:Name="MainTabControl">
@@ -27,7 +31,10 @@
                 <local:Property />
             </TabItem>
             <TabItem Header="{DynamicResource TabWeeklyPlaqueData}">
-                <views:DataEntry />
+                <views:DataEntry x:Name="DataEntryView" />
+            </TabItem>
+            <TabItem Header="{DynamicResource TabWeeklyPrint}">
+                <views:WeeklyPrint x:Name="WeeklyPrintView" />
             </TabItem>
         </TabControl>
     </DockPanel>

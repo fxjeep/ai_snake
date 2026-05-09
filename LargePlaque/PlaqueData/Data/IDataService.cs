@@ -7,6 +7,7 @@ namespace PlaqueData.Data
     public interface IDataService
     {
         Task InitializeAsync();
+        Task ChangeDatabaseAsync(string path);
         
         Task<List<Contact>> GetAllContactsAsync();
         Task<List<Live>> GetLiveRecordsByContactIdAsync(int contactId);

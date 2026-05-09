@@ -42,13 +42,13 @@
                              Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
                              Tag="Filter..."/>
                     
-                    <Button Click="PrintButton_Click" Margin="0,0,5,0" ToolTip="Print Selected">
+                    <Button Click="PrintButton_Click" Margin="0,0,5,0" ToolTip="{DynamicResource PrintSelected}">
                         <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" Margin="5"/>
                     </Button>
-                    <Button Click="NotPrintButton_Click" Margin="0,0,5,0" ToolTip="Not Print Selected">
+                    <Button Click="NotPrintButton_Click" Margin="0,0,5,0" ToolTip="{DynamicResource NotPrintSelected}">
                         <TextBlock Text="&#xE8D8;" FontFamily="Segoe MDL2 Assets" Margin="5"/>
                     </Button>
-                    <Button Click="DeleteButton_Click" ToolTip="Delete Selected">
+                    <Button Click="DeleteButton_Click" ToolTip="{DynamicResource DeleteSelected}">
                         <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Margin="5"/>
                     </Button>
                 </StackPanel>

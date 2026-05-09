@@ -9,7 +9,14 @@
     <system:String x:Key="TabTextInput">Large Plaque Text Input</system:String>
     <system:String x:Key="TabPropertyFilePrint">Property File Print</system:String>
     <system:String x:Key="TabWeeklyPlaqueData">Weekly Plaque Data</system:String>
+    <system:String x:Key="TabWeeklyPrint">Weekly Print</system:String>
     
+    <!-- Weekly Print -->
+    <system:String x:Key="GenerateWeeklyXps">Generate XPS</system:String>
+    <system:String x:Key="ClearPrint">Clear Print</system:String>
+    <system:String x:Key="Summary">Summary</system:String>
+    <system:String x:Key="Action">Action</system:String>
+
     <!-- DataEntry -->
     <system:String x:Key="DataEntryTitle">Data Entry</system:String>
     <system:String x:Key="SearchContacts">Search Contacts</system:String>
@@ -24,6 +31,9 @@
     <system:String x:Key="Search">Search</system:String>
     <system:String x:Key="Detail">Detail</system:String>
     <system:String x:Key="Delete">Delete</system:String>
+    <system:String x:Key="PrintSelected">Print Selected</system:String>
+    <system:String x:Key="NotPrintSelected">Not Print Selected</system:String>
+    <system:String x:Key="DeleteSelected">Delete Selected</system:String>
     <system:String x:Key="ConfirmDeleteContactFormat">Are you sure you want to delete the contact '{0}'?</system:String>
     <system:String x:Key="Print">Print</system:String>
     <system:String x:Key="Unprint">Unprint</system:String>

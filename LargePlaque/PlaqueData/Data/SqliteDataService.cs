@@ -9,7 +9,18 @@ namespace PlaqueData.Data
     public class SqliteDataService : IDataService
     {
         private SQLiteAsyncConnection? _database;
-        private readonly string _dbPath;
+        private string _dbPath;
+
+        public async Task ChangeDatabaseAsync(string path)
+        {
+            if (_database != null)
+            {
+                await _database.CloseAsync();
+                _database = null;
+            }
+            _dbPath = path;
+            await InitializeAsync();
+        }
 
         public SqliteDataService(string? customPath = null)
         {

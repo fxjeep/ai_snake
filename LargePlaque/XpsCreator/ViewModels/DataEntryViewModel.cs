@@ -30,5 +30,12 @@ namespace XpsCreator.ViewModels
                 }
             };
         }
+
+        public async System.Threading.Tasks.Task ChangeDatabaseAsync(string path)
+        {
+            await _dataService.ChangeDatabaseAsync(path);
+            await _contactSearch.LoadContactsAsync();
+            _detailEditor.CurrentContact = null;
+        }
     }
 }
