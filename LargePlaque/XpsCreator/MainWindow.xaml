@@ -20,7 +20,7 @@
                 <TextBox x:Name="DatabasePathTextBox" Width="250" IsReadOnly="True" VerticalContentAlignment="Center" Margin="5,0,0,0"/>
             </ToolBar>
         </ToolBarTray>
-        <TabControl x:Name="MainTabControl">
+        <TabControl x:Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged">
             <TabItem Header="{DynamicResource TabPositionConfigure}">
                 <local:PositionConfigure />
             </TabItem>

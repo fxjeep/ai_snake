@@ -29,6 +29,10 @@ namespace XpsCreator
                 {
                     _ = vm.ChangeDatabaseAsync(settings.LastDatabasePath);
                 }
+                if (WeeklyPrintView.DataContext is XpsCreator.ViewModels.WeeklyPrintViewModel pvm)
+                {
+                    _ = pvm.ChangeDatabaseAsync(settings.LastDatabasePath);
+                }
             }
         }
 
@@ -58,6 +62,21 @@ namespace XpsCreator
                     var settings = SettingsManager.LoadSettings();
                     settings.LastDatabasePath = openFileDialog.FileName;
                     SettingsManager.SaveSettings(settings);
+                }
+                if (WeeklyPrintView.DataContext is XpsCreator.ViewModels.WeeklyPrintViewModel pvm)
+                {
+                    await pvm.ChangeDatabaseAsync(openFileDialog.FileName);
+                }
+            }
+        }
+
+        private async void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl tc && tc.SelectedItem is TabItem ti && ti.Header?.ToString() == Application.Current.TryFindResource("TabWeeklyPrint")?.ToString())
+            {
+                if (WeeklyPrintView.DataContext is XpsCreator.ViewModels.WeeklyPrintViewModel pvm)
+                {
+                    await pvm.LoadItemsAsync();
                 }
             }
         }

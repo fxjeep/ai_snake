@@ -87,6 +87,89 @@ namespace PlaqueData.Data
             return await _database!.Table<Property>().Where(x => x.ContactId == contactId).ToListAsync();
         }
 
+        public async Task<Contact?> GetContactByIdAsync(int contactId)
+        {
+            await InitializeAsync();
+            return await _database!.Table<Contact>().Where(x => x.Id == contactId).FirstOrDefaultAsync();
+        }
+
+        public async Task UnprintContactAsync(int contactId)
+        {
+            await InitializeAsync();
+            await _database!.ExecuteAsync("UPDATE Contact SET IsPrint = 0 WHERE Id = ?", contactId);
+            await _database!.ExecuteAsync("UPDATE Live SET IsPrint = 0 WHERE ContactId = ?", contactId);
+            await _database!.ExecuteAsync("UPDATE Dead SET IsPrint = 0 WHERE ContactId = ?", contactId);
+            await _database!.ExecuteAsync("UPDATE Ancestor SET IsPrint = 0 WHERE ContactId = ?", contactId);
+            await _database!.ExecuteAsync("UPDATE Property SET IsPrint = 0 WHERE ContactId = ?", contactId);
+        }
+
+        public async Task<List<ContactPrintSummary>> GetPrintSummariesAsync()
+        {
+            await InitializeAsync();
+            
+            // Get all contacts first as requested, but we will filter them in memory 
+            // or better, find which ones are relevant first to avoid massive looping.
+            // However, to follow the "get all contacts first" request:
+            var allContacts = await GetAllContactsAsync();
+            
+            // Efficiently find which contacts have any print markers
+            var livePrintIds = new HashSet<int>(await _database!.QueryScalarsAsync<int>("SELECT ContactId FROM Live WHERE IsPrint = 1"));
+            var deadPrintIds = new HashSet<int>(await _database!.QueryScalarsAsync<int>("SELECT ContactId FROM Dead WHERE IsPrint = 1"));
+            var ancestorPrintIds = new HashSet<int>(await _database!.QueryScalarsAsync<int>("SELECT ContactId FROM Ancestor WHERE IsPrint = 1"));
+            var propertyPrintIds = new HashSet<int>(await _database!.QueryScalarsAsync<int>("SELECT ContactId FROM Property WHERE IsPrint = 1"));
+
+            var summaries = new List<ContactPrintSummary>();
+
+            foreach (var contact in allContacts)
+            {
+                bool hasPrintDetail = livePrintIds.Contains(contact.Id) || 
+                                      deadPrintIds.Contains(contact.Id) || 
+                                      ancestorPrintIds.Contains(contact.Id) || 
+                                      propertyPrintIds.Contains(contact.Id);
+
+                if (contact.IsPrint || hasPrintDetail)
+                {
+                    // Only perform count queries for contacts that are actually going to be displayed
+                    var livePrint = livePrintIds.Contains(contact.Id) ? await _database!.Table<Live>().Where(x => x.ContactId == contact.Id && x.IsPrint).CountAsync() : 0;
+                    var deadPrint = deadPrintIds.Contains(contact.Id) ? await _database!.Table<Dead>().Where(x => x.ContactId == contact.Id && x.IsPrint).CountAsync() : 0;
+                    var ancestorPrint = ancestorPrintIds.Contains(contact.Id) ? await _database!.Table<Ancestor>().Where(x => x.ContactId == contact.Id && x.IsPrint).CountAsync() : 0;
+                    var propertyPrint = propertyPrintIds.Contains(contact.Id) ? await _database!.Table<Property>().Where(x => x.ContactId == contact.Id && x.IsPrint).CountAsync() : 0;
+
+                    var liveTotal = await _database!.Table<Live>().Where(x => x.ContactId == contact.Id).CountAsync();
+                    var deadTotal = await _database!.Table<Dead>().Where(x => x.ContactId == contact.Id).CountAsync();
+                    var ancestorTotal = await _database!.Table<Ancestor>().Where(x => x.ContactId == contact.Id).CountAsync();
+                    var propertyTotal = await _database!.Table<Property>().Where(x => x.ContactId == contact.Id).CountAsync();
+
+                    summaries.Add(new ContactPrintSummary
+                    {
+                        Id = contact.Id,
+                        Name = contact.Name,
+                        Code = contact.Code,
+                        IsPrint = contact.IsPrint,
+                        LiveTotal = liveTotal,
+                        LivePrint = livePrint,
+                        DeadTotal = deadTotal,
+                        DeadPrint = deadPrint,
+                        AncestorTotal = ancestorTotal,
+                        AncestorPrint = ancestorPrint,
+                        PropertyTotal = propertyTotal,
+                        PropertyPrint = propertyPrint
+                    });
+                }
+            }
+            return summaries;
+        }
+
+        public async Task ClearAllPrintAsync()
+        {
+            await InitializeAsync();
+            await _database!.ExecuteAsync("UPDATE Contact SET IsPrint = 0 WHERE IsPrint = 1");
+            await _database!.ExecuteAsync("UPDATE Live SET IsPrint = 0 WHERE IsPrint = 1");
+            await _database!.ExecuteAsync("UPDATE Dead SET IsPrint = 0 WHERE IsPrint = 1");
+            await _database!.ExecuteAsync("UPDATE Ancestor SET IsPrint = 0 WHERE IsPrint = 1");
+            await _database!.ExecuteAsync("UPDATE Property SET IsPrint = 0 WHERE IsPrint = 1");
+        }
+
         public async Task<int> SaveContactAsync(Contact contact)
         {
             await InitializeAsync();

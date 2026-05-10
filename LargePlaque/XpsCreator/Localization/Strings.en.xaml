@@ -16,6 +16,7 @@
     <system:String x:Key="ClearPrint">Clear Print</system:String>
     <system:String x:Key="Summary">Summary</system:String>
     <system:String x:Key="Action">Action</system:String>
+    <system:String x:Key="Refresh">Refresh</system:String>
 
     <!-- DataEntry -->
     <system:String x:Key="DataEntryTitle">Data Entry</system:String>

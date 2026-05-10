@@ -16,6 +16,7 @@
     <system:String x:Key="ClearPrint">清除打印</system:String>
     <system:String x:Key="Summary">摘要</system:String>
     <system:String x:Key="Action">操作</system:String>
+    <system:String x:Key="Refresh">刷新</system:String>
 
     <!-- DataEntry -->
     <system:String x:Key="DataEntryTitle">数据录入</system:String>

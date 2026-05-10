@@ -8,13 +8,17 @@ namespace PlaqueData.Data
     {
         Task InitializeAsync();
         Task ChangeDatabaseAsync(string path);
-        
+
         Task<List<Contact>> GetAllContactsAsync();
         Task<List<Live>> GetLiveRecordsByContactIdAsync(int contactId);
         Task<List<Dead>> GetDeadRecordsByContactIdAsync(int contactId);
         Task<List<Ancestor>> GetAncestorRecordsByContactIdAsync(int contactId);
         Task<List<Property>> GetPropertyRecordsByContactIdAsync(int contactId);
-        
+        Task<List<ContactPrintSummary>> GetPrintSummariesAsync();
+        Task<Contact?> GetContactByIdAsync(int contactId);
+        Task UnprintContactAsync(int contactId);
+        Task ClearAllPrintAsync();
+
         Task<int> SaveContactAsync(Contact contact);
         Task<int> SaveLiveAsync(Live live);
         Task<int> SaveDeadAsync(Dead dead);
