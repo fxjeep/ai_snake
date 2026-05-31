@@ -68,6 +68,13 @@ namespace PlaqueData.Data
             await InitializeAsync();
             return await _database!.Table<Live>().Where(x => x.ContactId == contactId).ToListAsync();
         }
+        
+        public async Task<List<Live>> GetWeeklyLivePrintRecordsAsync()
+        {
+            await InitializeAsync();
+            return await _database!.QueryAsync<Live>(
+                "SELECT * FROM Live WHERE IsPrint = 1 OR ContactId IN (SELECT Id FROM Contact WHERE IsPrint = 1)");
+        }
 
         public async Task<List<Dead>> GetDeadRecordsByContactIdAsync(int contactId)
         {

@@ -42,6 +42,17 @@ public class TypeLayoutConfig
     public double SideMaxFontSize { get; set; } = 30.0;
 }
 
+public class WeeklyPrintTypeConfig
+{
+    public string TypeName { get; set; } = string.Empty;
+    public ElementRect MainTextBox { get; set; } = new ElementRect();
+    public ElementRect SideTextBox { get; set; } = new ElementRect();
+    public ImageElement Background { get; set; } = new ImageElement();
+    public double FontSize { get; set; } = 12.0;
+    public int Row { get; set; } = 4;
+    public int Column { get; set; } = 7;
+}
+
 public class PropertyPrintConfig
 {
     public double MarginLeftCm { get; set; } = 0.5;
@@ -69,6 +80,8 @@ public class PrintLayoutSettings
     
     public PropertyPrintConfig PropertyPrintConfig { get; set; } = new PropertyPrintConfig();
 
+    public List<WeeklyPrintTypeConfig> WeeklyPrintSettings { get; set; } = new List<WeeklyPrintTypeConfig>();
+
     public static string DefaultConfigPath => "PrintConfigure.xml";
 
     public static void Save(string filePath, PrintLayoutSettings settings)
@@ -93,6 +106,11 @@ public class PrintLayoutSettings
     public TypeLayoutConfig? GetConfig(string typeName)
     {
         return TypeConfigs.FirstOrDefault(t => t.TypeName == typeName);
+    }
+
+    public WeeklyPrintTypeConfig? GetWeeklyConfig(string typeName)
+    {
+        return WeeklyPrintSettings.FirstOrDefault(t => t.TypeName == typeName);
     }
 }
 

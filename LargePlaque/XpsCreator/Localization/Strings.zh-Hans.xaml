@@ -95,7 +95,9 @@
     <system:String x:Key="PrintBox">打印边框</system:String>
     <system:String x:Key="MainBoxFontSizeSetup">主框字号设置:</system:String>
     <system:String x:Key="MaxChar">最大字符</system:String>
-    <system:String x:Key="FontSize">字号</system:String>
-    <system:String x:Key="SmallFont">小字</system:String>
+    <!-- Weekly Print Feedback -->
+    <system:String x:Key="NoRecordsToPrint">没有找到需要打印的记录。</system:String>
+    <system:String x:Key="WeeklyXpsSuccess">XPS 文件生成成功：\n{0}</system:String>
+    <system:String x:Key="WeeklyXpsError">生成 XPS 错误: {0}</system:String>
     
 </ResourceDictionary>

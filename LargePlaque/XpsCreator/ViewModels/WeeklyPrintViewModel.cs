@@ -63,8 +63,51 @@ namespace XpsCreator.ViewModels
         [RelayCommand]
         private async Task GenerateXpsAsync()
         {
-            // TODO: Implement XPS Generation logic
-            await Task.CompletedTask;
+            try
+            {
+                var liveRecords = await _dataService.GetWeeklyLivePrintRecordsAsync();
+                if (liveRecords == null || liveRecords.Count == 0)
+                {
+                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
+                    MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                string settingsPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", PrintLayoutSettings.DefaultConfigPath);
+                if (!System.IO.File.Exists(settingsPath))
+                {
+                    MessageBox.Show($"Configuration file not found at: {settingsPath}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var settings = PrintLayoutSettings.Load(settingsPath);
+                var config = settings.GetWeeklyConfig("长生");
+                if (config == null)
+                {
+                    MessageBox.Show("Weekly print configuration for '长生' not found in configuration file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                string dateStr = DateTime.Now.ToString("yyyyMMdd");
+                string targetDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WeeklyPrint", dateStr);
+                string outputXpsPath = System.IO.Path.Combine(targetDir, $"{dateStr}_changsheng.xps");
+
+                string generatedPath = WeeklyXpsPrinter.GenerateWeeklyLiveXps(outputXpsPath, liveRecords, config);
+
+                if (!string.IsNullOrEmpty(generatedPath))
+                {
+                    var successMsg = Application.Current.TryFindResource("WeeklyXpsSuccess") as string ?? "XPS file generated successfully:\n{0}";
+                    // Clean up formatting of newline character in resource string if it was loaded literal
+                    successMsg = successMsg.Replace("\\n", Environment.NewLine);
+                    MessageBox.Show(string.Format(successMsg, generatedPath), "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorMsg = Application.Current.TryFindResource("WeeklyXpsError") as string ?? "Error generating XPS: {0}";
+                errorMsg = errorMsg.Replace("\\n", Environment.NewLine);
+                MessageBox.Show(string.Format(errorMsg, ex.Message), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         [RelayCommand]

@@ -95,7 +95,9 @@
     <system:String x:Key="PrintBox">Print box</system:String>
     <system:String x:Key="MainBoxFontSizeSetup">Main Box Font Size Setup:</system:String>
     <system:String x:Key="MaxChar">Max Char.</system:String>
-    <system:String x:Key="FontSize">Font Size</system:String>
-    <system:String x:Key="SmallFont">Small Font</system:String>
+    <!-- Weekly Print Feedback -->
+    <system:String x:Key="NoRecordsToPrint">No records found to print.</system:String>
+    <system:String x:Key="WeeklyXpsSuccess">XPS file generated successfully:\n{0}</system:String>
+    <system:String x:Key="WeeklyXpsError">Error generating XPS: {0}</system:String>
     
 </ResourceDictionary>
