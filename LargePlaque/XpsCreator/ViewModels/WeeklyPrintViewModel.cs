@@ -65,14 +65,6 @@ namespace XpsCreator.ViewModels
         {
             try
             {
-                var liveRecords = await _dataService.GetWeeklyLivePrintRecordsAsync();
-                if (liveRecords == null || liveRecords.Count == 0)
-                {
-                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
-                    MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
                 string settingsPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", PrintLayoutSettings.DefaultConfigPath);
                 if (!System.IO.File.Exists(settingsPath))
                 {
@@ -81,26 +73,14 @@ namespace XpsCreator.ViewModels
                 }
 
                 var settings = PrintLayoutSettings.Load(settingsPath);
-                var config = settings.GetWeeklyConfig("长生");
-                if (config == null)
-                {
-                    MessageBox.Show("Weekly print configuration for '长生' not found in configuration file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
                 string dateStr = DateTime.Now.ToString("yyyyMMdd");
+                string fileStr = DateTime.Now.ToString("yyyyMMddHHmmss");
                 string targetDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WeeklyPrint", dateStr);
-                string outputXpsPath = System.IO.Path.Combine(targetDir, $"{dateStr}_changsheng.xps");
 
-                string generatedPath = WeeklyXpsPrinter.GenerateWeeklyLiveXps(outputXpsPath, liveRecords, config);
+                await Generate(fileStr, targetDir, "changsheng");
+                await Generate(fileStr, targetDir, "yuanqing");
 
-                if (!string.IsNullOrEmpty(generatedPath))
-                {
-                    var successMsg = Application.Current.TryFindResource("WeeklyXpsSuccess") as string ?? "XPS file generated successfully:\n{0}";
-                    // Clean up formatting of newline character in resource string if it was loaded literal
-                    successMsg = successMsg.Replace("\\n", Environment.NewLine);
-                    MessageBox.Show(string.Format(successMsg, generatedPath), "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                
             }
             catch (Exception ex)
             {
@@ -108,6 +88,47 @@ namespace XpsCreator.ViewModels
                 errorMsg = errorMsg.Replace("\\n", Environment.NewLine);
                 MessageBox.Show(string.Format(errorMsg, ex.Message), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private async Task Generate(string fileStr, string targetDir, string typeName)
+        {
+            string outputXpsPath = System.IO.Path.Combine(targetDir, $"{fileStr}_{typeName}.xps");
+
+            // Load settings to retrieve the weekly config for the given type name
+            string settingsPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", PrintLayoutSettings.DefaultConfigPath);
+            var settings = PrintLayoutSettings.Load(settingsPath);
+            var config = settings.GetWeeklyConfig(typeName);
+            if (config == null)
+            {
+                MessageBox.Show($"Weekly print configuration for '{typeName}' not found in configuration file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (typeName==WeeklyPrintTypes.Changsheng || typeName==WeeklyPrintTypes.Yuanqing)
+            {
+                var liveRecords = await _dataService.GetWeeklyLivePrintRecordsAsync();
+                if (liveRecords == null || liveRecords.Count == 0)
+                {
+                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
+                    MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                WeeklyXpsPrinter.GenerateWeeklyLiveXps(outputXpsPath, liveRecords, config);
+            }
+            else if (typeName == WeeklyPrintTypes.Wangsheng)
+            {
+                var deadRecords = await _dataService.GetWeeklyDeadPrintRecordsAsync();
+                if (deadRecords == null || deadRecords.Count == 0)
+                {
+                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
+                    MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                WeeklyXpsPrinter.GenerateWeeklyDeadXps(outputXpsPath, deadRecords, config);
+             }
+            
         }
 
         [RelayCommand]

@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/XpsCreator/bin/Debug/net8.0-windows/XpsCreator.dll",
+            "program": "${workspaceFolder}/XpsCreator/bin/Debug/net9.0-windows/XpsCreator.dll",
             "args": [],
             "cwd": "${workspaceFolder}/XpsCreator",
             "console": "internalConsole",

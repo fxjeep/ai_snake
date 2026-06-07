@@ -7,60 +7,15 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PlaqueData.Models;
+using XpsCreator.ViewModels;
 
 namespace XpsCreator;
 
 public static class WeeklyXpsPrinter
 {
-    private static bool IsHorizontalSegmentChar(char c)
-    {
-        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || char.IsDigit(c))
-            return true;
 
-        // Vietnamese characters (Latin characters with diacritics)
-        if (char.IsLetter(c))
-        {
-            if ((c >= '\u00C0' && c <= '\u017F') || // Latin-1 Supplement & Extended-A
-                (c >= '\u0180' && c <= '\u024F') || // Latin Extended-B
-                (c >= '\u1E00' && c <= '\u1EFF'))   // Latin Extended Additional
-                return true;
-        }
 
-        return false;
-    }
-
-    private static System.Collections.Generic.List<string> ParseNameIntoLines(string name)
-    {
-        var lines = new System.Collections.Generic.List<string>();
-        if (string.IsNullOrWhiteSpace(name)) return lines;
-
-        string currentWord = "";
-        for (int i = 0; i < name.Length; i++)
-        {
-            char c = name[i];
-            if (IsHorizontalSegmentChar(c))
-            {
-                currentWord += c;
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(currentWord))
-                {
-                    lines.Add(currentWord);
-                    currentWord = "";
-                }
-                if (!char.IsWhiteSpace(c))
-                {
-                    lines.Add(c.ToString());
-                }
-            }
-        }
-        if (!string.IsNullOrEmpty(currentWord))
-        {
-            lines.Add(currentWord);
-        }
-        return lines;
-    }
+    
 
     public static string GenerateWeeklyLiveXps(string outputXpsPath, System.Collections.Generic.List<Live> liveRecords, WeeklyPrintTypeConfig config)
     {
@@ -133,76 +88,8 @@ public static class WeeklyXpsPrinter
                         Canvas.SetLeft(itemCanvas, cellLeft);
                         Canvas.SetTop(itemCanvas, cellTop);
 
-                        // 1. Draw Background Image
-                        if (bgImage != null)
-                        {
-                            var img = new Image
-                            {
-                                Source = bgImage,
-                                Width = imageWidthPx,
-                                Height = imageHeightPx,
-                                Stretch = Stretch.Fill
-                            };
-                            itemCanvas.Children.Add(img);
-                        }
-
-                        // 2. Draw Black Border
-                        var borderRect = new System.Windows.Shapes.Rectangle
-                        {
-                            Width = imageWidthPx,
-                            Height = imageHeightPx,
-                            Stroke = Brushes.Black,
-                            StrokeThickness = 1
-                        };
-                        itemCanvas.Children.Add(borderRect);
-
-                        // 3. Draw Name Text (only if within records count)
-                        if (j < pageRecords.Count)
-                        {
-                            var record = pageRecords[j];
-                            if (!string.IsNullOrWhiteSpace(record.Name))
-                            {
-                                double textBoxLeft = UnitConverter.ToPx(config.MainTextBox.Left);
-                                double textBoxTop = UnitConverter.ToPx(config.MainTextBox.Top);
-                                double textBoxWidth = UnitConverter.ToPx(config.MainTextBox.Width);
-                                double textBoxHeight = UnitConverter.ToPx(config.MainTextBox.Height);
-
-                                var parsedLines = ParseNameIntoLines(record.Name);
-                                if (parsedLines.Any())
-                                {
-                                    var textBlocks = new System.Collections.Generic.List<TextBlock>();
-                                    double totalHeight = 0;
-
-                                    foreach (var line in parsedLines)
-                                    {
-                                        var run = new Run(line);
-                                        var tb = new TextBlock(run)
-                                        {
-                                            FontFamily = new FontFamily("KaiTi"),
-                                            FontSize = config.FontSize,
-                                        };
-                                        tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                                        textBlocks.Add(tb);
-                                        totalHeight += tb.DesiredSize.Height;
-                                    }
-
-                                    // Center all lines vertically
-                                    double startY = 0;
-
-                                    double currentY = textBoxTop + startY;
-                                    foreach (var tb in textBlocks)
-                                    {
-                                        // Center each line horizontally
-                                        double lineX = textBoxLeft + (textBoxWidth - tb.DesiredSize.Width) / 2;
-                                        Canvas.SetLeft(tb, lineX);
-                                        Canvas.SetTop(tb, currentY);
-                                        itemCanvas.Children.Add(tb);
-
-                                        currentY += tb.DesiredSize.Height;
-                                    }
-                                }
-                            }
-                        }
+                        PrintOnePlaque(itemCanvas, imageWidthPx, imageHeightPx, bgImage,
+                            j < pageRecords.Count ? pageRecords[j] : null, config);
 
                         pageCanvas.Children.Add(itemCanvas);
                     }
@@ -229,4 +116,262 @@ public static class WeeklyXpsPrinter
             return "";
         }
     }
+    /// <summary>
+    /// Renders a single plaque cell: background image, border, and name text.
+    /// Pass <c>null</c> for <paramref name="record"/> to draw an empty placeholder cell.
+    /// </summary>
+    public static void PrintOnePlaque(Canvas itemCanvas, double width, double height,
+        BitmapImage? bgImage, Live? record, WeeklyPrintTypeConfig config)
+    {
+        // 1. Draw Background Image
+        if (bgImage != null)
+        {
+            var img = new Image
+            {
+                Source = bgImage,
+                Width = width,
+                Height = height,
+                Stretch = Stretch.Fill
+            };
+            itemCanvas.Children.Add(img);
+        }
+
+        // 2. Draw Black Border
+        var borderRect = new System.Windows.Shapes.Rectangle
+        {
+            Width = width,
+            Height = height,
+            Stroke = Brushes.Black,
+            StrokeThickness = 1
+        };
+        itemCanvas.Children.Add(borderRect);
+
+        // 3. Draw Name Text
+        if (record == null) return;
+
+        // WrapMode when Name contains English/Vietnamese characters (horizontal text, rotated CW 90°)
+        // LineMode when Name is pure Chinese (one character per line)
+        if (PlaqueTextPrintHelper.HasEnglishOrVietnamese(record.Name) && config.TypeName == WeeklyPrintTypes.Yuanqing)
+            PlaqueTextPrintHelper.PrintNameInWrapMode(itemCanvas, record.Name, config.MainTextBox, config.FontSize);
+        else
+            PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.Name, config.MainTextBox, config.FontSize);
+    }
+
+
+    /// <summary>
+    /// Prints a name into a single record canvas, centering each parsed line horizontally
+    /// within the specified text box area. Reusable across different plaque types.
+    /// </summary>
+    
+    // -------------------------------------------------------------------------
+    // Dead records (wangsheng)
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Generates an XPS file for weekly Dead records using the wangsheng
+    /// WeeklyPrintTypeConfig entry.
+    /// </summary>
+    public static string GenerateWeeklyDeadXps(string outputXpsPath,
+        System.Collections.Generic.List<PlaqueData.Models.Dead> deadRecords,
+        WeeklyPrintTypeConfig config)
+    {
+        try
+        {
+            string? dir = Path.GetDirectoryName(outputXpsPath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            double a4WidthPx  = UnitConverter.ToPx(21.0);
+            double a4HeightPx = UnitConverter.ToPx(29.7);
+
+            double topMarginPx  = UnitConverter.ToPx(2.0);
+            double leftMarginPx = UnitConverter.ToPx(0.5);
+
+            double imageWidthPx  = UnitConverter.ToPx(2.85);
+            double imageHeightPx = UnitConverter.ToPx(6.8);
+
+            int cols = config.Column > 0 ? config.Column : 7;
+            int rows = config.Row    > 0 ? config.Row    : 4;
+            int itemsPerPage = cols * rows;
+
+            // Load background image
+            string bgImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", config.Background.FileName);
+            BitmapImage? bgImage = null;
+            if (File.Exists(bgImagePath))
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.UriSource = new Uri(bgImagePath);
+                bitmap.EndInit();
+                bgImage = bitmap;
+            }
+
+            using (var package = System.IO.Packaging.Package.Open(outputXpsPath, FileMode.Create))
+            {
+                var xpsDoc    = new System.Windows.Xps.Packaging.XpsDocument(package);
+                var writer    = System.Windows.Xps.Packaging.XpsDocument.CreateXpsDocumentWriter(xpsDoc);
+                var fixedDoc  = new FixedDocument();
+
+                for (int i = 0; i < deadRecords.Count; i += itemsPerPage)
+                {
+                    var pageRecords = deadRecords.Skip(i).Take(itemsPerPage).ToList();
+
+                    var fixedPage = new FixedPage { Width = a4WidthPx, Height = a4HeightPx };
+                    var pageCanvas = new Canvas();
+
+                    for (int j = 0; j < itemsPerPage; j++)
+                    {
+                        int col = j % cols;
+                        int row = j / cols;
+
+                        double cellLeft = leftMarginPx + col * imageWidthPx;
+                        double cellTop  = topMarginPx  + row * imageHeightPx;
+
+                        var itemCanvas = new Canvas { Width = imageWidthPx, Height = imageHeightPx };
+                        Canvas.SetLeft(itemCanvas, cellLeft);
+                        Canvas.SetTop(itemCanvas,  cellTop);
+
+                        PrintOneDeadPlaque(itemCanvas, imageWidthPx, imageHeightPx, bgImage,
+                            j < pageRecords.Count ? pageRecords[j] : null, config);
+
+                        pageCanvas.Children.Add(itemCanvas);
+                    }
+
+                    fixedPage.Children.Add(pageCanvas);
+                    fixedPage.Measure(new Size(a4WidthPx, a4HeightPx));
+                    fixedPage.Arrange(new Rect(new Point(), new Size(a4WidthPx, a4HeightPx)));
+                    fixedPage.UpdateLayout();
+
+                    var content = new PageContent();
+                    ((System.Windows.Markup.IAddChild)content).AddChild(fixedPage);
+                    fixedDoc.Pages.Add(content);
+                }
+
+                writer.Write(fixedDoc);
+                xpsDoc.Close();
+            }
+
+            return outputXpsPath;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error generating XPS: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// Renders a single Dead plaque cell: background, border, DeadName (main),
+    /// and Relation+LiveName (side).
+    /// </summary>
+    private static void PrintOneDeadPlaque(Canvas itemCanvas, double width, double height,
+        BitmapImage? bgImage, PlaqueData.Models.Dead? record, WeeklyPrintTypeConfig config)
+    {
+        // 1. Background
+        if (bgImage != null)
+        {
+            var img = new Image { Source = bgImage, Width = width, Height = height, Stretch = Stretch.Fill };
+            itemCanvas.Children.Add(img);
+        }
+
+        // 2. Border
+        var borderRect = new System.Windows.Shapes.Rectangle
+        {
+            Width = width, Height = height,
+            Stroke = Brushes.Black, StrokeThickness = 1
+        };
+        itemCanvas.Children.Add(borderRect);
+
+        if (record == null) return;
+
+        // 3. MainTextBox – DeadName in LineMode (one char per line, centered)
+        PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.DeadName, config.MainTextBox, config.FontSize);
+
+        // 4. SideTextBox – Relation+LiveName
+        string sideText = record.Relation + record.LiveName;
+        if (!string.IsNullOrWhiteSpace(sideText))
+            PrintDeadSideText(itemCanvas, sideText, config.SideTextBox, config.FontSize);
+    }
+
+    /// <summary>
+    /// Prints the side text (Relation+LiveName) into the SideTextBox.<br/>
+    /// • If the text contains any English or Vietnamese characters → <b>WrapMode</b>:
+    ///   the text is laid out horizontally, wrapped to fit the box width, then the
+    ///   entire block is rotated clockwise 90° so it reads top-to-bottom in the
+    ///   narrow side column.<br/>
+    /// • Otherwise (pure Chinese) → <b>LineMode</b>: each character is placed on
+    ///   its own line, top-to-bottom, centred horizontally in the side box.
+    /// </summary>
+    private static void PrintDeadSideText(Canvas canvas, string text, ElementRect sideBox, double fontSize)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        double boxLeftPx   = UnitConverter.ToPx(sideBox.Left);
+        double boxTopPx    = UnitConverter.ToPx(sideBox.Top);
+        double boxWidthPx  = UnitConverter.ToPx(sideBox.Width);
+        double boxHeightPx = UnitConverter.ToPx(sideBox.Height);
+
+        bool hasNonChinese = PlaqueTextPrintHelper.HasEnglishOrVietnamese(text);
+
+        if (hasNonChinese)
+        {
+            // ── WrapMode ────────────────────────────────────────────────────
+            // Build a TextBlock that wraps horizontally within boxHeightPx
+            // (before rotation the "width" of the TB is the box height, because
+            // after a CW 90° rotation that dimension becomes the vertical span).
+            var tb = new TextBlock
+            {
+                Text        = text,
+                FontFamily  = new FontFamily("KaiTi"),
+                FontSize    = fontSize,
+                TextWrapping = TextWrapping.Wrap,
+                Width       = boxHeightPx,   // will become height after rotation
+                TextAlignment = TextAlignment.Left
+            };
+
+            // Rotate CW 90°: the top-left corner of the (rotated) element should
+            // sit at (boxLeftPx, boxTopPx + boxHeightPx).
+            var rotateTransform = new System.Windows.Media.RotateTransform(90);
+            tb.RenderTransform = rotateTransform;
+            // After CW rotation the element's top-left maps to its new origin.
+            // Offset so the rotated block sits inside the side box:
+            //   X = boxLeft  (left edge of side box)
+            //   Y = boxTop + boxHeight (bottom of side box in canvas coords,
+            //       which becomes the left edge after CW rotation)
+            Canvas.SetLeft(tb, boxLeftPx);
+            Canvas.SetTop(tb, boxTopPx);
+
+            canvas.Children.Add(tb);
+        }
+        else
+        {
+            // ── LineMode (pure Chinese) ──────────────────────────────────────
+            // Each character gets its own TextBlock, stacked top-to-bottom,
+            // centred horizontally within the side box.
+            double currentY = boxTopPx;
+            foreach (char c in text)
+            {
+                if (char.IsWhiteSpace(c)) continue;
+
+                var run = new Run(c.ToString());
+                var tb  = new TextBlock(run)
+                {
+                    FontFamily = new FontFamily("KaiTi"),
+                    FontSize   = fontSize,
+                };
+                tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+                double charX = boxLeftPx + (boxWidthPx - tb.DesiredSize.Width) / 2.0;
+                Canvas.SetLeft(tb, charX);
+                Canvas.SetTop(tb, currentY);
+                canvas.Children.Add(tb);
+
+                currentY += tb.DesiredSize.Height;
+                if (currentY > boxTopPx + boxHeightPx) break; // guard against overflow
+            }
+        }
+    }
+
+
 }

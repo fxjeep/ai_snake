@@ -148,9 +148,9 @@
   </PropertyPrintConfig>
   <WeeklyPrintSettings>
     <WeeklyPrintTypeConfig>
-      <TypeName>长生</TypeName>
+      <TypeName>changsheng</TypeName>
       <MainTextBox>
-        <Left>0.8</Left>
+        <Left>0.83</Left>
         <Top>3</Top>
         <Width>1.2</Width>
         <Height>1.8</Height>
@@ -168,62 +168,62 @@
         <Height>2.2</Height>
         <FileName>weekly_changsheng.jpg</FileName>
       </Background>
-      <FontSize>6</FontSize>
+      <FontSize>9</FontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
     <WeeklyPrintTypeConfig>
-      <TypeName>冤亲</TypeName>
+      <TypeName>yuanqing</TypeName>
       <MainTextBox>
+        <Left>0.3</Left>
+        <Top>2.8</Top>
+        <Width>0.2</Width>
+        <Height>2</Height>
+      </MainTextBox>
+      <SideTextBox>
         <Left>0</Left>
         <Top>0</Top>
         <Width>0</Width>
         <Height>0</Height>
-      </MainTextBox>
-      <SideTextBox>
-        <Left>8.1</Left>
-        <Top>21</Top>
-        <Width>2.2</Width>
-        <Height>10</Height>
       </SideTextBox>
       <Background>
         <Left>0</Left>
         <Top>0</Top>
-        <Width>29.7</Width>
-        <Height>42</Height>
+        <Width>6.8</Width>
+        <Height>2.2</Height>
         <FileName>weekly_yuanqing.JPG</FileName>
       </Background>
-      <FontSize>6</FontSize>
+      <FontSize>9</FontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
     <WeeklyPrintTypeConfig>
-      <TypeName>往生</TypeName>
+      <TypeName>wangsheng</TypeName>
       <MainTextBox>
-        <Left>11.335416666666667</Left>
-        <Top>17.41111111111111</Top>
-        <Width>6.905694444444439</Width>
-        <Height>11.364305555555555</Height>
+        <Left>0.83</Left>
+        <Top>3</Top>
+        <Width>1.2</Width>
+        <Height>1.8</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>7.817777777777776</Left>
-        <Top>25.004027777777775</Top>
-        <Width>2.0412500000000047</Width>
-        <Height>7.477638888888893</Height>
+        <Left>0.4</Left>
+        <Top>2.7</Top>
+        <Width>0.4</Width>
+        <Height>2</Height>
       </SideTextBox>
       <Background>
         <Left>0</Left>
         <Top>0</Top>
-        <Width>29.7</Width>
-        <Height>42</Height>
+        <Width>6.8</Width>
+        <Height>2.2</Height>
         <FileName>weekly_wangsheng.JPG</FileName>
       </Background>
-      <FontSize>6</FontSize>
+      <FontSize>7</FontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
     <WeeklyPrintTypeConfig>
-      <TypeName>祖先</TypeName>
+      <TypeName>zhuxian</TypeName>
       <MainTextBox>
         <Left>11.9175</Left>
         <Top>14.730000000000002</Top>
