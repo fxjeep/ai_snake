@@ -268,7 +268,7 @@ public static class WeeklyXpsPrinter
             //   X = boxLeft  (left edge of side box)
             //   Y = boxTop + boxHeight (bottom of side box in canvas coords,
             //       which becomes the left edge after CW rotation)
-            Canvas.SetLeft(tb, boxLeftPx+11);
+            Canvas.SetLeft(tb, boxLeftPx+15);
             Canvas.SetTop(tb, boxTopPx);
 
             canvas.Children.Add(tb);

@@ -225,13 +225,13 @@
     <WeeklyPrintTypeConfig>
       <TypeName>zhuxian</TypeName>
       <MainTextBox>
-         <Left>0.83</Left>
-        <Top>3</Top>
+         <Left>0.8</Left>
+        <Top>2.8</Top>
         <Width>1.2</Width>
         <Height>1.8</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>0.2</Left>
+        <Left>0.1</Left>
         <Top>2.7</Top>
         <Width>0.4</Width>
         <Height>2</Height>
@@ -243,7 +243,7 @@
         <Height>2.2</Height>
         <FileName>weekly_zhuxian.JPG</FileName>
       </Background>
-      <FontSize>7</FontSize>
+      <FontSize>8</FontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
