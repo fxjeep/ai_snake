@@ -200,14 +200,14 @@
     <WeeklyPrintTypeConfig>
       <TypeName>wangsheng</TypeName>
       <MainTextBox>
-        <Left>0.83</Left>
-        <Top>3</Top>
+        <Left>0.9</Left>
+        <Top>2.8</Top>
         <Width>1.2</Width>
         <Height>1.8</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>0.4</Left>
-        <Top>2.7</Top>
+        <Left>0.1</Left>
+        <Top>2.4</Top>
         <Width>0.4</Width>
         <Height>2</Height>
       </SideTextBox>
@@ -218,32 +218,32 @@
         <Height>2.2</Height>
         <FileName>weekly_wangsheng.JPG</FileName>
       </Background>
-      <FontSize>7</FontSize>
+      <FontSize>8</FontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
     <WeeklyPrintTypeConfig>
       <TypeName>zhuxian</TypeName>
       <MainTextBox>
-        <Left>11.9175</Left>
-        <Top>14.730000000000002</Top>
-        <Width>5.670972222222236</Width>
-        <Height>4.9084722222222394</Height>
+         <Left>0.83</Left>
+        <Top>3</Top>
+        <Width>1.2</Width>
+        <Height>1.8</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>8.064722222222223</Left>
-        <Top>20.629583333333333</Top>
-        <Width>2.2705555555555548</Width>
-        <Height>10.17638888888889</Height>
+        <Left>0.2</Left>
+        <Top>2.7</Top>
+        <Width>0.4</Width>
+        <Height>2</Height>
       </SideTextBox>
       <Background>
         <Left>0</Left>
         <Top>0</Top>
-        <Width>29.7</Width>
-        <Height>42</Height>
+        <Width>6.8</Width>
+        <Height>2.2</Height>
         <FileName>weekly_zhuxian.JPG</FileName>
       </Background>
-      <FontSize>6</FontSize>
+      <FontSize>7</FontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>

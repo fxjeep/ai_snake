@@ -77,8 +77,10 @@ namespace XpsCreator.ViewModels
                 string fileStr = DateTime.Now.ToString("yyyyMMddHHmmss");
                 string targetDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WeeklyPrint", dateStr);
 
-                await Generate(fileStr, targetDir, "changsheng");
-                await Generate(fileStr, targetDir, "yuanqing");
+                await Generate(fileStr, targetDir, WeeklyPrintTypes.Changsheng);
+                await Generate(fileStr, targetDir, WeeklyPrintTypes.Yuanqing);
+                await Generate(fileStr, targetDir, WeeklyPrintTypes.Wangsheng);
+                await Generate(fileStr, targetDir, WeeklyPrintTypes.Zhuxian);
 
                 
             }
@@ -104,7 +106,10 @@ namespace XpsCreator.ViewModels
                 return;
             }
 
-            if (typeName==WeeklyPrintTypes.Changsheng || typeName==WeeklyPrintTypes.Yuanqing)
+            // Load the background image once and capture it in the lambda
+            System.Windows.Media.Imaging.BitmapImage? bgImage = GetBGImage(config);
+
+            if (typeName == WeeklyPrintTypes.Changsheng || typeName == WeeklyPrintTypes.Yuanqing)
             {
                 var liveRecords = await _dataService.GetWeeklyLivePrintRecordsAsync();
                 if (liveRecords == null || liveRecords.Count == 0)
@@ -114,7 +119,8 @@ namespace XpsCreator.ViewModels
                     return;
                 }
 
-                WeeklyXpsPrinter.GenerateWeeklyLiveXps(outputXpsPath, liveRecords, config);
+                WeeklyXpsPrinter.GenerateWeeklyXps<Live>(outputXpsPath, liveRecords, config,
+                    (canvas, record) => WeeklyXpsPrinter.PrintOnePlaque(canvas, canvas.Width, canvas.Height, bgImage, record, config));
             }
             else if (typeName == WeeklyPrintTypes.Wangsheng)
             {
@@ -126,10 +132,43 @@ namespace XpsCreator.ViewModels
                     return;
                 }
 
-                WeeklyXpsPrinter.GenerateWeeklyDeadXps(outputXpsPath, deadRecords, config);
-             }
-            
+                //WeeklyXpsPrinter.GenerateWeeklyDeadXps(outputXpsPath, deadRecords, config);
+                WeeklyXpsPrinter.GenerateWeeklyXps<Dead>(outputXpsPath, deadRecords, config,
+    (canvas, record) => WeeklyXpsPrinter.PrintOneDeadPlaque(canvas, canvas.Width, canvas.Height, bgImage, record, config));
+            }
+            else if (typeName == WeeklyPrintTypes.Zhuxian)
+            {
+                var ancestorRecords = await _dataService.GetWeeklyAncestorPrintRecordsAsync();
+                if (ancestorRecords == null || ancestorRecords.Count == 0)
+                {
+                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
+                    MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                WeeklyXpsPrinter.GenerateWeeklyXps<Ancestor>(outputXpsPath, ancestorRecords, config,
+                    (canvas, record) => WeeklyXpsPrinter.PrintOneAncestorPlaque(canvas, canvas.Width, canvas.Height, bgImage, record, config));
+            }
+
         }
+
+        private static System.Windows.Media.Imaging.BitmapImage? GetBGImage(WeeklyPrintTypeConfig config)
+        {
+            string bgImagePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", config.Background.FileName);
+            System.Windows.Media.Imaging.BitmapImage? bgImage = null;
+            if (System.IO.File.Exists(bgImagePath))
+            {
+                var bitmap = new System.Windows.Media.Imaging.BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                bitmap.UriSource = new Uri(bgImagePath);
+                bitmap.EndInit();
+                bgImage = bitmap;
+            }
+
+            return bgImage;
+        }
+
 
         [RelayCommand]
         private async Task ClearPrintAsync()

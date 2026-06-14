@@ -17,7 +17,22 @@ public static class WeeklyXpsPrinter
 
     
 
-    public static string GenerateWeeklyLiveXps(string outputXpsPath, System.Collections.Generic.List<Live> liveRecords, WeeklyPrintTypeConfig config)
+    /// <summary>
+    /// Generates a paged XPS file for any weekly record type (<typeparamref name="T"/>).
+    /// The caller supplies a <paramref name="renderItem"/> delegate that is responsible
+    /// for drawing a single record (or an empty placeholder when the value is <c>null</c>)
+    /// onto the provided <see cref="Canvas"/>.
+    /// </summary>
+    /// <typeparam name="T">The record type: <see cref="Live"/>, <see cref="PlaqueData.Models.Dead"/>, Ancestor, etc.</typeparam>
+    /// <param name="outputXpsPath">Destination XPS file path.</param>
+    /// <param name="records">The list of records to print.</param>
+    /// <param name="config">Layout/style configuration for this print type.</param>
+    /// <param name="renderItem">
+    /// Callback invoked once per cell: <c>(canvas, record)</c>.
+    /// <paramref name="renderItem"/> receives <c>null</c> for empty placeholder cells.
+    /// </param>
+    public static string GenerateWeeklyXps<T>(string outputXpsPath, System.Collections.Generic.List<T> records, WeeklyPrintTypeConfig config, Action<Canvas, T?> renderItem)
+        where T : class
     {
         try
         {
@@ -42,28 +57,15 @@ public static class WeeklyXpsPrinter
             int rows = config.Row > 0 ? config.Row : 4;
             int itemsPerPage = cols * rows;
 
-            // Load background image
-            string bgImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", config.Background.FileName);
-            BitmapImage? bgImage = null;
-            if (File.Exists(bgImagePath))
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.UriSource = new Uri(bgImagePath);
-                bitmap.EndInit();
-                bgImage = bitmap;
-            }
-
             using (var package = System.IO.Packaging.Package.Open(outputXpsPath, FileMode.Create))
             {
                 var xpsDoc = new System.Windows.Xps.Packaging.XpsDocument(package);
                 var writer = System.Windows.Xps.Packaging.XpsDocument.CreateXpsDocumentWriter(xpsDoc);
                 var fixedDoc = new FixedDocument();
 
-                for (int i = 0; i < liveRecords.Count; i += itemsPerPage)
+                for (int i = 0; i < records.Count; i += itemsPerPage)
                 {
-                    var pageRecords = liveRecords.Skip(i).Take(itemsPerPage).ToList();
+                    var pageRecords = records.Skip(i).Take(itemsPerPage).ToList();
 
                     var fixedPage = new FixedPage
                     {
@@ -88,8 +90,7 @@ public static class WeeklyXpsPrinter
                         Canvas.SetLeft(itemCanvas, cellLeft);
                         Canvas.SetTop(itemCanvas, cellTop);
 
-                        PrintOnePlaque(itemCanvas, imageWidthPx, imageHeightPx, bgImage,
-                            j < pageRecords.Count ? pageRecords[j] : null, config);
+                        renderItem(itemCanvas, j < pageRecords.Count ? pageRecords[j] : null);
 
                         pageCanvas.Children.Add(itemCanvas);
                     }
@@ -157,115 +158,11 @@ public static class WeeklyXpsPrinter
             PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.Name, config.MainTextBox, config.FontSize);
     }
 
-
-    /// <summary>
-    /// Prints a name into a single record canvas, centering each parsed line horizontally
-    /// within the specified text box area. Reusable across different plaque types.
-    /// </summary>
-    
-    // -------------------------------------------------------------------------
-    // Dead records (wangsheng)
-    // -------------------------------------------------------------------------
-
-    /// <summary>
-    /// Generates an XPS file for weekly Dead records using the wangsheng
-    /// WeeklyPrintTypeConfig entry.
-    /// </summary>
-    public static string GenerateWeeklyDeadXps(string outputXpsPath,
-        System.Collections.Generic.List<PlaqueData.Models.Dead> deadRecords,
-        WeeklyPrintTypeConfig config)
-    {
-        try
-        {
-            string? dir = Path.GetDirectoryName(outputXpsPath);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            double a4WidthPx  = UnitConverter.ToPx(21.0);
-            double a4HeightPx = UnitConverter.ToPx(29.7);
-
-            double topMarginPx  = UnitConverter.ToPx(2.0);
-            double leftMarginPx = UnitConverter.ToPx(0.5);
-
-            double imageWidthPx  = UnitConverter.ToPx(2.85);
-            double imageHeightPx = UnitConverter.ToPx(6.8);
-
-            int cols = config.Column > 0 ? config.Column : 7;
-            int rows = config.Row    > 0 ? config.Row    : 4;
-            int itemsPerPage = cols * rows;
-
-            // Load background image
-            string bgImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", config.Background.FileName);
-            BitmapImage? bgImage = null;
-            if (File.Exists(bgImagePath))
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.UriSource = new Uri(bgImagePath);
-                bitmap.EndInit();
-                bgImage = bitmap;
-            }
-
-            using (var package = System.IO.Packaging.Package.Open(outputXpsPath, FileMode.Create))
-            {
-                var xpsDoc    = new System.Windows.Xps.Packaging.XpsDocument(package);
-                var writer    = System.Windows.Xps.Packaging.XpsDocument.CreateXpsDocumentWriter(xpsDoc);
-                var fixedDoc  = new FixedDocument();
-
-                for (int i = 0; i < deadRecords.Count; i += itemsPerPage)
-                {
-                    var pageRecords = deadRecords.Skip(i).Take(itemsPerPage).ToList();
-
-                    var fixedPage = new FixedPage { Width = a4WidthPx, Height = a4HeightPx };
-                    var pageCanvas = new Canvas();
-
-                    for (int j = 0; j < itemsPerPage; j++)
-                    {
-                        int col = j % cols;
-                        int row = j / cols;
-
-                        double cellLeft = leftMarginPx + col * imageWidthPx;
-                        double cellTop  = topMarginPx  + row * imageHeightPx;
-
-                        var itemCanvas = new Canvas { Width = imageWidthPx, Height = imageHeightPx };
-                        Canvas.SetLeft(itemCanvas, cellLeft);
-                        Canvas.SetTop(itemCanvas,  cellTop);
-
-                        PrintOneDeadPlaque(itemCanvas, imageWidthPx, imageHeightPx, bgImage,
-                            j < pageRecords.Count ? pageRecords[j] : null, config);
-
-                        pageCanvas.Children.Add(itemCanvas);
-                    }
-
-                    fixedPage.Children.Add(pageCanvas);
-                    fixedPage.Measure(new Size(a4WidthPx, a4HeightPx));
-                    fixedPage.Arrange(new Rect(new Point(), new Size(a4WidthPx, a4HeightPx)));
-                    fixedPage.UpdateLayout();
-
-                    var content = new PageContent();
-                    ((System.Windows.Markup.IAddChild)content).AddChild(fixedPage);
-                    fixedDoc.Pages.Add(content);
-                }
-
-                writer.Write(fixedDoc);
-                xpsDoc.Close();
-            }
-
-            return outputXpsPath;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error generating XPS: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return "";
-        }
-    }
-
     /// <summary>
     /// Renders a single Dead plaque cell: background, border, DeadName (main),
     /// and Relation+LiveName (side).
     /// </summary>
-    private static void PrintOneDeadPlaque(Canvas itemCanvas, double width, double height,
+    public static void PrintOneDeadPlaque(Canvas itemCanvas, double width, double height,
         BitmapImage? bgImage, PlaqueData.Models.Dead? record, WeeklyPrintTypeConfig config)
     {
         // 1. Background
@@ -292,6 +189,38 @@ public static class WeeklyXpsPrinter
         string sideText = record.Relation + record.LiveName;
         if (!string.IsNullOrWhiteSpace(sideText))
             PrintDeadSideText(itemCanvas, sideText, config.SideTextBox, config.FontSize);
+    }
+
+    /// <summary>
+    /// Renders a single Ancestor plaque cell: background, border, Surname (main),
+    /// and Name as the side text (LiveName equivalent).
+    /// </summary>
+    public static void PrintOneAncestorPlaque(Canvas itemCanvas, double width, double height,
+        BitmapImage? bgImage, PlaqueData.Models.Ancestor? record, WeeklyPrintTypeConfig config)
+    {
+        // 1. Background
+        if (bgImage != null)
+        {
+            var img = new Image { Source = bgImage, Width = width, Height = height, Stretch = Stretch.Fill };
+            itemCanvas.Children.Add(img);
+        }
+
+        // 2. Border
+        var borderRect = new System.Windows.Shapes.Rectangle
+        {
+            Width = width, Height = height,
+            Stroke = Brushes.Black, StrokeThickness = 1
+        };
+        itemCanvas.Children.Add(borderRect);
+
+        if (record == null) return;
+
+        // 3. MainTextBox – Surname in LineMode (one char per line, centered)
+        PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.Surname, config.MainTextBox, config.FontSize);
+
+        // 4. SideTextBox – Name (LiveName equivalent)
+        if (!string.IsNullOrWhiteSpace(record.Name))
+            PrintDeadSideText(itemCanvas, record.Name, config.SideTextBox, config.FontSize);
     }
 
     /// <summary>
@@ -339,7 +268,7 @@ public static class WeeklyXpsPrinter
             //   X = boxLeft  (left edge of side box)
             //   Y = boxTop + boxHeight (bottom of side box in canvas coords,
             //       which becomes the left edge after CW rotation)
-            Canvas.SetLeft(tb, boxLeftPx);
+            Canvas.SetLeft(tb, boxLeftPx+11);
             Canvas.SetTop(tb, boxTopPx);
 
             canvas.Children.Add(tb);
@@ -372,6 +301,4 @@ public static class WeeklyXpsPrinter
             }
         }
     }
-
-
 }

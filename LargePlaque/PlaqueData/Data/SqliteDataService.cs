@@ -83,6 +83,13 @@ namespace PlaqueData.Data
                 "SELECT * FROM Dead WHERE IsPrint = 1 OR ContactId IN (SELECT Id FROM Contact WHERE IsPrint = 1)");
         }
 
+        public async Task<List<Ancestor>> GetWeeklyAncestorPrintRecordsAsync()
+        {
+            await InitializeAsync();
+            return await _database!.QueryAsync<Ancestor>(
+                "SELECT * FROM Ancestor WHERE IsPrint = 1 OR ContactId IN (SELECT Id FROM Contact WHERE IsPrint = 1)");
+        }
+
         public async Task<List<Dead>> GetDeadRecordsByContactIdAsync(int contactId)
         {
             await InitializeAsync();
