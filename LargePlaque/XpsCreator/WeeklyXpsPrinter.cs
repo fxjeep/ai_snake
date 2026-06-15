@@ -153,9 +153,9 @@ public static class WeeklyXpsPrinter
         // WrapMode when Name contains English/Vietnamese characters (horizontal text, rotated CW 90°)
         // LineMode when Name is pure Chinese (one character per line)
         if (PlaqueTextPrintHelper.HasEnglishOrVietnamese(record.Name) && config.TypeName == WeeklyPrintTypes.Yuanqing)
-            PlaqueTextPrintHelper.PrintNameInWrapMode(itemCanvas, record.Name, config.MainTextBox, config.FontSize);
+            PlaqueTextPrintHelper.PrintNameInWrapMode(itemCanvas, record.Name, config.MainTextBox, config.MainFontSize);
         else
-            PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.Name, config.MainTextBox, config.FontSize);
+            PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.Name, config.MainTextBox, config.MainFontSize);
     }
 
     /// <summary>
@@ -183,12 +183,12 @@ public static class WeeklyXpsPrinter
         if (record == null) return;
 
         // 3. MainTextBox – DeadName in LineMode (one char per line, centered)
-        PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.DeadName, config.MainTextBox, config.FontSize);
+        PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.DeadName, config.MainTextBox, config.MainFontSize);
 
         // 4. SideTextBox – Relation+LiveName
         string sideText = record.Relation + record.LiveName;
         if (!string.IsNullOrWhiteSpace(sideText))
-            PrintDeadSideText(itemCanvas, sideText, config.SideTextBox, config.FontSize);
+            PrintDeadSideText(itemCanvas, sideText, config.SideTextBox, config.SideFontSize, config.WrapModeLeftOffset);
     }
 
     /// <summary>
@@ -216,11 +216,11 @@ public static class WeeklyXpsPrinter
         if (record == null) return;
 
         // 3. MainTextBox – Surname in LineMode (one char per line, centered)
-        PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.Surname, config.MainTextBox, config.FontSize);
+        PlaqueTextPrintHelper.PrintNameToRecord(itemCanvas, record.Surname, config.MainTextBox, config.MainFontSize);
 
         // 4. SideTextBox – Name (LiveName equivalent)
         if (!string.IsNullOrWhiteSpace(record.Name))
-            PrintDeadSideText(itemCanvas, record.Name, config.SideTextBox, config.FontSize);
+            PrintDeadSideText(itemCanvas, record.Name, config.SideTextBox, config.SideFontSize, config.WrapModeLeftOffset);
     }
 
     /// <summary>
@@ -232,7 +232,7 @@ public static class WeeklyXpsPrinter
     /// • Otherwise (pure Chinese) → <b>LineMode</b>: each character is placed on
     ///   its own line, top-to-bottom, centred horizontally in the side box.
     /// </summary>
-    private static void PrintDeadSideText(Canvas canvas, string text, ElementRect sideBox, double fontSize)
+    private static void PrintDeadSideText(Canvas canvas, string text, ElementRect sideBox, double fontSize, double wrapModeLeftOffset = 15.0)
     {
         if (string.IsNullOrWhiteSpace(text)) return;
 
@@ -268,7 +268,7 @@ public static class WeeklyXpsPrinter
             //   X = boxLeft  (left edge of side box)
             //   Y = boxTop + boxHeight (bottom of side box in canvas coords,
             //       which becomes the left edge after CW rotation)
-            Canvas.SetLeft(tb, boxLeftPx+15);
+            Canvas.SetLeft(tb, boxLeftPx + wrapModeLeftOffset);
             Canvas.SetTop(tb, boxTopPx);
 
             canvas.Children.Add(tb);

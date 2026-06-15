@@ -47,8 +47,10 @@ public class WeeklyPrintTypeConfig
     public string TypeName { get; set; } = string.Empty;
     public ElementRect MainTextBox { get; set; } = new ElementRect();
     public ElementRect SideTextBox { get; set; } = new ElementRect();
+    public double WrapModeLeftOffset { get; set; } = 15.0;
     public ImageElement Background { get; set; } = new ImageElement();
-    public double FontSize { get; set; } = 12.0;
+    public double MainFontSize { get; set; } = 12.0;
+    public double SideFontSize { get; set; } = 12.0;
     public int Row { get; set; } = 4;
     public int Column { get; set; } = 7;
 }

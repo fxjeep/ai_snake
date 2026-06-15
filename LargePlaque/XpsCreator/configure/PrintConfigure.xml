@@ -161,6 +161,7 @@
         <Width>0</Width>
         <Height>0</Height>
       </SideTextBox>
+      <WrapModeLeftOffset>15</WrapModeLeftOffset>
       <Background>
         <Left>0</Left>
         <Top>0</Top>
@@ -168,7 +169,8 @@
         <Height>2.2</Height>
         <FileName>weekly_changsheng.jpg</FileName>
       </Background>
-      <FontSize>9</FontSize>
+      <MainFontSize>9</MainFontSize>
+      <SideFontSize>9</SideFontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
@@ -186,6 +188,7 @@
         <Width>0</Width>
         <Height>0</Height>
       </SideTextBox>
+      <WrapModeLeftOffset>15</WrapModeLeftOffset>
       <Background>
         <Left>0</Left>
         <Top>0</Top>
@@ -193,7 +196,8 @@
         <Height>2.2</Height>
         <FileName>weekly_yuanqing.JPG</FileName>
       </Background>
-      <FontSize>9</FontSize>
+      <MainFontSize>9</MainFontSize>
+      <SideFontSize>9</SideFontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
@@ -211,6 +215,7 @@
         <Width>0.4</Width>
         <Height>2</Height>
       </SideTextBox>
+      <WrapModeLeftOffset>15</WrapModeLeftOffset>
       <Background>
         <Left>0</Left>
         <Top>0</Top>
@@ -218,7 +223,8 @@
         <Height>2.2</Height>
         <FileName>weekly_wangsheng.JPG</FileName>
       </Background>
-      <FontSize>8</FontSize>
+      <MainFontSize>9</MainFontSize>
+      <SideFontSize>8</SideFontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
@@ -236,6 +242,7 @@
         <Width>0.4</Width>
         <Height>2</Height>
       </SideTextBox>
+      <WrapModeLeftOffset>15</WrapModeLeftOffset>
       <Background>
         <Left>0</Left>
         <Top>0</Top>
@@ -243,7 +250,8 @@
         <Height>2.2</Height>
         <FileName>weekly_zhuxian.JPG</FileName>
       </Background>
-      <FontSize>8</FontSize>
+      <MainFontSize>10</MainFontSize>
+      <SideFontSize>8</SideFontSize>
       <Row>4</Row>
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
