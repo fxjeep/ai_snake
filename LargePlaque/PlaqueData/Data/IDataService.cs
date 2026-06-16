@@ -14,6 +14,7 @@ namespace PlaqueData.Data
         Task<List<Live>> GetWeeklyLivePrintRecordsAsync();
         Task<List<Dead>> GetWeeklyDeadPrintRecordsAsync();
         Task<List<Ancestor>> GetWeeklyAncestorPrintRecordsAsync();
+        Task<List<Property>> GetWeeklyPropertyPrintRecordsAsync();
         Task<List<Dead>> GetDeadRecordsByContactIdAsync(int contactId);
         Task<List<Ancestor>> GetAncestorRecordsByContactIdAsync(int contactId);
         Task<List<Property>> GetPropertyRecordsByContactIdAsync(int contactId);

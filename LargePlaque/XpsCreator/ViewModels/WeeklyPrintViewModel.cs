@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using PlaqueData.Data;
 using PlaqueData.Models;
+using XpsCreator;
 
 namespace XpsCreator.ViewModels
 {
@@ -81,7 +82,7 @@ namespace XpsCreator.ViewModels
                 await Generate(fileStr, targetDir, WeeklyPrintTypes.Yuanqing);
                 await Generate(fileStr, targetDir, WeeklyPrintTypes.Wangsheng);
                 await Generate(fileStr, targetDir, WeeklyPrintTypes.Zhuxian);
-
+                await GenerateProperty(fileStr, targetDir, WeeklyPrintTypes.DiJiZhu);
                 
             }
             catch (Exception ex)
@@ -90,6 +91,35 @@ namespace XpsCreator.ViewModels
                 errorMsg = errorMsg.Replace("\\n", Environment.NewLine);
                 MessageBox.Show(string.Format(errorMsg, ex.Message), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private async Task GenerateProperty(string fileStr, string targetDir, string typeName)
+        {
+            string outputXpsPath = System.IO.Path.Combine(targetDir, $"{fileStr}_{typeName}.xps");
+
+            // 1. load all property records whose IsPrint is true, or the property records for the contacts whose IsPrint is true.
+            var propertyRecords = await _dataService.GetWeeklyPropertyPrintRecordsAsync();
+            if (propertyRecords == null || propertyRecords.Count == 0)
+            {
+                return;
+            }
+
+            // 2. Save each record to a string whose format is LiveName+tab+Address, make the result as a string array.
+            var lines = propertyRecords.Select(r => $"{r.LiveName}\t{r.Address}").ToArray();
+
+            // 3. use PropertyXpsHelper.GenerateXpsDocument() to print out those string array, using the settings PropertyPrintConfig in PrintLayoutSettings.
+            string settingsPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", PrintLayoutSettings.DefaultConfigPath);
+            var settings = PrintLayoutSettings.Load(settingsPath);
+            const int SideFontSize = 12;
+
+            // Ensure the directory exists
+            string? dir = System.IO.Path.GetDirectoryName(outputXpsPath);
+            if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+
+            PropertyXpsHelper.GenerateXpsDocument(outputXpsPath, lines, settings, SideFontSize);
         }
 
         private async Task Generate(string fileStr, string targetDir, string typeName)

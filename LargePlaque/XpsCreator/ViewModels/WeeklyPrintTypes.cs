@@ -8,5 +8,6 @@ namespace XpsCreator.ViewModels
         public const string Yuanqing    = "yuanqing";
         public const string Wangsheng   = "wangsheng";  
         public const string Zhuxian     = "zhuxian";
+        public const string DiJiZhu = "dijizhu";
     }
 }

@@ -1,3 +1,3 @@
-adjust the width according to the lines of text to print on side.
-so the text is always in middle.
-add test position marker for easier test.
+1. creat list
+2. increase font in weekly editor
+3. print property.
