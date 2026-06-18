@@ -144,7 +144,7 @@ namespace XpsCreator.ViewModels
                 var liveRecords = await _dataService.GetWeeklyLivePrintRecordsAsync();
                 if (liveRecords == null || liveRecords.Count == 0)
                 {
-                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
+                    var noRecordsMsg = string.Format(Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print for {0}", "changsheng or yuanqing.");
                     MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
@@ -157,21 +157,21 @@ namespace XpsCreator.ViewModels
                 var deadRecords = await _dataService.GetWeeklyDeadPrintRecordsAsync();
                 if (deadRecords == null || deadRecords.Count == 0)
                 {
-                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
+                    var noRecordsMsg = string.Format(Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print for {0}", "wangsheng");
                     MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 //WeeklyXpsPrinter.GenerateWeeklyDeadXps(outputXpsPath, deadRecords, config);
                 WeeklyXpsPrinter.GenerateWeeklyXps<Dead>(outputXpsPath, deadRecords, config,
-    (canvas, record) => WeeklyXpsPrinter.PrintOneDeadPlaque(canvas, canvas.Width, canvas.Height, bgImage, record, config));
+                        (canvas, record) => WeeklyXpsPrinter.PrintOneDeadPlaque(canvas, canvas.Width, canvas.Height, bgImage, record, config));
             }
             else if (typeName == WeeklyPrintTypes.Zhuxian)
             {
                 var ancestorRecords = await _dataService.GetWeeklyAncestorPrintRecordsAsync();
                 if (ancestorRecords == null || ancestorRecords.Count == 0)
                 {
-                    var noRecordsMsg = Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print.";
+                    var noRecordsMsg = string.Format(Application.Current.TryFindResource("NoRecordsToPrint") as string ?? "No records found to print for {0}", "zhuxian");
                     MessageBox.Show(noRecordsMsg, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }

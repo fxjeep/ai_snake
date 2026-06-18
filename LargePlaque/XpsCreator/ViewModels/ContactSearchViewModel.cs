@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PlaqueData.Data;
 using PlaqueData.Models;
+using XpsCreator;
 
 namespace XpsCreator.ViewModels
 {
@@ -149,7 +150,52 @@ namespace XpsCreator.ViewModels
         private void Detail(Contact contact) { /* TODO */ }
 
         [RelayCommand]
-        private void CreateList(Contact contact) { /* TODO */ }
+        private async Task CreateList(Contact contact)
+        {
+            if (contact == null) return;
+
+            try
+            {
+                var liveRecords = await _dataService.GetLiveRecordsByContactIdAsync(contact.Id);
+                var deadRecords = await _dataService.GetDeadRecordsByContactIdAsync(contact.Id);
+                var ancestorRecords = await _dataService.GetAncestorRecordsByContactIdAsync(contact.Id);
+                var propertyRecords = await _dataService.GetPropertyRecordsByContactIdAsync(contact.Id);
+
+                string dateStr = DateTime.Now.ToString("yyyyMMdd");
+                string fileStr = DateTime.Now.ToString("yyyyMMddHHmmss");
+                string targetDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WeeklyPrint", dateStr);
+
+                string safeCode = string.Join("_", contact.Code.Split(System.IO.Path.GetInvalidFileNameChars()));
+                string safeName = string.Join("_", contact.Name.Split(System.IO.Path.GetInvalidFileNameChars()));
+                string fileName = $"{safeCode}_{safeName}_{fileStr}.xps";
+                string outputXpsPath = System.IO.Path.Combine(targetDir, fileName);
+
+                string generatedPath = ContactListXpsPrinter.GenerateContactListXps(
+                    outputXpsPath,
+                    contact,
+                    liveRecords,
+                    deadRecords,
+                    ancestorRecords,
+                    propertyRecords);
+
+                if (!string.IsNullOrEmpty(generatedPath))
+                {
+                    System.Windows.MessageBox.Show(
+                        $"XPS file generated successfully:\n{generatedPath}",
+                        "Success",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(
+                    $"Error generating XPS: {ex.Message}",
+                    "Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
+        }
 
         private void ApplyFilter()
         {
