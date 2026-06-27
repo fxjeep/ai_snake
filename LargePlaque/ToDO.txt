@@ -1,3 +1,1 @@
-1. creat list
 2. increase font in weekly editor
-3. print property.

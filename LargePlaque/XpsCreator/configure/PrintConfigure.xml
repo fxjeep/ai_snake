@@ -5,7 +5,7 @@
       <TypeName>长生</TypeName>
       <MainTextBox>
         <Left>11.482916666666668</Left>
-        <Top>16.61583333333333</Top>
+        <Top>15.61583333333333</Top>
         <Width>6.508750000000006</Width>
         <Height>10.84791666666661</Height>
       </MainTextBox>
@@ -41,8 +41,8 @@
         <Height>0</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>8.1</Left>
-        <Top>21</Top>
+        <Left>8.4</Left>
+        <Top>19.5</Top>
         <Width>2.2</Width>
         <Height>10</Height>
       </SideTextBox>
@@ -67,15 +67,15 @@
       <TypeName>往生</TypeName>
       <MainTextBox>
         <Left>11.335416666666667</Left>
-        <Top>17.41111111111111</Top>
+        <Top>16.41111111111111</Top>
         <Width>6.905694444444439</Width>
-        <Height>11.364305555555555</Height>
+        <Height>9.364305555555555</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>7.817777777777776</Left>
-        <Top>25.004027777777775</Top>
+        <Left>8.517777777777776</Left>
+        <Top>23.304027777777775</Top>
         <Width>2.0412500000000047</Width>
-        <Height>7.477638888888893</Height>
+        <Height>7.077638888888893</Height>
       </SideTextBox>
       <Stamp>
         <Left>11.8</Left>

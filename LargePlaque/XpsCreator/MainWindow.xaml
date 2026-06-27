@@ -21,9 +21,6 @@
             </ToolBar>
         </ToolBarTray>
         <TabControl x:Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged">
-            <TabItem Header="{DynamicResource TabPositionConfigure}">
-                <local:PositionConfigure />
-            </TabItem>
             <TabItem Header="{DynamicResource TabTextInput}">
                 <local:TextInput />
             </TabItem>

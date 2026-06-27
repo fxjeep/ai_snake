@@ -52,7 +52,7 @@ public static class TwoSectionPrint
                     if (sideElement != null)
                     {
                         var sideLines = printNames ? GetLinesFromElement(sideElement) : new System.Collections.Generic.List<string>();
-                        PrintTextBox.Print(canvas, sideLines.ToArray(), printBorder, mainElement == null && printStamp, printNames, config.SideTextBox, config.Stamp, config.SideMaxFontSize, 5);
+                        PrintTextBox.Print(canvas, sideLines.ToArray(), printBorder, mainElement == null && printStamp, printNames, config.SideTextBox, config.Stamp, config.SideMaxFontSize, 5, wrapModeIfLatin: true);
                     }
 
                     fixedPage.Children.Add(canvas);
