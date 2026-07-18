@@ -8,6 +8,7 @@ namespace PlaqueData.Data
     {
         Task InitializeAsync();
         Task ChangeDatabaseAsync(string path);
+        string DatabasePath { get; }
 
         Task<List<Contact>> GetAllContactsAsync();
         Task<List<Live>> GetLiveRecordsByContactIdAsync(int contactId);
@@ -21,6 +22,7 @@ namespace PlaqueData.Data
         Task<List<ContactPrintSummary>> GetPrintSummariesAsync();
         Task<Contact?> GetContactByIdAsync(int contactId);
         Task UnprintContactAsync(int contactId);
+        Task SetLastPrintForPrintedContactsAsync();
         Task ClearAllPrintAsync();
 
         Task<int> SaveContactAsync(Contact contact);

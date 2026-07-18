@@ -17,6 +17,18 @@ namespace XpsCreator.ViewModels
         private readonly IDataService _dataService;
         public ObservableCollection<WeeklyPrintItem> PrintItems { get; } = new();
 
+        [ObservableProperty]
+        private int _livePrintCount;
+
+        [ObservableProperty]
+        private int _deadPrintCount;
+
+        [ObservableProperty]
+        private int _ancestorPrintCount;
+
+        [ObservableProperty]
+        private int _propertyPrintCount;
+
         public WeeklyPrintViewModel()
         {
             _dataService = new SqliteDataService();
@@ -39,12 +51,19 @@ namespace XpsCreator.ViewModels
             var ancestorLabel = Application.Current.TryFindResource("TabAncestor") as string ?? "Ancestor";
             var propertyLabel = Application.Current.TryFindResource("TabProperty") as string ?? "Property";
 
+            int totalLive = 0, totalDead = 0, totalAncestor = 0, totalProperty = 0;
+
             foreach (var summary in summaries)
             {
                 int livePrint = summary.IsPrint ? summary.LiveTotal : summary.LivePrint;
                 int deadPrint = summary.IsPrint ? summary.DeadTotal : summary.DeadPrint;
                 int ancestorPrint = summary.IsPrint ? summary.AncestorTotal : summary.AncestorPrint;
                 int propertyPrint = summary.IsPrint ? summary.PropertyTotal : summary.PropertyPrint;
+
+                totalLive += livePrint;
+                totalDead += deadPrint;
+                totalAncestor += ancestorPrint;
+                totalProperty += propertyPrint;
 
                 string summaryText = $"{liveLabel}: {summary.LiveTotal}/{livePrint}, " +
                                    $"{deadLabel}: {summary.DeadTotal}/{deadPrint}, " +
@@ -59,6 +78,11 @@ namespace XpsCreator.ViewModels
                     Summary = summaryText
                 });
             }
+
+            LivePrintCount = totalLive;
+            DeadPrintCount = totalDead;
+            AncestorPrintCount = totalAncestor;
+            PropertyPrintCount = totalProperty;
         }
 
         [RelayCommand]
@@ -76,13 +100,23 @@ namespace XpsCreator.ViewModels
                 var settings = PrintLayoutSettings.Load(settingsPath);
                 string dateStr = DateTime.Now.ToString("yyyyMMdd");
                 string fileStr = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string targetDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WeeklyPrint", dateStr);
+                string dbFolder = System.IO.Path.GetDirectoryName(_dataService.DatabasePath) ?? AppDomain.CurrentDomain.BaseDirectory;
+                string targetDir = System.IO.Path.Combine(dbFolder, "WeeklyPrint", dateStr);
 
                 await Generate(fileStr, targetDir, WeeklyPrintTypes.Changsheng);
                 await Generate(fileStr, targetDir, WeeklyPrintTypes.Yuanqing);
                 await Generate(fileStr, targetDir, WeeklyPrintTypes.Wangsheng);
                 await Generate(fileStr, targetDir, WeeklyPrintTypes.Zhuxian);
                 await GenerateProperty(fileStr, targetDir, WeeklyPrintTypes.DiJiZhu);
+
+                // Generate the print list containing all included contacts
+                var printSummaries = await _dataService.GetPrintSummariesAsync();
+                string printListPath = System.IO.Path.Combine(targetDir, $"{fileStr}_printlist.xps");
+                ContactListXpsPrinter.GeneratePrintListXps(printListPath, printSummaries);
+
+                // Set LastPrint date for all applicable contacts
+                await _dataService.SetLastPrintForPrintedContactsAsync();
+                await LoadItemsAsync();
                 
             }
             catch (Exception ex)
@@ -204,7 +238,7 @@ namespace XpsCreator.ViewModels
         private async Task ClearPrintAsync()
         {
             var result = MessageBox.Show(
-                "Are you sure you want to clear all print markers and set the last print date to today?",
+                "Are you sure you want to clear all print markers?",
                 "Confirmation",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
@@ -223,6 +257,53 @@ namespace XpsCreator.ViewModels
             {
                 await _dataService.UnprintContactAsync(weeklyItem.ContactId);
                 PrintItems.Remove(weeklyItem);
+            }
+        }
+
+        [RelayCommand]
+        private async Task ShowContactListDialogAsync()
+        {
+            var dialog = new XpsCreator.Views.YearPickerDialog();
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+            {
+                int selectedYear = dialog.SelectedYear;
+                try
+                {
+                    var allContacts = await _dataService.GetAllContactsAsync();
+                    
+                    DateTime targetDate = new DateTime(selectedYear, 1, 1);
+                    var filteredContacts = new List<Contact>();
+                    foreach (var contact in allContacts)
+                    {
+                        if (string.IsNullOrWhiteSpace(contact.LastPrint))
+                            continue;
+                        
+                        if (DateTime.TryParse(contact.LastPrint, out DateTime lastPrintDate))
+                        {
+                            if (lastPrintDate > targetDate)
+                            {
+                                filteredContacts.Add(contact);
+                            }
+                        }
+                    }
+                    filteredContacts = filteredContacts.OrderBy(c => c.Code).ToList();
+
+                    string timestamp = DateTime.Now.ToString("yyyyMMdd_mmhhss");
+                    string fileName = $"{timestamp}_ContactList_From_{selectedYear}.xps";
+                    string dateStr = DateTime.Now.ToString("yyyyMMdd");
+                    string dbFolder = System.IO.Path.GetDirectoryName(_dataService.DatabasePath) ?? AppDomain.CurrentDomain.BaseDirectory;
+                    string targetDir = System.IO.Path.Combine(dbFolder, "WeeklyPrint", dateStr);
+                    string outputXpsPath = System.IO.Path.Combine(targetDir, fileName);
+
+                    string resultPath = ContactListXpsPrinter.GenerateContactsSummaryXps(outputXpsPath, filteredContacts, selectedYear);
+
+                    MessageBox.Show($"XPS file generated successfully:\n{resultPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error generating XPS: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }

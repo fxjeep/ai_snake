@@ -11,6 +11,8 @@ namespace PlaqueData.Data
         private SQLiteAsyncConnection? _database;
         private string _dbPath;
 
+        public string DatabasePath => _dbPath;
+
         public async Task ChangeDatabaseAsync(string path)
         {
             if (_database != null)
@@ -188,12 +190,29 @@ namespace PlaqueData.Data
             return summaries;
         }
 
+        public async Task SetLastPrintForPrintedContactsAsync()
+        {
+            await InitializeAsync();
+            string todayStr = System.DateTime.Today.ToString("yyyy-MM-dd");
+
+            await _database!.ExecuteAsync(
+                @"UPDATE Contact SET LastPrint = ?
+                  WHERE IsPrint = 1
+                     OR Id IN (SELECT ContactId FROM Live     WHERE IsPrint = 1)
+                     OR Id IN (SELECT ContactId FROM Dead     WHERE IsPrint = 1)
+                     OR Id IN (SELECT ContactId FROM Ancestor WHERE IsPrint = 1)
+                     OR Id IN (SELECT ContactId FROM Property WHERE IsPrint = 1)",
+                todayStr);
+        }
+
         public async Task ClearAllPrintAsync()
         {
             await InitializeAsync();
-            await _database!.ExecuteAsync("UPDATE Contact SET IsPrint = 0 WHERE IsPrint = 1");
-            await _database!.ExecuteAsync("UPDATE Live SET IsPrint = 0 WHERE IsPrint = 1");
-            await _database!.ExecuteAsync("UPDATE Dead SET IsPrint = 0 WHERE IsPrint = 1");
+
+            // Clear all print markers
+            await _database!.ExecuteAsync("UPDATE Contact  SET IsPrint = 0 WHERE IsPrint = 1");
+            await _database!.ExecuteAsync("UPDATE Live     SET IsPrint = 0 WHERE IsPrint = 1");
+            await _database!.ExecuteAsync("UPDATE Dead     SET IsPrint = 0 WHERE IsPrint = 1");
             await _database!.ExecuteAsync("UPDATE Ancestor SET IsPrint = 0 WHERE IsPrint = 1");
             await _database!.ExecuteAsync("UPDATE Property SET IsPrint = 0 WHERE IsPrint = 1");
         }

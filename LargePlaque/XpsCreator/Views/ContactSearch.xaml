@@ -110,13 +110,13 @@
                 </DataGridTemplateColumn>
 
                 <!-- Contact Name -->
-                <DataGridTextColumn Header="{DynamicResource ContactName}" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="{DynamicResource ContactName}" Binding="{Binding Name}" Width="2*"/>
 
                 <!-- Contact Code -->
-                <DataGridTextColumn Header="{DynamicResource ContactCode}" Binding="{Binding Code}" Width="Auto"/>
+                <DataGridTextColumn Header="{DynamicResource ContactCode}" Binding="{Binding Code}" Width="*"/>
 
                 <!-- Last Print Date -->
-                <DataGridTextColumn Header="{DynamicResource LastPrintDate}" Binding="{Binding LastPrint}" Width="Auto" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource LastPrintDate}" Binding="{Binding LastPrint}" Width="1.5*" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

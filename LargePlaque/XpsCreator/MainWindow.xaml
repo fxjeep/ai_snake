@@ -17,7 +17,7 @@
                 <RadioButton Content="CN" Style="{StaticResource {x:Type ToggleButton}}" Click="Language_Click" Tag="cn"/>
                 <Separator/>
                 <Button Content="📁" Click="SelectDatabase_Click" ToolTip="Select Database File"/>
-                <TextBox x:Name="DatabasePathTextBox" Width="250" IsReadOnly="True" VerticalContentAlignment="Center" Margin="5,0,0,0"/>
+                <TextBox x:Name="DatabasePathTextBox" Width="Auto" HorizontalAlignment="Stretch" IsReadOnly="True" VerticalContentAlignment="Center" Margin="5,0,0,0"/>
             </ToolBar>
         </ToolBarTray>
         <TabControl x:Name="MainTabControl" SelectionChanged="MainTabControl_SelectionChanged">

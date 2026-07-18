@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Packaging;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -28,8 +29,8 @@ namespace XpsCreator
                 Directory.CreateDirectory(dir);
             }
 
-            // Create title: [ContactCode - ContactName - yyyyMMdd]
-            string dateStr = DateTime.Now.ToString("yyyyMMdd");
+            // Create title: [ContactCode - ContactName - yyyy-MM-dd]
+            string dateStr = DateTime.Now.ToString("yyyy-MM-dd");
             string titleText = $"[{contact.Code} - {contact.Name} - {dateStr}]";
 
             var pageManager = new PageManager(titleText);
@@ -211,9 +212,9 @@ namespace XpsCreator
             {
                 Text = title,
                 FontFamily = new FontFamily("KaiTi"),
-                FontSize = 14.0 * 96.0 / 72.0,
+                FontSize = 12.0 * 96.0 / 72.0,
                 FontWeight = FontWeights.Bold,
-                Margin = new Thickness(0, 15, 0, 5),
+                Margin = new Thickness(0, 10, 0, 3),
                 Foreground = Brushes.DarkSlateGray
             };
         }
@@ -239,7 +240,7 @@ namespace XpsCreator
                 {
                     BorderBrush = Brushes.Black,
                     BorderThickness = new Thickness(0.5),
-                    Padding = new Thickness(5),
+                    Padding = new Thickness(2),
                     Background = isHeader ? new SolidColorBrush(Color.FromRgb(240, 240, 240)) : Brushes.Transparent
                 };
 
@@ -247,7 +248,7 @@ namespace XpsCreator
                 {
                     Text = cellTexts[col],
                     FontFamily = new FontFamily("KaiTi"),
-                    FontSize = 12.0 * 96.0 / 72.0, // 12pt
+                    FontSize = 10.0 * 96.0 / 72.0, // 10pt
                     FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
                     TextWrapping = TextWrapping.Wrap,
                     HorizontalAlignment = isHeader ? HorizontalAlignment.Center : HorizontalAlignment.Left,
@@ -347,7 +348,7 @@ namespace XpsCreator
                 pageNumberBlock.Measure(new Size(680.31, double.PositiveInfinity));
                 double footerHeight = pageNumberBlock.DesiredSize.Height + pageNumberBlock.Margin.Top + pageNumberBlock.Margin.Bottom;
 
-                _maxContentHeight = 1009.13 - titleHeight - footerHeight;
+                _maxContentHeight = 1084.73 - titleHeight - footerHeight;
                 _currentHeight = 0;
                 _pages.Add(page);
             }
@@ -363,8 +364,8 @@ namespace XpsCreator
                 var mainGrid = new Grid
                 {
                     Width = 680.31,
-                    Height = 1009.13,
-                    Margin = new Thickness(56.69, 56.69, 56.69, 56.69),
+                    Height = 1084.73,
+                    Margin = new Thickness(56.69, 37.79, 56.69, 0),
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     VerticalAlignment = VerticalAlignment.Stretch
                 };
@@ -380,7 +381,7 @@ namespace XpsCreator
                     FontSize = 16.0 * 96.0 / 72.0, // 16pt font
                     FontWeight = FontWeights.Bold,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Margin = new Thickness(0, 0, 0, 15)
+                    Margin = new Thickness(0, 0, 0, 0)
                 };
                 Grid.SetRow(titleBlock, 0);
                 mainGrid.Children.Add(titleBlock);
@@ -399,7 +400,7 @@ namespace XpsCreator
                     FontFamily = new FontFamily("KaiTi"),
                     FontSize = 12.0 * 96.0 / 72.0,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Margin = new Thickness(0, 15, 0, 0)
+                    Margin = new Thickness(0, 52.80, 0, 0)
                 };
                 Grid.SetRow(pageNumberBlock, 2);
                 mainGrid.Children.Add(pageNumberBlock);
@@ -451,6 +452,314 @@ namespace XpsCreator
                     var mainGrid = (Grid)_pages[i].Children[0];
                     var pageNumberBlock = (TextBlock)mainGrid.Children[2];
                     pageNumberBlock.Text = $"{i + 1}";
+                    
+                    _pages[i].Measure(new Size(793.70, 1122.52));
+                    _pages[i].Arrange(new Rect(new Point(), new Size(793.70, 1122.52)));
+                    _pages[i].UpdateLayout();
+                }
+            }
+        }
+
+        public static string GeneratePrintListXps(
+            string outputXpsPath,
+            List<ContactPrintSummary> summaries)
+        {
+            string? dir = Path.GetDirectoryName(outputXpsPath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            string dateStr = DateTime.Now.ToString("yyyyMMdd");
+            string titleText = $"{dateStr} Print List";
+
+            var pageManager = new SummaryPageManager(titleText);
+
+            double[] colWidths = Enumerable.Repeat(1.0, 8).ToArray();
+
+            var orderedSummaries = summaries.OrderBy(s => s.Code).ToList();
+            for (int i = 0; i < orderedSummaries.Count; i += 4)
+            {
+                var rowTexts = new List<string>();
+                for (int j = 0; j < 4; j++)
+                {
+                    if (i + j < orderedSummaries.Count)
+                    {
+                        rowTexts.Add(orderedSummaries[i + j].Name);
+                        rowTexts.Add(orderedSummaries[i + j].Code);
+                    }
+                    else
+                    {
+                        rowTexts.Add("");
+                        rowTexts.Add("");
+                    }
+                }
+                var row = CreateSummaryTableRow(colWidths, rowTexts.ToArray(), isHeader: false);
+                if (i == 0)
+                    pageManager.AddInitialElement(row);
+                else
+                    pageManager.AddElement(row);
+            }
+
+            pageManager.FinalizePageNumbers();
+
+            using (var package = Package.Open(outputXpsPath, FileMode.Create))
+            {
+                var xpsDoc = new XpsDocument(package);
+                var writer = XpsDocument.CreateXpsDocumentWriter(xpsDoc);
+                var fixedDoc = new FixedDocument();
+
+                foreach (var page in pageManager.Pages)
+                {
+                    var content = new PageContent();
+                    ((System.Windows.Markup.IAddChild)content).AddChild(page);
+                    fixedDoc.Pages.Add(content);
+                }
+
+                writer.Write(fixedDoc);
+                xpsDoc.Close();
+            }
+
+            return outputXpsPath;
+        }
+
+        public static string GenerateContactsSummaryXps(
+            string outputXpsPath,
+            List<Contact> contacts,
+            int selectedYear)
+        {
+            // Ensure directory exists
+            string? dir = Path.GetDirectoryName(outputXpsPath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            string titleText = $"Contact List Since {selectedYear}";
+            var pageManager = new SummaryPageManager(titleText);
+
+            double[] colWidths = { 2.0, 1.2, 1.8 };
+
+            for (int i = 0; i < contacts.Count; i++)
+            {
+                var contact = contacts[i];
+                string formattedDate = contact.LastPrint;
+                if (DateTime.TryParse(contact.LastPrint, out DateTime dt))
+                {
+                    formattedDate = dt.ToString("yyyy-MM-dd");
+                }
+                string[] rowTexts = { contact.Name, contact.Code, formattedDate };
+                var row = CreateSummaryTableRow(colWidths, rowTexts, isHeader: false);
+
+                if (i == 0)
+                    pageManager.AddInitialElement(row);
+                else
+                    pageManager.AddElement(row);
+            }
+
+            pageManager.FinalizePageNumbers();
+
+            // Save FixedDocument to XPS file
+            using (var package = Package.Open(outputXpsPath, FileMode.Create))
+            {
+                var xpsDoc = new XpsDocument(package);
+                var writer = XpsDocument.CreateXpsDocumentWriter(xpsDoc);
+                var fixedDoc = new FixedDocument();
+
+                foreach (var page in pageManager.Pages)
+                {
+                    var content = new PageContent();
+                    ((System.Windows.Markup.IAddChild)content).AddChild(page);
+                    fixedDoc.Pages.Add(content);
+                }
+
+                writer.Write(fixedDoc);
+                xpsDoc.Close();
+            }
+
+            return outputXpsPath;
+        }
+
+        private static Grid CreateSummaryTableRow(double[] colWidths, string[] cellTexts, bool isHeader = false)
+        {
+            var grid = new Grid
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
+
+            for (int col = 0; col < colWidths.Length; col++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = new GridLength(colWidths[col], GridUnitType.Star)
+                });
+            }
+
+            for (int col = 0; col < cellTexts.Length; col++)
+            {
+                var border = new Border
+                {
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(1), // Full border
+                    Padding = new Thickness(0),
+                    Background = isHeader ? new SolidColorBrush(Color.FromRgb(240, 240, 240)) : Brushes.Transparent
+                };
+
+                var textBlock = new TextBlock
+                {
+                    Text = cellTexts[col] ?? string.Empty,
+                    FontFamily = new FontFamily("KaiTi"),
+                    FontSize = 26.0, // Font size is 26px
+                    FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = isHeader ? HorizontalAlignment.Center : HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                border.Child = textBlock;
+                Grid.SetColumn(border, col);
+                grid.Children.Add(border);
+            }
+
+            return grid;
+        }
+
+        private class SummaryPageManager
+        {
+            private readonly string _titleText;
+            private readonly List<FixedPage> _pages = new();
+            private FixedPage _currentPage = null!;
+            private StackPanel _currentPanel = null!;
+            private double _maxContentHeight;
+            private double _currentHeight;
+            private int _pageCount = 0;
+
+            public SummaryPageManager(string titleText)
+            {
+                _titleText = titleText;
+                StartNewPage();
+            }
+
+            public List<FixedPage> Pages => _pages;
+            public StackPanel CurrentPanel => _currentPanel;
+
+            private void StartNewPage()
+            {
+                _pageCount++;
+                var (page, panel) = CreatePage(_titleText, _pageCount);
+                _currentPage = page;
+                _currentPanel = panel;
+
+                var mainGrid = (Grid)page.Children[0];
+                var titleBlock = (TextBlock)mainGrid.Children[0];
+                var pageNumberBlock = (TextBlock)mainGrid.Children[2];
+
+                titleBlock.Measure(new Size(680.31, double.PositiveInfinity));
+                double titleHeight = titleBlock.DesiredSize.Height + titleBlock.Margin.Top + titleBlock.Margin.Bottom;
+
+                pageNumberBlock.Measure(new Size(680.31, double.PositiveInfinity));
+                double footerHeight = pageNumberBlock.DesiredSize.Height + pageNumberBlock.Margin.Top + pageNumberBlock.Margin.Bottom;
+
+                _maxContentHeight = 1079.73 - titleHeight - footerHeight;
+                _currentHeight = 0;
+                _pages.Add(page);
+            }
+
+            private static (FixedPage Page, StackPanel ContentPanel) CreatePage(string titleText, int pageNumber)
+            {
+                var fixedPage = new FixedPage
+                {
+                    Width = 793.70,
+                    Height = 1122.52
+                };
+
+                var mainGrid = new Grid
+                {
+                    Width = 680.31,
+                    Height = 1079.73,
+                    Margin = new Thickness(56.69, 37.79, 56.69, 5),
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                };
+
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                var titleBlock = new TextBlock
+                {
+                    Text = titleText,
+                    FontFamily = new FontFamily("KaiTi"),
+                    FontSize = 28.0,
+                    FontWeight = FontWeights.Bold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, -18.9, 0, 15)
+                };
+                Grid.SetRow(titleBlock, 0);
+                mainGrid.Children.Add(titleBlock);
+
+                var contentPanel = new StackPanel
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Top
+                };
+                Grid.SetRow(contentPanel, 1);
+                mainGrid.Children.Add(contentPanel);
+
+                var pageNumberBlock = new TextBlock
+                {
+                    Text = pageNumber.ToString(),
+                    FontFamily = new FontFamily("KaiTi"),
+                    FontSize = 20.0,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 5, 0, 0)
+                };
+                Grid.SetRow(pageNumberBlock, 2);
+                mainGrid.Children.Add(pageNumberBlock);
+
+                fixedPage.Children.Add(mainGrid);
+
+                fixedPage.Measure(new Size(793.70, 1122.52));
+                fixedPage.Arrange(new Rect(new Point(), new Size(793.70, 1122.52)));
+                fixedPage.UpdateLayout();
+
+                return (fixedPage, contentPanel);
+            }
+
+            public void AddInitialElement(UIElement element)
+            {
+                element.Measure(new Size(680.31, double.PositiveInfinity));
+                _currentPanel.Children.Add(element);
+                _currentHeight += element.DesiredSize.Height;
+
+                _currentPage.Measure(new Size(793.70, 1122.52));
+                _currentPage.Arrange(new Rect(new Point(), new Size(793.70, 1122.52)));
+                _currentPage.UpdateLayout();
+            }
+
+            public void AddElement(UIElement element)
+            {
+                element.Measure(new Size(680.31, double.PositiveInfinity));
+                double elementHeight = element.DesiredSize.Height;
+
+                if (_currentHeight + elementHeight > _maxContentHeight && _currentHeight > 0)
+                    StartNewPage();
+
+                _currentPanel.Children.Add(element);
+                _currentHeight += elementHeight;
+
+                _currentPage.Measure(new Size(793.70, 1122.52));
+                _currentPage.Arrange(new Rect(new Point(), new Size(793.70, 1122.52)));
+                _currentPage.UpdateLayout();
+            }
+
+            public void FinalizePageNumbers()
+            {
+                for (int i = 0; i < _pages.Count; i++)
+                {
+                    var mainGrid = (Grid)_pages[i].Children[0];
+                    var pageNumberBlock = (TextBlock)mainGrid.Children[2];
+                    pageNumberBlock.Text = $"{i + 1} of {_pages.Count} page";
                     
                     _pages[i].Measure(new Size(793.70, 1122.52));
                     _pages[i].Arrange(new Rect(new Point(), new Size(793.70, 1122.52)));

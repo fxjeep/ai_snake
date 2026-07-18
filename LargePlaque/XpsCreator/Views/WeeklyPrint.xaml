@@ -35,10 +35,26 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="{DynamicResource Refresh}" Command="{Binding LoadItemsCommand}" Margin="0,0,10,0" Padding="10,5"/>
-            <Button Content="{DynamicResource GenerateWeeklyXps}" Command="{Binding GenerateXpsCommand}" Margin="0,0,10,0" Padding="10,5"/>
-            <Button Content="{DynamicResource ClearPrint}" Command="{Binding ClearPrintCommand}" Padding="10,5"/>
-        </StackPanel>
+        <DockPanel Grid.Row="1" Margin="10">
+            <!-- Action buttons docked to the right -->
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="{DynamicResource Refresh}" Command="{Binding LoadItemsCommand}" Margin="0,0,10,0" Padding="10,5"/>
+                <Button Content="{DynamicResource GenerateWeeklyXps}" Command="{Binding GenerateXpsCommand}" Margin="0,0,10,0" Padding="10,5"/>
+                <Button Content="{DynamicResource ClearPrint}" Command="{Binding ClearPrintCommand}" Margin="0,0,10,0" Padding="10,5"/>
+                <Button Content="Contact List" Command="{Binding ShowContactListDialogCommand}" Padding="10,5"/>
+            </StackPanel>
+
+            <!-- Plaque type record counts on the left -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="{DynamicResource TabLive}" Margin="0,0,3,0" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding LivePrintCount}" Margin="0,0,15,0"/>
+                <TextBlock Text="{DynamicResource TabDead}" Margin="0,0,3,0" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding DeadPrintCount}" Margin="0,0,15,0"/>
+                <TextBlock Text="{DynamicResource TabAncestor}" Margin="0,0,3,0" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding AncestorPrintCount}" Margin="0,0,15,0"/>
+                <TextBlock Text="{DynamicResource TabProperty}" Margin="0,0,3,0" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding PropertyPrintCount}"/>
+            </StackPanel>
+        </DockPanel>
     </Grid>
 </UserControl>

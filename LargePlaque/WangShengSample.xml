@@ -326,7 +326,7 @@
             <line>先會長賴格蘭姆先生</line>
         </main>
         <side>
-            <line>雪梨淨宗學會等四衆弟子</line>
+            <line>雪梨淨宗學會四衆弟子</line>
         </side>
     </item>
     <item>
@@ -345,6 +345,18 @@
         </main>
         <side>
             <line>佛弟子　鄭得旺</line>
+        </side>
+    </item>
+    <item>
+        <main><line>先姐張惠英</line></main>
+        <side>
+            <line>二妹　張沛英</line>
+        </side>
+    </item>
+    <item>
+        <main><line>先父傅敬善</line></main>
+        <side>
+            <line>女兒　傅文玉</line>
         </side>
     </item>
 </list>

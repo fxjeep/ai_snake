@@ -27,7 +27,6 @@ namespace XpsCreator.ViewModels
         public ContactSearchViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            _ = LoadContactsAsync();
         }
 
         [RelayCommand]
@@ -38,9 +37,9 @@ namespace XpsCreator.ViewModels
         }
 
         [RelayCommand]
-        private void Search()
+        private async Task Search()
         {
-            ApplyFilter();
+            await LoadContactsAsync();
         }
 
         [RelayCommand]
@@ -200,9 +199,10 @@ namespace XpsCreator.ViewModels
         private void ApplyFilter()
         {
             var filtered = string.IsNullOrWhiteSpace(SearchText)
-                ? _allContacts
+                ? _allContacts.OrderBy(c => c.Code)
                 : _allContacts.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                          c.Code.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+                                          c.Code.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                              .OrderBy(c => c.Code);
 
             FilteredContacts.Clear();
             foreach (var contact in filtered)

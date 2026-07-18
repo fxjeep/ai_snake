@@ -33,8 +33,7 @@
         <local:ContactSearch DataContext="{Binding ContactSearch}"/>
         
         <!-- Splitter -->
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="#e0e0e0"
-                      Style="{StaticResource VisibilityBySelectionStyle}"/>
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="#e0e0e0"/>
         
         <!-- Right: Detail Editor -->
         <local:DetailEditor Grid.Column="2" DataContext="{Binding DetailEditor}"

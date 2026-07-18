@@ -66,8 +66,8 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Name}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="SizeToHeader" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Name}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="Auto" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
@@ -81,10 +81,10 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="{DynamicResource DeadName}" Binding="{Binding DeadName}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource LiveName}" Binding="{Binding LiveName}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource Relation}" Binding="{Binding Relation}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="SizeToHeader" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="{DynamicResource DeadName}" Binding="{Binding DeadName}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource LiveName}" Binding="{Binding LiveName}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource Relation}" Binding="{Binding Relation}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="Auto" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
@@ -98,9 +98,9 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="{DynamicResource Surname}" Binding="{Binding Surname}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Name}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="SizeToHeader" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="{DynamicResource Surname}" Binding="{Binding Surname}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource Name}" Binding="{Binding Name}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="Auto" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
@@ -114,9 +114,9 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="{DynamicResource LiveName}" Binding="{Binding LiveName}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource Address}" Binding="{Binding Address}" Width="SizeToHeader"/>
-                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="SizeToHeader" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="{DynamicResource LiveName}" Binding="{Binding LiveName}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource Address}" Binding="{Binding Address}" Width="Auto"/>
+                        <DataGridTextColumn Header="{DynamicResource LastPrint}" Binding="{Binding LastPrint}" Width="Auto" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>

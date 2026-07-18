@@ -57,25 +57,25 @@
 
             <!-- Row 1 -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="{DynamicResource MaxChar}" VerticalAlignment="Center" Width="60"/>
-                <TextBox x:Name="L1MaxCharTextBox" Width="40" VerticalContentAlignment="Center"/>
-                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
-                <TextBox x:Name="L1FontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
+                <TextBlock Text="{DynamicResource MaxChar}" VerticalAlignment="Center" Width="100"/>
+                <TextBox x:Name="L1MaxCharTextBox" Width="100" VerticalContentAlignment="Center"/>
+                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="100" Margin="10,0,0,0"/>
+                <TextBox x:Name="L1FontSizeTextBox" Width="100" VerticalContentAlignment="Center"/>
             </StackPanel>
 
             <!-- Row 2 -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="{DynamicResource MaxChar}" VerticalAlignment="Center" Width="60"/>
-                <TextBox x:Name="L2MaxCharTextBox" Width="40" VerticalContentAlignment="Center"/>
-                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="60" Margin="10,0,0,0"/>
-                <TextBox x:Name="L2FontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
+                <TextBlock Text="{DynamicResource MaxChar}" VerticalAlignment="Center" Width="100"/>
+                <TextBox x:Name="L2MaxCharTextBox" Width="100" VerticalContentAlignment="Center"/>
+                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="100" Margin="10,0,0,0"/>
+                <TextBox x:Name="L2FontSizeTextBox" Width="100" VerticalContentAlignment="Center"/>
             </StackPanel>
 
             <!-- Row 3 -->
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="{DynamicResource SmallFont}" VerticalAlignment="Center" Width="110"/>
-                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="60"/>
-                <TextBox x:Name="SmallFontSizeTextBox" Width="40" VerticalContentAlignment="Center"/>
+                <TextBlock Text="{DynamicResource FontSize}" VerticalAlignment="Center" Width="100"/>
+                <TextBox x:Name="SmallFontSizeTextBox" Width="100" VerticalContentAlignment="Center"/>
             </StackPanel>
         </StackPanel>
     </Grid>

@@ -41,7 +41,7 @@
     <system:String x:Key="CreateList">Create List</system:String>
     <system:String x:Key="ContactName">Name</system:String>
     <system:String x:Key="ContactCode">Code</system:String>
-    <system:String x:Key="LastPrintDate">Last Print Date</system:String>
+    <system:String x:Key="LastPrintDate">Last Print</system:String>
     <system:String x:Key="IsPrint">Print</system:String>
     <system:String x:Key="Name">Name</system:String>
     <system:String x:Key="LastPrint">Last Print</system:String>
