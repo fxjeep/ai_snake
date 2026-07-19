@@ -21,6 +21,37 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <Style TargetType="TabItem">
+            <Setter Property="BorderBrush" Value="#999"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,11"/>
+            <Setter Property="Background" Value="#eee"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4,4,0,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="Header"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#4a90d9"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#2a6cb5"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="10">
@@ -56,8 +87,22 @@
         </Border>
         
         <TabControl Grid.Row="1" x:Name="DetailTabControl">
+            <TabControl.Template>
+                <ControlTemplate TargetType="TabControl">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <UniformGrid Rows="1" IsItemsHost="True"/>
+                        <Border Grid.Row="1" BorderBrush="#999" BorderThickness="1,0,1,1" CornerRadius="0,0,4,4">
+                            <ContentPresenter ContentSource="SelectedContent" Margin="5"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </TabControl.Template>
             <TabItem Header="{DynamicResource TabLive}">
-                <DataGrid x:Name="LiveGrid" ItemsSource="{Binding LiveView}" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
+                <DataGrid x:Name="LiveGrid" ItemsSource="{Binding LiveView}" FontSize="18" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="{DynamicResource IsPrint}" Width="SizeToHeader">
                             <DataGridTemplateColumn.CellTemplate>
@@ -72,7 +117,7 @@
                 </DataGrid>
             </TabItem>
             <TabItem Header="{DynamicResource TabDead}">
-                <DataGrid x:Name="DeadGrid" ItemsSource="{Binding DeadView}" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
+                <DataGrid x:Name="DeadGrid" ItemsSource="{Binding DeadView}" FontSize="18" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="{DynamicResource IsPrint}" Width="SizeToHeader">
                             <DataGridTemplateColumn.CellTemplate>
@@ -89,7 +134,7 @@
                 </DataGrid>
             </TabItem>
             <TabItem Header="{DynamicResource TabAncestor}">
-                <DataGrid x:Name="AncestorGrid" ItemsSource="{Binding AncestorView}" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
+                <DataGrid x:Name="AncestorGrid" ItemsSource="{Binding AncestorView}" FontSize="18" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="{DynamicResource IsPrint}" Width="SizeToHeader">
                             <DataGridTemplateColumn.CellTemplate>
@@ -105,7 +150,7 @@
                 </DataGrid>
             </TabItem>
             <TabItem Header="{DynamicResource TabProperty}">
-                <DataGrid x:Name="PropertyGrid" ItemsSource="{Binding PropertyView}" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
+                <DataGrid x:Name="PropertyGrid" ItemsSource="{Binding PropertyView}" FontSize="18" AutoGenerateColumns="False" Margin="5" InitializingNewItem="DataGrid_InitializingNewItem" RowEditEnding="DataGrid_RowEditEnding">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="{DynamicResource IsPrint}" Width="SizeToHeader">
                             <DataGridTemplateColumn.CellTemplate>

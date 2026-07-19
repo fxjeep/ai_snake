@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using XpsCreator.Localization;
@@ -21,17 +23,18 @@ namespace XpsCreator
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var settings = SettingsManager.LoadSettings();
-            if (!string.IsNullOrEmpty(settings.LastDatabasePath) && System.IO.File.Exists(settings.LastDatabasePath))
+            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", PrintLayoutSettings.DefaultConfigPath);
+            var settings = PrintLayoutSettings.Load(settingsPath);
+            if (!string.IsNullOrEmpty(settings.WeeklyDataFile) && File.Exists(settings.WeeklyDataFile))
             {
-                DatabasePathTextBox.Text = settings.LastDatabasePath;
+                DatabasePathTextBox.Text = settings.WeeklyDataFile;
                 if (DataEntryView.DataContext is XpsCreator.ViewModels.DataEntryViewModel vm)
                 {
-                    _ = vm.ChangeDatabaseAsync(settings.LastDatabasePath);
+                    _ = vm.ChangeDatabaseAsync(settings.WeeklyDataFile);
                 }
                 if (WeeklyPrintView.DataContext is XpsCreator.ViewModels.WeeklyPrintViewModel pvm)
                 {
-                    _ = pvm.ChangeDatabaseAsync(settings.LastDatabasePath);
+                    _ = pvm.ChangeDatabaseAsync(settings.WeeklyDataFile);
                 }
             }
         }
@@ -58,10 +61,11 @@ namespace XpsCreator
                 if (DataEntryView.DataContext is XpsCreator.ViewModels.DataEntryViewModel vm)
                 {
                     await vm.ChangeDatabaseAsync(openFileDialog.FileName);
-                    
-                    var settings = SettingsManager.LoadSettings();
-                    settings.LastDatabasePath = openFileDialog.FileName;
-                    SettingsManager.SaveSettings(settings);
+
+                    string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configure", PrintLayoutSettings.DefaultConfigPath);
+                    var settings = PrintLayoutSettings.Load(settingsPath);
+                    settings.WeeklyDataFile = openFileDialog.FileName;
+                    PrintLayoutSettings.Save(settingsPath, settings);
                 }
                 if (WeeklyPrintView.DataContext is XpsCreator.ViewModels.WeeklyPrintViewModel pvm)
                 {

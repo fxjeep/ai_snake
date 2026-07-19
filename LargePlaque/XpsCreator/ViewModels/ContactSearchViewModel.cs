@@ -162,7 +162,8 @@ namespace XpsCreator.ViewModels
 
                 string dateStr = DateTime.Now.ToString("yyyyMMdd");
                 string fileStr = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string targetDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WeeklyPrint", dateStr);
+                string dbFolder = System.IO.Path.GetDirectoryName(_dataService.DatabasePath) ?? AppDomain.CurrentDomain.BaseDirectory;
+                string targetDir = System.IO.Path.Combine(dbFolder, "WeekllyPrint", dateStr);
 
                 string safeCode = string.Join("_", contact.Code.Split(System.IO.Path.GetInvalidFileNameChars()));
                 string safeName = string.Join("_", contact.Name.Split(System.IO.Path.GetInvalidFileNameChars()));

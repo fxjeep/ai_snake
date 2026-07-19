@@ -84,6 +84,8 @@ public class PrintLayoutSettings
 
     public List<WeeklyPrintTypeConfig> WeeklyPrintSettings { get; set; } = new List<WeeklyPrintTypeConfig>();
 
+    public string WeeklyDataFile { get; set; } = string.Empty;
+
     public static string DefaultConfigPath => "PrintConfigure.xml";
 
     public static void Save(string filePath, PrintLayoutSettings settings)

@@ -72,8 +72,8 @@
         <Height>9.364305555555555</Height>
       </MainTextBox>
       <SideTextBox>
-        <Left>8.517777777777776</Left>
-        <Top>23.304027777777775</Top>
+        <Left>8.517777777777775</Left>
+        <Top>23.304027777777776</Top>
         <Width>2.0412500000000047</Width>
         <Height>7.077638888888893</Height>
       </SideTextBox>
@@ -145,6 +145,11 @@
       <Width>0.6418055555555554</Width>
       <Height>6.24013888888889</Height>
     </Side>
+    <MainFontLevel1MaxChars>50</MainFontLevel1MaxChars>
+    <MainFontLevel1Size>18</MainFontLevel1Size>
+    <MainFontLevel2MaxChars>100</MainFontLevel2MaxChars>
+    <MainFontLevel2Size>16</MainFontLevel2Size>
+    <MainFontSmallSize>14</MainFontSmallSize>
   </PropertyPrintConfig>
   <WeeklyPrintSettings>
     <WeeklyPrintTypeConfig>
@@ -231,7 +236,7 @@
     <WeeklyPrintTypeConfig>
       <TypeName>zhuxian</TypeName>
       <MainTextBox>
-         <Left>0.8</Left>
+        <Left>0.8</Left>
         <Top>2.8</Top>
         <Width>1.2</Width>
         <Height>1.8</Height>
@@ -256,4 +261,5 @@
       <Column>7</Column>
     </WeeklyPrintTypeConfig>
   </WeeklyPrintSettings>
+  <WeeklyDataFile>D:\test\ai\antigravity\snake\LargePlaque\DataFile\pwdatabase.db3</WeeklyDataFile>
 </PrintLayoutSettings>
