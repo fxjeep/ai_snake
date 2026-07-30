@@ -134,6 +134,17 @@ public static class PropertyXpsHelper
                     pageCanvas.Children.Add(itemCanvas);
                 }
 
+                var pageNumTb = new TextBlock
+                {
+                    Text = $"{(i / itemsPerPage) + 1}",
+                    FontFamily = new FontFamily("SongTi"),
+                    FontSize = 14,
+                };
+                pageNumTb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                Canvas.SetLeft(pageNumTb, a4Width - pageNumTb.DesiredSize.Width - 15);
+                Canvas.SetTop(pageNumTb, 10);
+                pageCanvas.Children.Add(pageNumTb);
+
                 fixedPage.Children.Add(pageCanvas);
                 fixedPage.Measure(new Size(a4Width, a4Height));
                 fixedPage.Arrange(new Rect(new Point(), new Size(a4Width, a4Height)));
@@ -156,7 +167,7 @@ public static class PropertyXpsHelper
             Text = text,
             TextWrapping = TextWrapping.Wrap,
             FontSize = fontSize,
-            FontFamily = new FontFamily("KaiTi"),
+            FontFamily = new FontFamily("SongTi"),
             Width = UnitConverter.ToPx(rect.Height), // Swap dimensions since it will be rotated
             TextAlignment = TextAlignment.Center
         };

@@ -87,7 +87,7 @@ public static class PrintTextBox
             double mid = (minFont + maxFont) / 2.0;
             var tempBlock = new TextBlock(new Run(concatenatedText))
             {
-                FontFamily = new FontFamily("KaiTi"),
+                FontFamily = new FontFamily("SongTi"),
                 FontSize = mid,
                 TextWrapping = TextWrapping.Wrap,
                 Width = boxHeightPx,
@@ -111,7 +111,7 @@ public static class PrintTextBox
 
         var tb = new TextBlock(new Run(concatenatedText))
         {
-            FontFamily = new FontFamily("KaiTi"),
+            FontFamily = new FontFamily("SongTi"),
             FontSize = fontSize,
             TextWrapping = TextWrapping.Wrap,
             Width = boxHeightPx,

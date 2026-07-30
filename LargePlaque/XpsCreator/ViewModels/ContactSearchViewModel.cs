@@ -64,7 +64,7 @@ namespace XpsCreator.ViewModels
                 var title = System.Windows.Application.Current.TryFindResource("Delete") as string ?? "Delete";
                 var format = System.Windows.Application.Current.TryFindResource("ConfirmDeleteContactFormat") as string ?? "Are you sure you want to delete the contact '{0}'?";
                 var message = string.Format(format, contact.Name);
-                
+
                 var result = System.Windows.MessageBox.Show(
                     message,
                     title,
@@ -163,12 +163,22 @@ namespace XpsCreator.ViewModels
                 string dateStr = DateTime.Now.ToString("yyyyMMdd");
                 string fileStr = DateTime.Now.ToString("yyyyMMddHHmmss");
                 string dbFolder = System.IO.Path.GetDirectoryName(_dataService.DatabasePath) ?? AppDomain.CurrentDomain.BaseDirectory;
-                string targetDir = System.IO.Path.Combine(dbFolder, "WeekllyPrint", dateStr);
+                string targetDir = System.IO.Path.Combine(dbFolder, "WeeklyPrint", dateStr);
 
                 string safeCode = string.Join("_", contact.Code.Split(System.IO.Path.GetInvalidFileNameChars()));
                 string safeName = string.Join("_", contact.Name.Split(System.IO.Path.GetInvalidFileNameChars()));
                 string fileName = $"{safeCode}_{safeName}_{fileStr}.xps";
                 string outputXpsPath = System.IO.Path.Combine(targetDir, fileName);
+
+                liveRecords ??= new List<Live>();
+                deadRecords ??= new List<Dead>();
+                ancestorRecords ??= new List<Ancestor>();
+                propertyRecords ??= new List<PlaqueData.Models.Property>();
+
+                for (int i = 0; i < 12; i++) liveRecords.Add(new Live());
+                for (int i = 0; i < 6; i++) deadRecords.Add(new Dead());
+                for (int i = 0; i < 9; i++) ancestorRecords.Add(new Ancestor());
+                for (int i = 0; i < 3; i++) propertyRecords.Add(new PlaqueData.Models.Property());
 
                 string generatedPath = ContactListXpsPrinter.GenerateContactListXps(
                     outputXpsPath,

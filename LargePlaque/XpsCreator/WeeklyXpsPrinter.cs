@@ -95,6 +95,17 @@ public static class WeeklyXpsPrinter
                         pageCanvas.Children.Add(itemCanvas);
                     }
 
+                    var pageNumTb = new TextBlock
+                    {
+                        Text = $"{(i / itemsPerPage) + 1}",
+                        FontFamily = new FontFamily("SongTi"),
+                        FontSize = 14,
+                    };
+                    pageNumTb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                    Canvas.SetLeft(pageNumTb, a4WidthPx - pageNumTb.DesiredSize.Width - 15);
+                    Canvas.SetTop(pageNumTb, 10);
+                    pageCanvas.Children.Add(pageNumTb);
+
                     fixedPage.Children.Add(pageCanvas);
                     fixedPage.Measure(new Size(a4WidthPx, a4HeightPx));
                     fixedPage.Arrange(new Rect(new Point(), new Size(a4WidthPx, a4HeightPx)));
@@ -252,7 +263,7 @@ public static class WeeklyXpsPrinter
             var tb = new TextBlock
             {
                 Text        = text,
-                FontFamily  = new FontFamily("KaiTi"),
+                FontFamily  = new FontFamily("SongTi"),
                 FontSize    = fontSize,
                 TextWrapping = TextWrapping.Wrap,
                 Width       = boxHeightPx,   // will become height after rotation
@@ -286,7 +297,7 @@ public static class WeeklyXpsPrinter
                 var run = new Run(c.ToString());
                 var tb  = new TextBlock(run)
                 {
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize   = fontSize,
                 };
                 tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));

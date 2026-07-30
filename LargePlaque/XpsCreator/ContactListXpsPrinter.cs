@@ -175,7 +175,7 @@ namespace XpsCreator
                 var noRecordsBlock = new TextBlock
                 {
                     Text = "No records found.",
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize = 14.0 * 96.0 / 72.0,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 20, 0, 0)
@@ -211,7 +211,7 @@ namespace XpsCreator
             return new TextBlock
             {
                 Text = title,
-                FontFamily = new FontFamily("KaiTi"),
+                FontFamily = new FontFamily("SongTi"),
                 FontSize = 12.0 * 96.0 / 72.0,
                 FontWeight = FontWeights.Bold,
                 Margin = new Thickness(0, 10, 0, 3),
@@ -247,7 +247,7 @@ namespace XpsCreator
                 var textBlock = new TextBlock
                 {
                     Text = cellTexts[col],
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize = 10.0 * 96.0 / 72.0, // 10pt
                     FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
                     TextWrapping = TextWrapping.Wrap,
@@ -377,7 +377,7 @@ namespace XpsCreator
                 var titleBlock = new TextBlock
                 {
                     Text = titleText,
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize = 16.0 * 96.0 / 72.0, // 16pt font
                     FontWeight = FontWeights.Bold,
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -397,7 +397,7 @@ namespace XpsCreator
                 var pageNumberBlock = new TextBlock
                 {
                     Text = pageNumber.ToString(),
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize = 12.0 * 96.0 / 72.0,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 52.80, 0, 0)
@@ -608,7 +608,7 @@ namespace XpsCreator
                 var textBlock = new TextBlock
                 {
                     Text = cellTexts[col] ?? string.Empty,
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize = 26.0, // Font size is 26px
                     FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
                     TextWrapping = TextWrapping.Wrap,
@@ -689,7 +689,7 @@ namespace XpsCreator
                 var titleBlock = new TextBlock
                 {
                     Text = titleText,
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize = 28.0,
                     FontWeight = FontWeights.Bold,
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -709,7 +709,7 @@ namespace XpsCreator
                 var pageNumberBlock = new TextBlock
                 {
                     Text = pageNumber.ToString(),
-                    FontFamily = new FontFamily("KaiTi"),
+                    FontFamily = new FontFamily("SongTi"),
                     FontSize = 20.0,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 5, 0, 0)

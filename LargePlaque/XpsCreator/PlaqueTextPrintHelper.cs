@@ -22,7 +22,7 @@ public class PlaqueTextPrintHelper
         var tb = new TextBlock
         {
             Text          = name,
-            FontFamily    = new FontFamily("KaiTi"),
+            FontFamily    = new FontFamily("SongTi"),
             FontSize      = fontSize,
             TextWrapping  = TextWrapping.Wrap,
             Width         = boxHeightPx,
@@ -57,7 +57,7 @@ public class PlaqueTextPrintHelper
             var run = new Run(line);
             var tb = new TextBlock(run)
             {
-                FontFamily = new FontFamily("KaiTi"),
+                FontFamily = new FontFamily("SongTi"),
                 FontSize = fontSize,
             };
             tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));

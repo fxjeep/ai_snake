@@ -211,7 +211,7 @@ public static class VerticalTextRenderer
         var run = new Run(text);
         var textBlock = new TextBlock(run)
         {
-            FontFamily = new FontFamily("KaiTi"),
+            FontFamily = new FontFamily("SongTi"),
             FontSize = fontSize,
         };
 
@@ -315,7 +315,7 @@ public static class VerticalTextRenderer
         var run = new Run(text);
         var textBlock = new TextBlock(run)
         {
-            FontFamily = new FontFamily("KaiTi"),
+            FontFamily = new FontFamily("SongTi"),
             FontSize = fontSize,
         };
         textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -327,7 +327,7 @@ public static class VerticalTextRenderer
         var run = new Run(text);
         var textBlock = new TextBlock(run)
         {
-            FontFamily = new FontFamily("KaiTi"),
+            FontFamily = new FontFamily("SongTi"),
             FontSize = fontSize,
         };
         textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
