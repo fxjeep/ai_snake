@@ -1,0 +1,40 @@
+<Window x:Class="TaskNotesWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaskNotesWpf"
+        mc:Ignorable="d"
+        Title="Task Notes" Height="600" Width="400">
+    <Window.DataContext>
+        <local:MainViewModel />
+    </Window.DataContext>
+    <DockPanel Margin="10">
+        <CheckBox Content="Show Completed" IsChecked="{Binding ShowCompleted}" DockPanel.Dock="Top" Margin="0,0,0,10"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding VisibleTasks}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,0,0,8" Background="{Binding Background}">
+                            <TextBlock Text="{Binding DisplayTitle}" FontSize="18" FontWeight="Bold" Foreground="Black" TextWrapping="Wrap" />
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <EventTrigger RoutedEvent="MouseLeftButtonUp">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Duration="0:0:0">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                                <EventTrigger.Actions>
+                                    <BeginInvokeCommandAction Command="{Binding DataContext.OpenTaskCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                </EventTrigger.Actions>
+                            </EventTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
