@@ -7,6 +7,7 @@
         xmlns:vm="clr-namespace:TaskNotesWpf.ViewModels"
         mc:Ignorable="d"
         Title="Task Notes" Height="640" Width="460"
+        Icon="app.ico"
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica"
         WindowCornerPreference="Round">
@@ -14,7 +15,11 @@
         <vm:MainViewModel />
     </ui:FluentWindow.DataContext>
     <DockPanel>
-        <ui:TitleBar Title="Task Notes" DockPanel.Dock="Top" />
+        <ui:TitleBar Title="Task Notes" DockPanel.Dock="Top">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="/app.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
         <Grid DockPanel.Dock="Top" Margin="20,10,20,0">
             <Grid.ColumnDefinitions>
