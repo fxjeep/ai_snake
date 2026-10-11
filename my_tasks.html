@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Tasks</title>
+<style>
+:root{--bg:#f6f8fc;--card:#fff;--border:#dbe3f0;--text:#172b4d;--muted:#657a9c;--blue:#2463eb;--blue-bg:#e5efff;--green:#138765;--green-bg:#d9f5e9;--orange:#b66a00;--orange-bg:#fff0d7;--shadow:0 1px 2px #1c376012}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:1250px;margin:0 auto;padding:28px 24px 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}.brand{display:flex;align-items:center;gap:18px}.logo{width:48px;height:48px;color:#3479ed}.brand h1{margin:0;font-size:30px;letter-spacing:-.7px}.sub{color:var(--muted);margin-top:3px}.btn{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:9px;padding:10px 14px;font:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:hover{background:#f0f5ff;border-color:#b9c9e4}.btn-primary{background:var(--blue);border-color:var(--blue);color:white;padding:13px 18px;font-weight:650}.btn-primary:hover{background:#1e52c9}.tools{display:grid;grid-template-columns:1fr 220px;gap:16px;margin-bottom:22px}.search,.filter{height:50px;border:1px solid var(--border);border-radius:9px;background:white;padding:0 15px;font:inherit;color:var(--text);width:100%;outline:none}.search:focus,textarea:focus,input:focus,select:focus{border-color:#6c9cf7;box-shadow:0 0 0 3px #2d70ed18}.filter{cursor:pointer}.task-list{display:flex;flex-direction:column;gap:16px}.task{background:var(--card);border:1px solid var(--border);border-radius:11px;box-shadow:var(--shadow);overflow:hidden}.task-head{display:flex;align-items:center;gap:15px;padding:17px 20px;min-height:72px}.drag{color:#63799b;cursor:grab;font-size:20px;letter-spacing:-3px;padding:0 6px;user-select:none}.task-title{font-size:18px;font-weight:700;flex:1;min-width:0;border:1px solid transparent;background:transparent;color:var(--text);font:inherit;font-weight:700;padding:5px 7px;border-radius:6px}.task-title:focus{outline:none;border-color:#9dbcf5;background:#fff}.status{border:0;border-radius:20px;padding:7px 13px;font:inherit;font-weight:650;cursor:pointer;white-space:nowrap}.status.doing{color:var(--blue);background:var(--blue-bg)}.status.done{color:var(--green);background:var(--green-bg)}.status.hold{color:var(--orange);background:var(--orange-bg)}.chevron{border:0;background:transparent;color:#526b91;font-size:21px;cursor:pointer;padding:5px 0 5px 8px;width:28px}.task-body{border-top:1px solid #edf1f7;padding:18px 24px 22px}.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:25px}.field label{display:block;color:var(--muted);font-weight:650;margin:0 0 7px}.field textarea{display:block;width:100%;min-height:104px;resize:vertical;border:1px solid #cbd7e9;border-radius:8px;padding:10px 13px;font:inherit;line-height:1.55;color:var(--text);background:#fff;outline:none}.details textarea{min-height:126px}.attachment-row{display:flex;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}.thumb{width:118px;height:72px;border-radius:7px;object-fit:cover;border:1px solid var(--border);display:none}.thumb.visible{display:block}.file-label{cursor:pointer}.file-input{display:none}.updated{margin-left:auto;color:#7b8eac;font-size:13px}.icon-btn{width:42px;height:42px;padding:0;font-size:18px}.empty{padding:40px;text-align:center;color:var(--muted);background:white;border:1px dashed var(--border);border-radius:12px}.footer{color:var(--muted);font-size:12px;text-align:center;margin-top:22px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#18365e;color:white;padding:10px 16px;border-radius:8px;box-shadow:0 5px 20px #0002;opacity:0;pointer-events:none;transition:opacity .2s}.toast.show{opacity:1}
+@media(max-width:680px){.app{padding:18px 12px 32px}.brand{gap:10px}.brand h1{font-size:24px}.logo{width:38px;height:38px}.top{align-items:flex-start}.btn-primary{padding:10px 12px}.tools{grid-template-columns:1fr;gap:9px}.filter{height:44px}.task-head{padding:13px 12px;gap:7px}.task-title{font-size:16px;padding:5px 2px}.drag{padding:0 2px}.status{font-size:12px;padding:6px 9px}.task-body{padding:15px 13px 18px}.two-cols{grid-template-columns:1fr;gap:16px;margin-bottom:20px}.updated{width:100%;margin:0;order:5}.attachment-row .thumb{width:90px;height:60px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M16 9H11a4 4 0 0 0-4 4v27a3 3 0 0 0 3 3h28a3 3 0 0 0 3-3V13a4 4 0 0 0-4-4h-5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="16" y="4" width="16" height="10" rx="4" fill="white" stroke="currentColor" stroke-width="3"/><path d="M16 22h16M16 29h16M16 36h8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      <div><h1>My Tasks</h1><div class="sub" id="save-state">Saved locally</div></div>
+    </div>
+    <button class="btn btn-primary" id="add-task">＋ New Task</button>
+  </header>
+  <section class="tools">
+    <input class="search" id="search" type="search" placeholder="⌕  Search tasks...">
+    <select class="filter" id="filter" aria-label="Filter tasks"><option value="all">☷　All statuses</option><option value="doing">Doing</option><option value="hold">Hold</option><option value="done">Done</option></select>
+  </section>
+  <section class="task-list" id="task-list"></section>
+  <div class="footer">Your tasks are stored in this browser on this device. Use Export backup regularly to keep a copy.</div>
+  <div style="display:flex;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap">
+    <button class="btn" id="export">Export backup</button>
+    <button class="btn" id="import-btn">Import backup</button>
+    <input type="file" id="import-file" accept=".json,application/json" hidden>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+const KEY='myTasksApp_v1';
+const $=s=>document.querySelector(s);
+let tasks=[];
+let expanded=new Set();
+let saveTimer;
+const statusNames={doing:'Doing',done:'Done',hold:'Hold'};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+function load(){try{const data=JSON.parse(localStorage.getItem(KEY)||'null');if(Array.isArray(data))tasks=data;}catch(e){tasks=[]}
+if(!tasks.length){tasks=[
+{id:uid(),title:'Install hybrid flooring',status:'doing',stage:'Room measurements',next:'Plan the starting point around the stairs',details:'Check door clearance, floor level, and expansion gaps.',image:'',updated:Date.now()},
+{id:uid(),title:'Investigate wall cladding',status:'hold',stage:'Review existing reports',next:'Arrange laboratory testing for samples',details:'Collect relevant reports and confirm which cladding sections need testing.',image:'',updated:Date.now()},
+{id:uid(),title:'Repaint porch posts',status:'doing',stage:'Surface preparation',next:'Finish sanding and remove dust',details:'',image:'',updated:Date.now()},
+{id:uid(),title:'Install garage shelving',status:'done',stage:'Installation complete',next:'No further action',details:'',image:'',updated:Date.now()}
+];save();}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function save(){clearTimeout(saveTimer);$('#save-state').textContent='Saving…';saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(tasks));$('#save-state').textContent='Saved locally';}catch(e){$('#save-state').textContent='Storage full — export backup';toast('Could not save. Image may be too large; try a smaller image.')}},250)}
+function render(){const query=$('#search').value.trim().toLowerCase(),filter=$('#filter').value;
+const visible=tasks.filter(t=>(filter==='all'||t.status===filter)&&[t.title,t.stage,t.next,t.details].some(v=>(v||'').toLowerCase().includes(query)));
+const list=$('#task-list');
+if(!visible.length){list.innerHTML='<div class="empty">No tasks found. Add a task or change your search.</div>';return}
+list.innerHTML=visible.map(t=>{const open=expanded.has(t.id);return `<article class="task" data-id="${esc(t.id)}">
+<div class="task-head">
+<span class="drag" title="Use the arrows in the task menu to reorder">⠿</span>
+<input class="task-title" aria-label="Task title" value="${esc(t.title)}" data-field="title" title="Click to edit title">
+<button class="status ${t.status}" data-action="status" title="Click to change status">${statusNames[t.status]||'Doing'} ▾</button>
+<button class="chevron" data-action="toggle" aria-label="${open?'Collapse':'Expand'} task">${open?'⌃':'⌄'}</button>
+</div>
+${open?`<div class="task-body">
+<div class="two-cols">
+<div class="field"><label>Current Stage</label><textarea data-field="stage" placeholder="Where are you up to?">${esc(t.stage)}</textarea></div>
+<div class="field"><label>Next Task</label><textarea data-field="next" placeholder="What should you do next?">${esc(t.next)}</textarea></div>
+</div>
+<div class="field details"><label>Task Details</label><textarea data-field="details" placeholder="Write any notes, steps, measurements, links, or reminders...">${esc(t.details)}</textarea></div>
+<div class="attachment-row">
+<img class="thumb ${t.image?'visible':''}" ${t.image?`src="${t.image}"`:''} alt="Task image">
+<label class="btn file-label">▧　${t.image?'Change image':'Add image'}<input class="file-input" type="file" accept="image/*" data-action="image"></label>
+${t.image?'<button class="btn" data-action="remove-image">Remove image</button>':''}
+<span class="updated">Updated ${t.updated?new Date(t.updated).toLocaleString():'just now'}</span>
+<button class="btn icon-btn" data-action="up" title="Move task up" aria-label="Move task up">↑</button>
+<button class="btn icon-btn" data-action="down" title="Move task down" aria-label="Move task down">↓</button>
+<button class="btn icon-btn" data-action="delete" title="Delete task" aria-label="Delete task">⌫</button>
+</div></div>`:''}</article>`}).join('')}
+function updateTask(id,field,value){const t=tasks.find(t=>t.id===id);if(!t)return;t[field]=value;t.updated=Date.now();save();}
+$('#task-list').addEventListener('input',e=>{const field=e.target.dataset.field;if(!field)return;const card=e.target.closest('.task');updateTask(card.dataset.id,field,e.target.value);if(field==='title'){} });
+$('#task-list').addEventListener('change',async e=>{const card=e.target.closest('.task');if(!card)return;const id=card.dataset.id;
+if(e.target.matches('[data-action="image"]')){const file=e.target.files[0];if(!file)return;if(!file.type.startsWith('image/'))return toast('Please choose an image.');if(file.size>12*1024*1024)return toast('Please choose an image under 12 MB.');try{const data=await compressImage(file);updateTask(id,'image',data);render()}catch(err){toast('Could not load image.')}}
+});
+$('#task-list').addEventListener('click',e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const card=btn.closest('.task');if(!card)return;const id=card.dataset.id,t=tasks.find(x=>x.id===id);switch(btn.dataset.action){
+case'toggle':expanded.has(id)?expanded.delete(id):expanded.add(id);render();break;
+case'status':t.status=t.status==='doing'?'hold':t.status==='hold'?'done':'doing';t.updated=Date.now();save();render();break;
+case'remove-image':t.image='';t.updated=Date.now();save();render();break;
+case'delete':if(confirm(`Delete "${t.title}"? This cannot be undone unless you have a backup.`)){tasks=tasks.filter(x=>x.id!==id);expanded.delete(id);save();render()}break;
+case'up':move(id,-1);break;case'down':move(id,1);break;
+}});
+function move(id,delta){const i=tasks.findIndex(t=>t.id===id),j=i+delta;if(j<0||j>=tasks.length)return;[tasks[i],tasks[j]]=[tasks[j],tasks[i]];save();render()}
+async function compressImage(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=reject;reader.onload=()=>{const img=new Image();img.onerror=reject;img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',.78))};img.src=reader.result};reader.readAsDataURL(file)})}
+$('#add-task').addEventListener('click',()=>{const title=prompt('Task title:');if(title===null)return;const clean=title.trim();if(!clean)return toast('Please enter a task title.');const t={id:uid(),title:clean,status:'doing',stage:'',next:'',details:'',image:'',updated:Date.now()};tasks.unshift(t);expanded.add(t.id);save();render();const card=[...document.querySelectorAll('.task')].find(x=>x.dataset.id===t.id);card?.querySelector('.task-title')?.focus()});
+$('#search').addEventListener('input',render);$('#filter').addEventListener('change',render);
+$('#export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='my-tasks-backup.json';a.click();URL.revokeObjectURL(url);toast('Backup exported.')});
+$('#import-btn').addEventListener('click',()=>$('#import-file').click());
+$('#import-file').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data)||!data.every(t=>t&&typeof t.title==='string'))throw Error();if(!confirm(`Import ${data.length} tasks? This replaces your current list.`))return;tasks=data.map(t=>({...t,id:String(t.id||uid()),status:['doing','hold','done'].includes(t.status)?t.status:'doing',stage:String(t.stage||''),next:String(t.next||''),details:String(t.details||''),image:typeof t.image==='string'?t.image:'',updated:t.updated||Date.now()}));expanded=new Set();save();render();toast('Backup imported.')}catch(err){toast('Invalid backup file.')}finally{e.target.value=''}});
+load();render();
+})();
+</script>
+</body>
+</html>
